@@ -2729,7 +2729,7 @@ const struct BattleMove gBattleMoves[MOVES_COUNT_DYNAMAX] =
     [MOVE_EXPLOSION] =
     {
         .effect = EFFECT_EXPLOSION,
-        .power = 300,
+        .power = 250,
         .type = TYPE_NORMAL,
         .accuracy = 100,
         .pp = 5,
