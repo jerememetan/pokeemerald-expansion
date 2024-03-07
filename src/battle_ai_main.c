@@ -124,11 +124,11 @@ static u32 GetWildAiFlags(void)
         avgLevel = (GetMonData(&gEnemyParty[0], MON_DATA_LEVEL) + GetMonData(&gEnemyParty[1], MON_DATA_LEVEL)) / 2;
 
     flags |= AI_FLAG_CHECK_BAD_MOVE;
-    if (avgLevel >= 20)
+    if (avgLevel >= 5)
         flags |= AI_FLAG_CHECK_VIABILITY;
-    if (avgLevel >= 60)
+    if (avgLevel >= 10)
         flags |= AI_FLAG_PREFER_STRONGEST_MOVE;
-    if (avgLevel >= 80)
+    if (avgLevel >= 12)
         flags |= AI_FLAG_HP_AWARE;
 
 #if B_VAR_WILD_AI_FLAGS != 0
