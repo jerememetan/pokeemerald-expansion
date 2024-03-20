@@ -1447,10 +1447,4 @@ void Task_ItemUse_CloseMessageBoxAndReturnToField_VsSeeker(u8 taskId)
     Task_CloseCantUseKeyItemMessage(taskId);
 }
 
-void ItemUseOutOfBattle_Mints(u8 taskId)
-{
-    gItemUseCB = ItemUseCB_Mints;
-    SetUpItemUseCallback(taskId);
-}
-
 #undef tUsingRegisteredKeyItem
