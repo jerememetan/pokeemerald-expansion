@@ -191,7 +191,7 @@ Route111_EventScript_SetWinstratesNotDefeated::
 # 96 "data/maps/Route111/scripts.pory"
 Route111_EventScript_SetLayoutNoMirageTower::
 # 97 "data/maps/Route111/scripts.pory"
-	setmaplayoutindex LAYOUT_ROUTE111_NO_MIRAGE_TOWER
+	//setmaplayoutindex LAYOUT_ROUTE111_NO_MIRAGE_TOWER
 # 98 "data/maps/Route111/scripts.pory"
 	return
 # 99 "data/maps/Route111/scripts.pory"

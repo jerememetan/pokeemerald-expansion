@@ -408,6 +408,8 @@ PetalburgCity_Gym_EventScript_NormanBattle::
 PetalburgCity_Gym_EventScript_GiveFacade::
 	giveitem ITEM_TM_FACADE
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_BagIsFull
+	giveitem ITEM_MEGA_RING
+	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_BagIsFull
 	setflag FLAG_RECEIVED_TM_FACADE
 	msgbox PetalburgCity_Gym_Text_ExplainFacade, MSGBOX_DEFAULT
 	return
@@ -1297,7 +1299,9 @@ PetalburgCity_Gym_Text_ExplainFacade:
 	.string "the POKéMON is poisoned, paralyzed,\l"
 	.string "or burned.\p"
 	.string "It might be able to turn a bad\n"
-	.string "situation into an advantage.$"
+	.string "situation into an advantage.\p"
+	.string "The Mega Ring allows you to\n"
+	.string "Mega Evolve your POKéMON.$"
 
 PetalburgCity_Gym_Text_DadHappyAndSad:
 	.string "DAD: As the GYM LEADER, I can't\n"

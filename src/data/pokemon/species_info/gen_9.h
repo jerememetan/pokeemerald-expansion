@@ -621,8 +621,8 @@ const struct SpeciesInfo gSpeciesInfoGen9[] =
 
     [SPECIES_SPIDOPS] =
     {
-        .baseHP        = 60,
-        .baseAttack    = 79,
+        .baseHP        = 70,
+        .baseAttack    = 89,
         .baseDefense   = 92,
         .baseSpeed     = 35,
         .baseSpAttack  = 52,

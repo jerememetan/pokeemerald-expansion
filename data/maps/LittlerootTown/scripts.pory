@@ -7,7 +7,9 @@ raw `
 LittlerootTown_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, LittlerootTown_OnTransition
 	map_script MAP_SCRIPT_ON_FRAME_TABLE, LittlerootTown_OnFrame
+	map_script MAP_SCRIPT_ON_RESUME, LittlerootTown_OnResume
 	map_script MAP_SCRIPT_ON_WARP_INTO_MAP_TABLE, LittlerootTown_OnWarp
+
 	.byte 0
 
 	@ State descriptions for VAR_LITTLEROOT_TOWN_STATE
@@ -40,6 +42,16 @@ LittlerootTown_MapScripts::
 	@ 4: Received Pokedex
 
 
+LittlerootTown_OnResume::
+    call_if_set FLAG_SYS_CTRL_OBJ_DELETE, Littleroot_EventScript_TryRemoveDusclops
+	end
+
+Littleroot_EventScript_TryRemoveDusclops::
+    specialvar VAR_RESULT, GetBattleOutcome
+	goto_if_ne VAR_RESULT, B_OUTCOME_CAUGHT, Common_EventScript_NopReturn
+	removeobject VAR_LAST_TALKED
+	return
+
 LittlerootTown_OnTransition:
 	setflag FLAG_VISITED_LITTLEROOT_TOWN
 	call Common_EventScript_SetupRivalGfxId
@@ -52,11 +64,40 @@ LittlerootTown_OnTransition:
 	call_if_eq VAR_LITTLEROOT_RIVAL_STATE, 3, LittlerootTown_EventScript_SetRivalLeftForRoute103
 	call_if_eq VAR_DEX_UPGRADE_JOHTO_STARTER_STATE, 1, LittlerootTown_EventScript_HideMapNamePopup
 	call_if_eq VAR_DEX_UPGRADE_JOHTO_STARTER_STATE, 2, LittlerootTown_EventScript_LeftLabAfterDexUpgrade
+	call_if_unset FLAG_DEFEATED_DUSCLOPS_LITTLEROOT_TOWN, Littleroot_EventScritpt_ShowDusclops
 	end
+
+Littleroot_EventScritpt_ShowDusclops::
+    clearflag FLAG_DUSCLOPSTEST
+	return
 
 LittlerootTown_EventScript_LeftLabAfterDexUpgrade::
 	setvar VAR_DEX_UPGRADE_JOHTO_STARTER_STATE, 3
 	return
+
+LittlerootTown_EventScript_Dusclops::
+    lock
+	faceplayer
+	setwildbattle SPECIES_DUSCLOPS, 5
+	waitse
+	playmoncry SPECIES_DUSCLOPS, CRY_MODE_ENCOUNTER
+	delay 40
+	waitmoncry
+	setflag FLAG_SYS_CTRL_OBJ_DELETE
+	dowildbattle
+	clearflag FLAG_SYS_CTRL_OBJ_DELETE
+	specialvar VAR_RESULT, GetBattleOutcome
+	goto_if_eq VAR_RESULT, B_OUTCOME_WON, LittlerootTown_EventScripts_DefeatedDusclops
+	goto_if_eq VAR_RESULT, B_OUTCOME_RAN, LittlerootTown_EventScripts_DefeatedDusclops
+	goto_if_eq VAR_RESULT, B_OUTCOME_PLAYER_TELEPORTED, LittlerootTown_EventScripts_DefeatedDusclops
+	setflag FLAG_DEFEATED_DUSCLOPS_LITTLEROOT_TOWN
+	release
+	end
+
+LittlerootTown_EventScripts_DefeatedDusclops::
+	setflag FLAG_DEFEATED_DUSCLOPS_LITTLEROOT_TOWN
+	goto Common_EventScript_RemoveStaticPokemon
+	end
 
 LittlerootTown_EventScript_HideMapNamePopup::
 	setflag FLAG_HIDE_MAP_NAME_POPUP

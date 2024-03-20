@@ -22,6 +22,11 @@
       "map": "MAP_ROUTE117",
       "offset": 0,
       "direction": "right"
+    },
+    {
+      "map": "MAP_VERDANTURF_EXTENSION",
+      "offset": 9,
+      "direction": "down"
     }
   ],
   "object_events": [

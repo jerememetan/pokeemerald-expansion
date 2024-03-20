@@ -2,7 +2,7 @@ raw `
 .set LOCALID_CHALLENGE_BIKER, 21
 .set LOCALID_RIVAL, 28
 .set LOCALID_RIVAL_ON_BIKE, 29
-.set LOCALID_BIRCH, 36
+.set LOCALID_BIRCH, 34
 
 Route110_MapScripts::
 	map_script MAP_SCRIPT_ON_RESUME, Route110_OnResume

@@ -9,21 +9,21 @@ Route113_GlassWorkshop_MapScripts::
 # 5 "data/maps/Route113_GlassWorkshop/scripts.pory"
 
 # 6 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	.set BLUE_FLUTE_PRICE,   250
+	.set PIDGEOTITE_PRICE,   250
 # 7 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	.set YELLOW_FLUTE_PRICE, 500
+	.set AUDINITE_PRICE,     500
 # 8 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	.set RED_FLUTE_PRICE,    500
+	.set CAMERUPTITE_PRICE,  500
 # 9 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	.set WHITE_FLUTE_PRICE,  1000
+	.set BANETTITE_PRICE,  1500
 # 10 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	.set BLACK_FLUTE_PRICE,  1000
+	.set SHARPEDONITE_PRICE,  1500
 # 11 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	.set PRETTY_CHAIR_PRICE, 6000
+	.set STEELIXITE_PRICE, 2000
 # 12 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	.set PRETTY_DESK_PRICE,  8000
+	.set GARCHOMPITE_PPRICE,  5000
 # 13 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	.set LOWEST_ASH_PRICE,   BLUE_FLUTE_PRICE
+	.set LOWEST_ASH_PRICE,   PIDGEOTITE_PRICE
 # 14 "data/maps/Route113_GlassWorkshop/scripts.pory"
 
 # 15 "data/maps/Route113_GlassWorkshop/scripts.pory"
@@ -149,13 +149,13 @@ Route113_GlassWorkshop_EventScript_ChooseGlassItem::
 # 75 "data/maps/Route113_GlassWorkshop/scripts.pory"
 Route113_GlassWorkshop_EventScript_BlueFlute::
 # 76 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	setvar VAR_0x8008, ITEM_BLUE_FLUTE
+	setvar VAR_0x8008, ITEM_PIDGEOTITE
 # 77 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	bufferitemname STR_VAR_1, VAR_0x8008
 # 78 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	setvar VAR_0x800A, BLUE_FLUTE_PRICE
+	setvar VAR_0x800A, PIDGEOTITE_PRICE
 # 79 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	goto_if_lt VAR_ASH_GATHER_COUNT, BLUE_FLUTE_PRICE, Route113_GlassWorkshop_EventScript_NotEnoughAshForItem
+	goto_if_lt VAR_ASH_GATHER_COUNT, PIDGEOTITE_PRICE, Route113_GlassWorkshop_EventScript_NotEnoughAshForItem
 # 80 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	msgbox Route113_GlassWorkshop_Text_IsThatTheItemForYou, MSGBOX_YESNO
 # 81 "data/maps/Route113_GlassWorkshop/scripts.pory"
@@ -163,7 +163,7 @@ Route113_GlassWorkshop_EventScript_BlueFlute::
 # 82 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	setvar VAR_GLASS_WORKSHOP_STATE, 10
 # 83 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	subvar VAR_ASH_GATHER_COUNT, BLUE_FLUTE_PRICE
+	subvar VAR_ASH_GATHER_COUNT, PIDGEOTITE_PRICE
 # 84 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	goto Route113_GlassWorkshop_EventScript_MakeGlassItem
 # 85 "data/maps/Route113_GlassWorkshop/scripts.pory"
@@ -173,13 +173,13 @@ Route113_GlassWorkshop_EventScript_BlueFlute::
 # 87 "data/maps/Route113_GlassWorkshop/scripts.pory"
 Route113_GlassWorkshop_EventScript_YellowFlute::
 # 88 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	setvar VAR_0x8008, ITEM_YELLOW_FLUTE
+	setvar VAR_0x8008, ITEM_AUDINITE
 # 89 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	bufferitemname STR_VAR_1, VAR_0x8008
 # 90 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	setvar VAR_0x800A, YELLOW_FLUTE_PRICE
+	setvar VAR_0x800A, AUDINITE_PRICE
 # 91 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	goto_if_lt VAR_ASH_GATHER_COUNT, YELLOW_FLUTE_PRICE, Route113_GlassWorkshop_EventScript_NotEnoughAshForItem
+	goto_if_lt VAR_ASH_GATHER_COUNT, AUDINITE_PRICE, Route113_GlassWorkshop_EventScript_NotEnoughAshForItem
 # 92 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	msgbox Route113_GlassWorkshop_Text_IsThatTheItemForYou, MSGBOX_YESNO
 # 93 "data/maps/Route113_GlassWorkshop/scripts.pory"
@@ -187,7 +187,7 @@ Route113_GlassWorkshop_EventScript_YellowFlute::
 # 94 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	setvar VAR_GLASS_WORKSHOP_STATE, 11
 # 95 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	subvar VAR_ASH_GATHER_COUNT, YELLOW_FLUTE_PRICE
+	subvar VAR_ASH_GATHER_COUNT, AUDINITE_PRICE
 # 96 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	goto Route113_GlassWorkshop_EventScript_MakeGlassItem
 # 97 "data/maps/Route113_GlassWorkshop/scripts.pory"
@@ -197,13 +197,13 @@ Route113_GlassWorkshop_EventScript_YellowFlute::
 # 99 "data/maps/Route113_GlassWorkshop/scripts.pory"
 Route113_GlassWorkshop_EventScript_RedFlute::
 # 100 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	setvar VAR_0x8008, ITEM_RED_FLUTE
+	setvar VAR_0x8008, ITEM_CAMERUPTITE
 # 101 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	bufferitemname STR_VAR_1, VAR_0x8008
 # 102 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	setvar VAR_0x800A, RED_FLUTE_PRICE
+	setvar VAR_0x800A, CAMERUPTITE_PRICE
 # 103 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	goto_if_lt VAR_ASH_GATHER_COUNT, RED_FLUTE_PRICE, Route113_GlassWorkshop_EventScript_NotEnoughAshForItem
+	goto_if_lt VAR_ASH_GATHER_COUNT, CAMERUPTITE_PRICE, Route113_GlassWorkshop_EventScript_NotEnoughAshForItem
 # 104 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	msgbox Route113_GlassWorkshop_Text_IsThatTheItemForYou, MSGBOX_YESNO
 # 105 "data/maps/Route113_GlassWorkshop/scripts.pory"
@@ -211,7 +211,7 @@ Route113_GlassWorkshop_EventScript_RedFlute::
 # 106 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	setvar VAR_GLASS_WORKSHOP_STATE, 12
 # 107 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	subvar VAR_ASH_GATHER_COUNT, RED_FLUTE_PRICE
+	subvar VAR_ASH_GATHER_COUNT, CAMERUPTITE_PRICE
 # 108 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	goto Route113_GlassWorkshop_EventScript_MakeGlassItem
 # 109 "data/maps/Route113_GlassWorkshop/scripts.pory"
@@ -221,13 +221,13 @@ Route113_GlassWorkshop_EventScript_RedFlute::
 # 111 "data/maps/Route113_GlassWorkshop/scripts.pory"
 Route113_GlassWorkshop_EventScript_WhiteFlute::
 # 112 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	setvar VAR_0x8008, ITEM_WHITE_FLUTE
+	setvar VAR_0x8008, ITEM_BANETTITE
 # 113 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	bufferitemname STR_VAR_1, VAR_0x8008
 # 114 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	setvar VAR_0x800A, WHITE_FLUTE_PRICE
+	setvar VAR_0x800A, BANETTITE_PRICE
 # 115 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	goto_if_lt VAR_ASH_GATHER_COUNT, WHITE_FLUTE_PRICE, Route113_GlassWorkshop_EventScript_NotEnoughAshForItem
+	goto_if_lt VAR_ASH_GATHER_COUNT, BANETTITE_PRICE, Route113_GlassWorkshop_EventScript_NotEnoughAshForItem
 # 116 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	msgbox Route113_GlassWorkshop_Text_IsThatTheItemForYou, MSGBOX_YESNO
 # 117 "data/maps/Route113_GlassWorkshop/scripts.pory"
@@ -235,7 +235,7 @@ Route113_GlassWorkshop_EventScript_WhiteFlute::
 # 118 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	setvar VAR_GLASS_WORKSHOP_STATE, 13
 # 119 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	subvar VAR_ASH_GATHER_COUNT, WHITE_FLUTE_PRICE
+	subvar VAR_ASH_GATHER_COUNT, BANETTITE_PRICE
 # 120 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	goto Route113_GlassWorkshop_EventScript_MakeGlassItem
 # 121 "data/maps/Route113_GlassWorkshop/scripts.pory"
@@ -245,13 +245,13 @@ Route113_GlassWorkshop_EventScript_WhiteFlute::
 # 123 "data/maps/Route113_GlassWorkshop/scripts.pory"
 Route113_GlassWorkshop_EventScript_BlackFlute::
 # 124 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	setvar VAR_0x8008, ITEM_BLACK_FLUTE
+	setvar VAR_0x8008, ITEM_SHARPEDONITE 
 # 125 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	bufferitemname STR_VAR_1, VAR_0x8008
 # 126 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	setvar VAR_0x800A, BLACK_FLUTE_PRICE
+	setvar VAR_0x800A, SHARPEDONITE_PRICE
 # 127 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	goto_if_lt VAR_ASH_GATHER_COUNT, BLACK_FLUTE_PRICE, Route113_GlassWorkshop_EventScript_NotEnoughAshForItem
+	goto_if_lt VAR_ASH_GATHER_COUNT, SHARPEDONITE_PRICE, Route113_GlassWorkshop_EventScript_NotEnoughAshForItem
 # 128 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	msgbox Route113_GlassWorkshop_Text_IsThatTheItemForYou, MSGBOX_YESNO
 # 129 "data/maps/Route113_GlassWorkshop/scripts.pory"
@@ -259,7 +259,7 @@ Route113_GlassWorkshop_EventScript_BlackFlute::
 # 130 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	setvar VAR_GLASS_WORKSHOP_STATE, 14
 # 131 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	subvar VAR_ASH_GATHER_COUNT, BLACK_FLUTE_PRICE
+	subvar VAR_ASH_GATHER_COUNT, SHARPEDONITE_PRICE
 # 132 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	goto Route113_GlassWorkshop_EventScript_MakeGlassItem
 # 133 "data/maps/Route113_GlassWorkshop/scripts.pory"
@@ -269,494 +269,490 @@ Route113_GlassWorkshop_EventScript_BlackFlute::
 # 135 "data/maps/Route113_GlassWorkshop/scripts.pory"
 Route113_GlassWorkshop_EventScript_PrettyChair::
 # 136 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	setvar VAR_0x8009, 1
+	setvar VAR_0x8008, ITEM_STEELIXITE
 # 137 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	setvar VAR_0x8008, DECOR_PRETTY_CHAIR
+	bufferitemname STR_VAR_1, VAR_0x8008
 # 138 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	bufferdecorationname STR_VAR_1, VAR_0x8008
+	setvar VAR_0x800A, STEELIXITE_PRICE
 # 139 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	setvar VAR_0x800A, PRETTY_CHAIR_PRICE
+	goto_if_lt VAR_ASH_GATHER_COUNT, STEELIXITE_PRICE, Route113_GlassWorkshop_EventScript_NotEnoughAshForItem
 # 140 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	goto_if_lt VAR_ASH_GATHER_COUNT, PRETTY_CHAIR_PRICE, Route113_GlassWorkshop_EventScript_NotEnoughAshForItem
+	msgbox Route113_GlassWorkshop_Text_IsThatTheItemForYou, MSGBOX_YESNO
 # 141 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	msgbox Route113_GlassWorkshop_Text_IsThatTheItemForYou, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, Route113_GlassWorkshop_EventScript_ChooseDifferentItem
 # 142 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	goto_if_eq VAR_RESULT, NO, Route113_GlassWorkshop_EventScript_ChooseDifferentItem
-# 143 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	setvar VAR_GLASS_WORKSHOP_STATE, 15
+# 143 "data/maps/Route113_GlassWorkshop/scripts.pory"
+	subvar VAR_ASH_GATHER_COUNT, STEELIXITE_PRICE
 # 144 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	subvar VAR_ASH_GATHER_COUNT, PRETTY_CHAIR_PRICE
+	goto Route113_GlassWorkshop_EventScript_MakeGlassItem
 # 145 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	goto Route113_GlassWorkshop_EventScript_MakeGlassItem
+	end
 # 146 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	end
+
 # 147 "data/maps/Route113_GlassWorkshop/scripts.pory"
-
-# 148 "data/maps/Route113_GlassWorkshop/scripts.pory"
 Route113_GlassWorkshop_EventScript_PrettyDesk::
+# 148 "data/maps/Route113_GlassWorkshop/scripts.pory"
+	setvar VAR_0x8008, ITEM_GARCHOMPITE
 # 149 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	setvar VAR_0x8009, 1
+	bufferitemname STR_VAR_1, VAR_0x8008
 # 150 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	setvar VAR_0x8008, DECOR_PRETTY_DESK
+	setvar VAR_0x800A, GARCHOMPITE_PPRICE
 # 151 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	bufferdecorationname STR_VAR_1, VAR_0x8008
+	goto_if_lt VAR_ASH_GATHER_COUNT, GARCHOMPITE_PPRICE, Route113_GlassWorkshop_EventScript_NotEnoughAshForItem
 # 152 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	setvar VAR_0x800A, PRETTY_DESK_PRICE
-# 153 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	goto_if_lt VAR_ASH_GATHER_COUNT, PRETTY_DESK_PRICE, Route113_GlassWorkshop_EventScript_NotEnoughAshForItem
-# 154 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	msgbox Route113_GlassWorkshop_Text_IsThatTheItemForYou, MSGBOX_YESNO
-# 155 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 153 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	goto_if_eq VAR_RESULT, NO, Route113_GlassWorkshop_EventScript_ChooseDifferentItem
-# 156 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 154 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	setvar VAR_GLASS_WORKSHOP_STATE, 16
-# 157 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	subvar VAR_ASH_GATHER_COUNT, PRETTY_DESK_PRICE
-# 158 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 155 "data/maps/Route113_GlassWorkshop/scripts.pory"
+	subvar VAR_ASH_GATHER_COUNT, GARCHOMPITE_PPRICE
+# 156 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	goto Route113_GlassWorkshop_EventScript_MakeGlassItem
+# 157 "data/maps/Route113_GlassWorkshop/scripts.pory"
+	end
+# 158 "data/maps/Route113_GlassWorkshop/scripts.pory"
+
 # 159 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	end
-# 160 "data/maps/Route113_GlassWorkshop/scripts.pory"
-
-# 161 "data/maps/Route113_GlassWorkshop/scripts.pory"
 Route113_GlassWorkshop_EventScript_CancelGlassItemSelect::
-# 162 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 160 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	msgbox Route113_GlassWorkshop_Text_AllThatAshButDontWantAnything, MSGBOX_DEFAULT
+# 161 "data/maps/Route113_GlassWorkshop/scripts.pory"
+	release
+# 162 "data/maps/Route113_GlassWorkshop/scripts.pory"
+	end
 # 163 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	release
+
 # 164 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	end
-# 165 "data/maps/Route113_GlassWorkshop/scripts.pory"
-
-# 166 "data/maps/Route113_GlassWorkshop/scripts.pory"
 Route113_GlassWorkshop_EventScript_NotEnoughAsh::
-# 167 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 165 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	setvar VAR_0x800A, LOWEST_ASH_PRICE
-# 168 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 166 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	subvar VAR_0x800A, VAR_ASH_GATHER_COUNT
-# 169 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 167 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	buffernumberstring STR_VAR_1, VAR_0x800A
-# 170 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 168 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	msgbox Route113_GlassWorkshop_Text_NotEnoughAshNeedX, MSGBOX_DEFAULT
+# 169 "data/maps/Route113_GlassWorkshop/scripts.pory"
+	release
+# 170 "data/maps/Route113_GlassWorkshop/scripts.pory"
+	end
 # 171 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	release
+
 # 172 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	end
-# 173 "data/maps/Route113_GlassWorkshop/scripts.pory"
-
-# 174 "data/maps/Route113_GlassWorkshop/scripts.pory"
 Route113_GlassWorkshop_EventScript_NotEnoughAshForItem::
-# 175 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 173 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	subvar VAR_0x800A, VAR_ASH_GATHER_COUNT
-# 176 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 174 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	buffernumberstring STR_VAR_2, VAR_0x800A
-# 177 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 175 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	message Route113_GlassWorkshop_Text_NotEnoughAshToMakeItem
+# 176 "data/maps/Route113_GlassWorkshop/scripts.pory"
+	waitmessage
+# 177 "data/maps/Route113_GlassWorkshop/scripts.pory"
+	goto Route113_GlassWorkshop_EventScript_ChooseGlassItem
 # 178 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	waitmessage
+	end
 # 179 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	goto Route113_GlassWorkshop_EventScript_ChooseGlassItem
+
 # 180 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	end
-# 181 "data/maps/Route113_GlassWorkshop/scripts.pory"
-
-# 182 "data/maps/Route113_GlassWorkshop/scripts.pory"
 Route113_GlassWorkshop_EventScript_ChooseDifferentItem::
-# 183 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 181 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	message Route113_GlassWorkshop_Text_WhichWouldYouLike
-# 184 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 182 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	waitmessage
-# 185 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 183 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	goto Route113_GlassWorkshop_EventScript_ChooseGlassItem
+# 184 "data/maps/Route113_GlassWorkshop/scripts.pory"
+	end
+# 185 "data/maps/Route113_GlassWorkshop/scripts.pory"
+
 # 186 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	end
-# 187 "data/maps/Route113_GlassWorkshop/scripts.pory"
-
-# 188 "data/maps/Route113_GlassWorkshop/scripts.pory"
 Route113_GlassWorkshop_EventScript_MakeGlassItem::
-# 189 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 187 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	msgbox Route113_GlassWorkshop_Text_IllMakeItemForYou, MSGBOX_DEFAULT
-# 190 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 188 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	closemessage
-# 191 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 189 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	fadescreen FADE_TO_BLACK
-# 192 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 190 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	playse SE_SELECT
-# 193 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 191 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	delay 30
-# 194 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 192 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	fadescreen FADE_FROM_BLACK
+# 193 "data/maps/Route113_GlassWorkshop/scripts.pory"
+	msgbox Route113_GlassWorkshop_Text_IveFinishedGlassItem, MSGBOX_DEFAULT
+# 194 "data/maps/Route113_GlassWorkshop/scripts.pory"
+	call_if_eq VAR_0x8009, 0, Route113_GlassWorkshop_EventScript_GiveGlassFlute
 # 195 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	msgbox Route113_GlassWorkshop_Text_IveFinishedGlassItem, MSGBOX_DEFAULT
+	call_if_eq VAR_0x8009, 1, Route113_GlassWorkshop_EventScript_GiveGlassDecor
 # 196 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	call_if_eq VAR_0x8009, 0, Route113_GlassWorkshop_EventScript_GiveGlassFlute
+	setvar VAR_GLASS_WORKSHOP_STATE, 2
 # 197 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	call_if_eq VAR_0x8009, 1, Route113_GlassWorkshop_EventScript_GiveGlassDecor
+	release
 # 198 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	setvar VAR_GLASS_WORKSHOP_STATE, 2
+	end
 # 199 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	release
+
 # 200 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	end
-# 201 "data/maps/Route113_GlassWorkshop/scripts.pory"
-
-# 202 "data/maps/Route113_GlassWorkshop/scripts.pory"
 Route113_GlassWorkshop_EventScript_GiveGlassFlute::
-# 203 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 201 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	giveitem VAR_0x8008
-# 204 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 202 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	goto_if_eq VAR_RESULT, FALSE, Route113_GlassWorkshop_EventScript_NoRoomForFlute
+# 203 "data/maps/Route113_GlassWorkshop/scripts.pory"
+	return
+# 204 "data/maps/Route113_GlassWorkshop/scripts.pory"
+
 # 205 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	return
-# 206 "data/maps/Route113_GlassWorkshop/scripts.pory"
-
-# 207 "data/maps/Route113_GlassWorkshop/scripts.pory"
 Route113_GlassWorkshop_EventScript_GiveGlassDecor::
-# 208 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 206 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	givedecoration VAR_0x8008
-# 209 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 207 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	goto_if_eq VAR_RESULT, FALSE, Route113_GlassWorkshop_EventScript_NoRoomForDecor
-# 210 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 208 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	return
-# 211 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 209 "data/maps/Route113_GlassWorkshop/scripts.pory"
 
-# 212 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 210 "data/maps/Route113_GlassWorkshop/scripts.pory"
 Route113_GlassWorkshop_EventScript_NoRoomForFlute::
-# 213 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 211 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	call Common_EventScript_BagIsFull
-# 214 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 212 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	msgbox Route113_GlassWorkshop_Text_NoRoomInBag, MSGBOX_DEFAULT
+# 213 "data/maps/Route113_GlassWorkshop/scripts.pory"
+	release
+# 214 "data/maps/Route113_GlassWorkshop/scripts.pory"
+	end
 # 215 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	release
+
 # 216 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	end
-# 217 "data/maps/Route113_GlassWorkshop/scripts.pory"
-
-# 218 "data/maps/Route113_GlassWorkshop/scripts.pory"
 Route113_GlassWorkshop_EventScript_NoRoomForDecor::
-# 219 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 217 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	call Common_EventScript_NoRoomForDecor
-# 220 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 218 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	msgbox Route113_GlassWorkshop_Text_NoRoomInPC, MSGBOX_DEFAULT
+# 219 "data/maps/Route113_GlassWorkshop/scripts.pory"
+	release
+# 220 "data/maps/Route113_GlassWorkshop/scripts.pory"
+	end
 # 221 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	release
+
 # 222 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	end
-# 223 "data/maps/Route113_GlassWorkshop/scripts.pory"
-
-# 224 "data/maps/Route113_GlassWorkshop/scripts.pory"
 Route113_GlassWorkshop_EventScript_GiveItemAfterNoRoom::
-# 225 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 223 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	switch VAR_GLASS_WORKSHOP_STATE
+# 224 "data/maps/Route113_GlassWorkshop/scripts.pory"
+	case 10, Route113_GlassWorkshop_EventScript_GivePidgeotite
+# 225 "data/maps/Route113_GlassWorkshop/scripts.pory"
+	case 11, Route113_GlassWorkshop_EventScript_GiveAudinite
 # 226 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	case 10, Route113_GlassWorkshop_EventScript_GiveBlueFlute
+	case 12, Route113_GlassWorkshop_EventScript_GiveCameruptite
 # 227 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	case 11, Route113_GlassWorkshop_EventScript_GiveYellowFlute
+	case 13, Route113_GlassWorkshop_EventScript_GiveBanettite
 # 228 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	case 12, Route113_GlassWorkshop_EventScript_GiveRedFlute
+	case 14, Route113_GlassWorkshop_EventScript_GiveSharpedonite
 # 229 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	case 13, Route113_GlassWorkshop_EventScript_GiveWhiteFlute
+	case 15, Route113_GlassWorkshop_EventScript_GiveSteelixite
 # 230 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	case 14, Route113_GlassWorkshop_EventScript_GiveBlackFlute
+	case 16, Route113_GlassWorkshop_EventScript_GiveGarchompite
 # 231 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	case 15, Route113_GlassWorkshop_EventScript_GivePrettyChair
+	end
 # 232 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	case 16, Route113_GlassWorkshop_EventScript_GivePrettyDesk
+
 # 233 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	end
+Route113_GlassWorkshop_EventScript_GivePidgeotite::
 # 234 "data/maps/Route113_GlassWorkshop/scripts.pory"
-
+	setvar VAR_0x8009, 0
 # 235 "data/maps/Route113_GlassWorkshop/scripts.pory"
-Route113_GlassWorkshop_EventScript_GiveBlueFlute::
+	setvar VAR_0x8008, ITEM_PIDGEOTITE
 # 236 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	setvar VAR_0x8009, 0
+	bufferitemname STR_VAR_1, VAR_0x8008
 # 237 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	setvar VAR_0x8008, ITEM_BLUE_FLUTE
+	goto Route113_GlassWorkshop_EventScript_TryGiveItemAgain
 # 238 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	bufferitemname STR_VAR_1, VAR_0x8008
+	end
 # 239 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	goto Route113_GlassWorkshop_EventScript_TryGiveItemAgain
+
 # 240 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	end
+Route113_GlassWorkshop_EventScript_GiveAudinite::
 # 241 "data/maps/Route113_GlassWorkshop/scripts.pory"
-
+	setvar VAR_0x8009, 0
 # 242 "data/maps/Route113_GlassWorkshop/scripts.pory"
-Route113_GlassWorkshop_EventScript_GiveYellowFlute::
+	setvar VAR_0x8008, ITEM_AUDINITE
 # 243 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	setvar VAR_0x8009, 0
+	bufferitemname STR_VAR_1, VAR_0x8008
 # 244 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	setvar VAR_0x8008, ITEM_YELLOW_FLUTE
+	goto Route113_GlassWorkshop_EventScript_TryGiveItemAgain
 # 245 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	bufferitemname STR_VAR_1, VAR_0x8008
+	end
 # 246 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	goto Route113_GlassWorkshop_EventScript_TryGiveItemAgain
+
 # 247 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	end
+Route113_GlassWorkshop_EventScript_GiveCameruptite::
 # 248 "data/maps/Route113_GlassWorkshop/scripts.pory"
-
+	setvar VAR_0x8009, 0
 # 249 "data/maps/Route113_GlassWorkshop/scripts.pory"
-Route113_GlassWorkshop_EventScript_GiveRedFlute::
+	setvar VAR_0x8008, ITEM_CAMERUPTITE
 # 250 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	setvar VAR_0x8009, 0
+	bufferitemname STR_VAR_1, VAR_0x8008
 # 251 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	setvar VAR_0x8008, ITEM_RED_FLUTE
+	goto Route113_GlassWorkshop_EventScript_TryGiveItemAgain
 # 252 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	bufferitemname STR_VAR_1, VAR_0x8008
+	end
 # 253 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	goto Route113_GlassWorkshop_EventScript_TryGiveItemAgain
+
 # 254 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	end
+Route113_GlassWorkshop_EventScript_GiveBanettite::
 # 255 "data/maps/Route113_GlassWorkshop/scripts.pory"
-
+	setvar VAR_0x8009, 0
 # 256 "data/maps/Route113_GlassWorkshop/scripts.pory"
-Route113_GlassWorkshop_EventScript_GiveWhiteFlute::
+	setvar VAR_0x8008, ITEM_BANETTITE
 # 257 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	setvar VAR_0x8009, 0
+	bufferitemname STR_VAR_1, VAR_0x8008
 # 258 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	setvar VAR_0x8008, ITEM_WHITE_FLUTE
+	goto Route113_GlassWorkshop_EventScript_TryGiveItemAgain
 # 259 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	bufferitemname STR_VAR_1, VAR_0x8008
+	end
 # 260 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	goto Route113_GlassWorkshop_EventScript_TryGiveItemAgain
+
 # 261 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	end
+Route113_GlassWorkshop_EventScript_GiveSharpedonite::
 # 262 "data/maps/Route113_GlassWorkshop/scripts.pory"
-
-# 263 "data/maps/Route113_GlassWorkshop/scripts.pory"
-Route113_GlassWorkshop_EventScript_GiveBlackFlute::
-# 264 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	setvar VAR_0x8009, 0
-# 265 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	setvar VAR_0x8008, ITEM_BLACK_FLUTE
-# 266 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 263 "data/maps/Route113_GlassWorkshop/scripts.pory"
+	setvar VAR_0x8008, ITEM_SHARPEDONITE
+# 264 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	bufferitemname STR_VAR_1, VAR_0x8008
+# 265 "data/maps/Route113_GlassWorkshop/scripts.pory"
+	goto Route113_GlassWorkshop_EventScript_TryGiveItemAgain
+# 266 "data/maps/Route113_GlassWorkshop/scripts.pory"
+	end
 # 267 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	goto Route113_GlassWorkshop_EventScript_TryGiveItemAgain
+
 # 268 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	end
+Route113_GlassWorkshop_EventScript_GiveSteelixite::
 # 269 "data/maps/Route113_GlassWorkshop/scripts.pory"
-
+	setvar VAR_0x8009, 0
 # 270 "data/maps/Route113_GlassWorkshop/scripts.pory"
-Route113_GlassWorkshop_EventScript_GivePrettyChair::
+	setvar VAR_0x8008, ITEM_STEELIXITE
 # 271 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	setvar VAR_0x8009, 1
+	bufferitemname STR_VAR_1, VAR_0x8008
 # 272 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	setvar VAR_0x8008, DECOR_PRETTY_CHAIR
+	goto Route113_GlassWorkshop_EventScript_TryGiveItemAgain
 # 273 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	bufferdecorationname STR_VAR_1, DECOR_PRETTY_CHAIR
+	end
 # 274 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	goto Route113_GlassWorkshop_EventScript_TryGiveItemAgain
+
 # 275 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	end
+Route113_GlassWorkshop_EventScript_GiveGarchompite::
 # 276 "data/maps/Route113_GlassWorkshop/scripts.pory"
-
+	setvar VAR_0x8009, 0
 # 277 "data/maps/Route113_GlassWorkshop/scripts.pory"
-Route113_GlassWorkshop_EventScript_GivePrettyDesk::
+	setvar VAR_0x8008, ITEM_GARCHOMPITE
 # 278 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	setvar VAR_0x8009, 1
+	bufferitemname STR_VAR_1, VAR_0x8008
 # 279 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	setvar VAR_0x8008, DECOR_PRETTY_DESK
-# 280 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	bufferdecorationname STR_VAR_1, DECOR_PRETTY_DESK
-# 281 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	goto Route113_GlassWorkshop_EventScript_TryGiveItemAgain
+# 280 "data/maps/Route113_GlassWorkshop/scripts.pory"
+	end
+# 281 "data/maps/Route113_GlassWorkshop/scripts.pory"
+
 # 282 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	end
-# 283 "data/maps/Route113_GlassWorkshop/scripts.pory"
-
-# 284 "data/maps/Route113_GlassWorkshop/scripts.pory"
 Route113_GlassWorkshop_EventScript_TryGiveItemAgain::
-# 285 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 283 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	msgbox Route113_GlassWorkshop_Text_IveFinishedGlassItem, MSGBOX_DEFAULT
-# 286 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 284 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	call_if_eq VAR_0x8009, 0, Route113_GlassWorkshop_EventScript_GiveGlassFlute
-# 287 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 285 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	call_if_eq VAR_0x8009, 1, Route113_GlassWorkshop_EventScript_GiveGlassDecor
-# 288 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 286 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	setvar VAR_GLASS_WORKSHOP_STATE, 2
-# 289 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 287 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	release
+# 288 "data/maps/Route113_GlassWorkshop/scripts.pory"
+	end
+# 289 "data/maps/Route113_GlassWorkshop/scripts.pory"
+
 # 290 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	end
-# 291 "data/maps/Route113_GlassWorkshop/scripts.pory"
-
-# 292 "data/maps/Route113_GlassWorkshop/scripts.pory"
 Route113_GlassWorkshop_EventScript_NinjaBoy::
-# 293 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 291 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	msgbox Route113_GlassWorkshop_Text_FunToBlowGlassFlute, MSGBOX_NPC
-# 294 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 292 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	end
-# 295 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 293 "data/maps/Route113_GlassWorkshop/scripts.pory"
 
-# 296 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 294 "data/maps/Route113_GlassWorkshop/scripts.pory"
 Route113_GlassWorkshop_Text_GoCollectAshWithThis:
-# 297 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 295 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "This area is covered in volcanic ash,\n"
-# 298 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 296 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "huff-puff!\p"
-# 299 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 297 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "I'm specially gifted, huff-puff.\p"
-# 300 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 298 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "I make glass out of volcanic ash\n"
-# 301 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 299 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "and make items, huff-puff.\p"
-# 302 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 300 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "Go collect ashes with this, huff-puff.$"
-# 303 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 301 "data/maps/Route113_GlassWorkshop/scripts.pory"
 
-# 304 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 302 "data/maps/Route113_GlassWorkshop/scripts.pory"
 Route113_GlassWorkshop_Text_ExplainSootSack:
-# 305 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 303 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "Just take that SOOT SACK and walk\n"
-# 306 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 304 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "through piles of ash, huff-puff.\p"
-# 307 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 305 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "And it will fill up with the volcanic ash,\n"
-# 308 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 306 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "huff-puff.\p"
-# 309 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 307 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "Once you think you've collected a good\n"
-# 310 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 308 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "amount, come see me, huff-puff.$"
-# 311 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 309 "data/maps/Route113_GlassWorkshop/scripts.pory"
 
-# 312 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 310 "data/maps/Route113_GlassWorkshop/scripts.pory"
 Route113_GlassWorkshop_Text_LetsSeeCollectedAshes:
-# 313 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 311 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "Have you collected ashes, huff-puff?\n"
-# 314 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 312 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "Let me see, huff-puff.$"
-# 315 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 313 "data/maps/Route113_GlassWorkshop/scripts.pory"
 
-# 316 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 314 "data/maps/Route113_GlassWorkshop/scripts.pory"
 Route113_GlassWorkshop_Text_NotEnoughAshNeedX:
-# 317 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 315 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "Hmmm…\n"
-# 318 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 316 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "There's not enough ash here, huff-puff.\l"
-# 319 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 317 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "I can't make glass with this, huff-puff.\p"
-# 320 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 318 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "Let's see… {STR_VAR_1} is the number of steps\n"
-# 321 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 319 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "you'll need to walk for me to make you\l"
+# 320 "data/maps/Route113_GlassWorkshop/scripts.pory"
+	.string "a Pidgeotite, huff-puff.$"
+# 321 "data/maps/Route113_GlassWorkshop/scripts.pory"
+
 # 322 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	.string "a BLUE FLUTE, huff-puff.$"
-# 323 "data/maps/Route113_GlassWorkshop/scripts.pory"
-
-# 324 "data/maps/Route113_GlassWorkshop/scripts.pory"
 Route113_GlassWorkshop_Text_WhichGlassItemWoudYouLike:
-# 325 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 323 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "Oh!\n"
-# 326 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 324 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "You've got a lot of ashes, huff-puff!\p"
+# 325 "data/maps/Route113_GlassWorkshop/scripts.pory"
+	.string "I'll make you a Mega Stone, huff-puff!\n"
+# 326 "data/maps/Route113_GlassWorkshop/scripts.pory"
+	.string "Which one would you like, huff-puff?$"
 # 327 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	.string "I'll make you a glass item, huff-puff!\n"
+
 # 328 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	.string "Which one would you like, huff-puff?$"
-# 329 "data/maps/Route113_GlassWorkshop/scripts.pory"
-
-# 330 "data/maps/Route113_GlassWorkshop/scripts.pory"
 Route113_GlassWorkshop_Text_IsThatTheItemForYou:
-# 331 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 329 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "A {STR_VAR_1}, huff-puff?\n"
-# 332 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 330 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "Is that the one for you, huff-puff?$"
-# 333 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 331 "data/maps/Route113_GlassWorkshop/scripts.pory"
 
-# 334 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 332 "data/maps/Route113_GlassWorkshop/scripts.pory"
 Route113_GlassWorkshop_Text_WhichWouldYouLike:
-# 335 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 333 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "Which one would you like, huff-puff?$"
-# 336 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 334 "data/maps/Route113_GlassWorkshop/scripts.pory"
 
-# 337 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 335 "data/maps/Route113_GlassWorkshop/scripts.pory"
 Route113_GlassWorkshop_Text_IllMakeItemForYou:
-# 338 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 336 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "A {STR_VAR_1} it is, then, huff-puff!\p"
-# 339 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 337 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "Okay! I'll make it for you, huff-puff.\n"
-# 340 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 338 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "Just wait a little while, huff-puff.$"
-# 341 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 339 "data/maps/Route113_GlassWorkshop/scripts.pory"
 
-# 342 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 340 "data/maps/Route113_GlassWorkshop/scripts.pory"
 Route113_GlassWorkshop_Text_NotEnoughAshToMakeItem:
-# 343 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 341 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "A {STR_VAR_1}, huff-puff?\p"
-# 344 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 342 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "There's not enough ash here to make\n"
-# 345 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 343 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "that, though, huff-puff.\p"
-# 346 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 344 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "Let's see… {STR_VAR_2} is the number of steps\n"
-# 347 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 345 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "you'll need to walk through volcanic ash\l"
-# 348 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 346 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "for me to make that item, huff-puff.\p"
-# 349 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 347 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "Which item would you rather have me\n"
-# 350 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 348 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "make instead, huff-puff?$"
-# 351 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 349 "data/maps/Route113_GlassWorkshop/scripts.pory"
 
-# 352 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 350 "data/maps/Route113_GlassWorkshop/scripts.pory"
 Route113_GlassWorkshop_Text_AllThatAshButDontWantAnything:
-# 353 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 351 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "You've collected all that ash, but you\n"
-# 354 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 352 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "don't want anything, huff-puff?$"
-# 355 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 353 "data/maps/Route113_GlassWorkshop/scripts.pory"
 
-# 356 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 354 "data/maps/Route113_GlassWorkshop/scripts.pory"
 Route113_GlassWorkshop_Text_IveFinishedGlassItem:
-# 357 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 355 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "Ah, I've finished your {STR_VAR_1}.\n"
-# 358 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 356 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "Take it, huff-puff.$"
-# 359 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 357 "data/maps/Route113_GlassWorkshop/scripts.pory"
 
-# 360 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 358 "data/maps/Route113_GlassWorkshop/scripts.pory"
 Route113_GlassWorkshop_Text_NoRoomInBag:
-# 361 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 359 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "Oh?\n"
-# 362 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 360 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "You've no room in your BAG, huff-puff.\p"
+# 361 "data/maps/Route113_GlassWorkshop/scripts.pory"
+	.string "I'll hold on to it, so come back later,\n"
+# 362 "data/maps/Route113_GlassWorkshop/scripts.pory"
+	.string "huff-puff.$"
 # 363 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	.string "I'll hold on to it, so come back later,\n"
+
 # 364 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	.string "huff-puff.$"
-# 365 "data/maps/Route113_GlassWorkshop/scripts.pory"
-
-# 366 "data/maps/Route113_GlassWorkshop/scripts.pory"
 Route113_GlassWorkshop_Text_NoRoomInPC:
-# 367 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 365 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "Oh?\n"
-# 368 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 366 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "You've no room in your PC, huff-puff?\p"
-# 369 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 367 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "I'll hold on to it, so come back later,\n"
-# 370 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 368 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "huff-puff.$"
-# 371 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 369 "data/maps/Route113_GlassWorkshop/scripts.pory"
 
-# 372 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 370 "data/maps/Route113_GlassWorkshop/scripts.pory"
 Route113_GlassWorkshop_Text_HaventGotYourSootSack:
-# 373 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 371 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "Hah? You haven't got your SOOT SACK\n"
-# 374 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 372 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "with you, huff-puff.\p"
-# 375 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 373 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "You have to keep it with you to collect\n"
-# 376 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 374 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "volcanic ash, huff-puff.$"
-# 377 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 375 "data/maps/Route113_GlassWorkshop/scripts.pory"
 
-# 378 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 376 "data/maps/Route113_GlassWorkshop/scripts.pory"
 Route113_GlassWorkshop_Text_FunToBlowGlassFlute:
-# 379 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 377 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "It's fun to blow a glass flute while\n"
-# 380 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 378 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "my boss is talking.\p"
-# 381 "data/maps/Route113_GlassWorkshop/scripts.pory"
+# 379 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.string "Huff-huff! Puff-puff!$"

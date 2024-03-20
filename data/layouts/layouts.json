@@ -4410,6 +4410,26 @@
       "secondary_tileset": "gTileset_MysteryEventsHouse",
       "border_filepath": "data/layouts/SootopolisCity_MysteryEventsHouse_1F_StairsUnblocked/border.bin",
       "blockdata_filepath": "data/layouts/SootopolisCity_MysteryEventsHouse_1F_StairsUnblocked/map.bin"
+    },
+    {
+      "id": "LAYOUT_VERDANTURF_EXTENSION",
+      "name": "Verdanturf_Extension_Layout",
+      "width": 10,
+      "height": 20,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Mauville",
+      "border_filepath": "data/layouts/Verdanturf_Extension/border.bin",
+      "blockdata_filepath": "data/layouts/Verdanturf_Extension/map.bin"
+    },
+    {
+      "id": "LAYOUT_LITTLEROOT_EXTENSION",
+      "name": "Littleroot_Extension_Layout",
+      "width": 8,
+      "height": 10,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Petalburg",
+      "border_filepath": "data/layouts/Littleroot_Extension/border.bin",
+      "blockdata_filepath": "data/layouts/Littleroot_Extension/map.bin"
     }
   ]
 }

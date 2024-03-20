@@ -7,7 +7,7 @@
 # 4 "data/maps/Route110/scripts.pory"
 .set LOCALID_RIVAL_ON_BIKE, 29
 # 5 "data/maps/Route110/scripts.pory"
-.set LOCALID_BIRCH, 36
+.set LOCALID_BIRCH, 34
 # 6 "data/maps/Route110/scripts.pory"
 
 # 7 "data/maps/Route110/scripts.pory"

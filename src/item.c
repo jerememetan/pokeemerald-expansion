@@ -218,7 +218,7 @@ bool8 CheckBagHasSpace(u16 itemId, u16 count)
             ownedCount = GetBagItemQuantity(&gBagPockets[pocket].itemSlots[i].quantity);
             if (ownedCount + count <= slotCapacity)
                 return TRUE;
-            if (pocket == TMHM_POCKET || pocket == BERRIES_POCKET)
+            if (pocket == ITEMS_POCKET || pocket == MEDICINE_POCKET || pocket == BALLS_POCKET || pocket == BATTLEITEMS_POCKET || pocket == BERRIES_POCKET || pocket == TREASURES_POCKET || pocket == MEGASTONES_POCKET || pocket == ZCRYSTALS_POCKET || pocket == TMHM_POCKET )
                 return FALSE;
             count -= (slotCapacity - ownedCount);
             if (count == 0)
@@ -235,7 +235,7 @@ bool8 CheckBagHasSpace(u16 itemId, u16 count)
             {
                 if (count > slotCapacity)
                 {
-                    if (pocket == TMHM_POCKET || pocket == BERRIES_POCKET)
+                    if (pocket == ITEMS_POCKET || pocket == MEDICINE_POCKET || pocket == BALLS_POCKET || pocket == BATTLEITEMS_POCKET || pocket == BERRIES_POCKET || pocket == TREASURES_POCKET || pocket == MEGASTONES_POCKET || pocket == ZCRYSTALS_POCKET || pocket == TMHM_POCKET )
                         return FALSE;
                     count -= slotCapacity;
                 }
@@ -299,7 +299,7 @@ bool8 AddBagItem(u16 itemId, u16 count)
                 else
                 {
                     // try creating another instance of the item if possible
-                    if (pocket == TMHM_POCKET || pocket == BERRIES_POCKET)
+                    if (pocket == ITEMS_POCKET || pocket == MEDICINE_POCKET || pocket == BALLS_POCKET || pocket == BATTLEITEMS_POCKET || pocket == BERRIES_POCKET || pocket == TREASURES_POCKET || pocket == MEGASTONES_POCKET || pocket == ZCRYSTALS_POCKET || pocket == TMHM_POCKET )
                     {
                         Free(newItems);
                         return FALSE;
@@ -330,7 +330,7 @@ bool8 AddBagItem(u16 itemId, u16 count)
                     if (count > slotCapacity)
                     {
                         // try creating a new slot with max capacity if duplicates are possible
-                        if (pocket == TMHM_POCKET || pocket == BERRIES_POCKET)
+                        if (pocket == ITEMS_POCKET || pocket == MEDICINE_POCKET || pocket == BALLS_POCKET || pocket == BATTLEITEMS_POCKET || pocket == BERRIES_POCKET || pocket == TREASURES_POCKET || pocket == MEGASTONES_POCKET || pocket == ZCRYSTALS_POCKET || pocket == TMHM_POCKET )
                         {
                             Free(newItems);
                             return FALSE;
@@ -690,7 +690,7 @@ u16 CountTotalItemQuantityInBag(u16 itemId)
 {
     u16 i;
     u16 ownedCount = 0;
-    struct BagPocket *bagPocket = &gBagPockets[ItemId_GetPocket(itemId) - 1];
+    struct BagPocket *bagPocket = &gBagPockets[ItemId_GetPocket(itemId)- 1];
 
     for (i = 0; i < bagPocket->capacity; i++)
     {

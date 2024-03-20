@@ -1701,11 +1701,11 @@ RustboroCity_EventScript_MayEncounter::
 # 851 "data/maps/RustboroCity/scripts.pory"
 	setvar VAR_0x8008, 0
 # 852 "data/maps/RustboroCity/scripts.pory"
-	msgbox RustboroCity_Text_MayPassedBrineyWantToBattle, MSGBOX_YESNO
+	msgbox RustboroCity_Text_MayPassedBrineyWantToBattle, MSGBOX_DEFAULT
 # 853 "data/maps/RustboroCity/scripts.pory"
-	goto_if_eq VAR_RESULT, YES, RustboroCity_EventScript_BattleMay
+	goto RustboroCity_EventScript_BattleMay
 # 854 "data/maps/RustboroCity/scripts.pory"
-	msgbox RustboroCity_Text_MayOhHaventRaisedPokemonEnough, MSGBOX_DEFAULT
+	//msgbox RustboroCity_Text_MayOhHaventRaisedPokemonEnough, MSGBOX_DEFAULT
 # 855 "data/maps/RustboroCity/scripts.pory"
 	call RustboroCity_EventScript_RestoreBgm
 # 856 "data/maps/RustboroCity/scripts.pory"
@@ -1835,11 +1835,11 @@ RustboroCity_EventScript_BrendanEncounter::
 # 918 "data/maps/RustboroCity/scripts.pory"
 	setvar VAR_ROUTE104_STATE, 2
 # 919 "data/maps/RustboroCity/scripts.pory"
-	msgbox RustboroCity_Text_BrendanPassedBrineyWantToBattle, MSGBOX_YESNO
+	msgbox RustboroCity_Text_BrendanPassedBrineyWantToBattle, MSGBOX_DEFAULT
 # 920 "data/maps/RustboroCity/scripts.pory"
-	goto_if_eq VAR_RESULT, YES, RustboroCity_EventScript_BattleBrendan
+	goto RustboroCity_EventScript_BattleBrendan
 # 921 "data/maps/RustboroCity/scripts.pory"
-	msgbox RustboroCity_Text_BrendanNoConfidenceInPokemon, MSGBOX_DEFAULT
+	//msgbox RustboroCity_Text_BrendanNoConfidenceInPokemon, MSGBOX_DEFAULT
 # 922 "data/maps/RustboroCity/scripts.pory"
 	call RustboroCity_EventScript_RestoreBgm
 # 923 "data/maps/RustboroCity/scripts.pory"
@@ -2313,7 +2313,7 @@ RustboroCity_Text_MayPassedBrineyWantToBattle:
 # 1157 "data/maps/RustboroCity/scripts.pory"
 	.string "So…\n"
 # 1158 "data/maps/RustboroCity/scripts.pory"
-	.string "How about a little battle?$"
+	.string "Let Battle!$"
 # 1159 "data/maps/RustboroCity/scripts.pory"
 
 # 1160 "data/maps/RustboroCity/scripts.pory"
@@ -2407,9 +2407,9 @@ RustboroCity_Text_BrendanPassedBrineyWantToBattle:
 # 1204 "data/maps/RustboroCity/scripts.pory"
 	.string "Mine rules.\p"
 # 1205 "data/maps/RustboroCity/scripts.pory"
-	.string "Want to have a battle to test how\n"
+	.string "Lets battle to test how\n"
 # 1206 "data/maps/RustboroCity/scripts.pory"
-	.string "far you've progressed?$"
+	.string "far you've progressed!$"
 # 1207 "data/maps/RustboroCity/scripts.pory"
 
 # 1208 "data/maps/RustboroCity/scripts.pory"
