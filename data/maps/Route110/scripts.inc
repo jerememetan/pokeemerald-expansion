@@ -1,11 +1,11 @@
 # 1 "data/maps/Route110/scripts.pory"
 
 # 2 "data/maps/Route110/scripts.pory"
-.set LOCALID_CHALLENGE_BIKER, 21
+.set LOCALID_CHALLENGE_BIKER, 20
 # 3 "data/maps/Route110/scripts.pory"
-.set LOCALID_RIVAL, 28
+.set LOCALID_RIVAL, 27
 # 4 "data/maps/Route110/scripts.pory"
-.set LOCALID_RIVAL_ON_BIKE, 29
+.set LOCALID_RIVAL_ON_BIKE, 28
 # 5 "data/maps/Route110/scripts.pory"
 .set LOCALID_BIRCH, 34
 # 6 "data/maps/Route110/scripts.pory"

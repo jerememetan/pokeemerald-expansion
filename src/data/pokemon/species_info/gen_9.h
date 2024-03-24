@@ -858,7 +858,7 @@ const struct SpeciesInfo gSpeciesInfoGen9[] =
         ICON(Pawmo, 3),
         //.footprint = gMonFootprint_Pawmo,
         LEARNSETS(Pawmo),
-        .evolutions = EVOLUTION({EVO_NONE, 0, SPECIES_PAWMOT}),
+        .evolutions = EVOLUTION({EVO_LEVEL, 34, SPECIES_PAWMOT}),
     },
 
     [SPECIES_PAWMOT] =
@@ -1553,8 +1553,8 @@ const struct SpeciesInfo gSpeciesInfoGen9[] =
         ICON(Charcadet, 1),
         //.footprint = gMonFootprint_Charcadet,
         LEARNSETS(Charcadet),
-        .evolutions = EVOLUTION({EVO_ITEM, ITEM_AUSPICIOUS_ARMOR, SPECIES_ARMAROUGE},
-                                {EVO_ITEM, ITEM_MALICIOUS_ARMOR, SPECIES_CERULEDGE}),
+        .evolutions = EVOLUTION({EVO_ITEM, ITEM_FIRE_STONE, SPECIES_ARMAROUGE},
+                                {EVO_ITEM, ITEM_DUSK_STONE, SPECIES_CERULEDGE}),
     },
 
     [SPECIES_ARMAROUGE] =
@@ -2087,7 +2087,7 @@ const struct SpeciesInfo gSpeciesInfoGen9[] =
         ICON(Bramblin, 3),
         //.footprint = gMonFootprint_Bramblin,
         LEARNSETS(Bramblin),
-        .evolutions = EVOLUTION({EVO_NONE, 0, SPECIES_BRAMBLEGHAST}),
+        .evolutions = EVOLUTION({EVO_LEVEL, 39, SPECIES_BRAMBLEGHAST}),
     },
 
     [SPECIES_BRAMBLEGHAST] =
@@ -2427,7 +2427,7 @@ const struct SpeciesInfo gSpeciesInfoGen9[] =
         ICON(Rellor, 5),
         //.footprint = gMonFootprint_Rellor,
         LEARNSETS(Rellor),
-        .evolutions = EVOLUTION({EVO_NONE, 0, SPECIES_RABSCA}),
+        .evolutions = EVOLUTION({EVO_LEVEL, 35, SPECIES_RABSCA}),
     },
 
     [SPECIES_RABSCA] =
@@ -3334,7 +3334,7 @@ const struct SpeciesInfo gSpeciesInfoGen9[] =
         ICON(Greavard, 2),
         //.footprint = gMonFootprint_Greavard,
         LEARNSETS(Greavard),
-        .evolutions = EVOLUTION({EVO_LEVEL_NIGHT, 30, SPECIES_HOUNDSTONE}),
+        .evolutions = EVOLUTION({EVO_LEVEL, 30, SPECIES_HOUNDSTONE}),
     },
 
     [SPECIES_HOUNDSTONE] =
@@ -4480,7 +4480,7 @@ const struct SpeciesInfo gSpeciesInfoGen9[] =
         .frontAnimFrames = sAnims_Gimmighoul,                                           \
         LEARNSETS(Gimmighoul),                                                          \
         .formSpeciesIdTable = sGimmighoulFormSpeciesIdTable,                            \
-        .evolutions = EVOLUTION({EVO_NONE, 0, SPECIES_GHOLDENGO})
+        .evolutions = EVOLUTION({EVO_LEVEL, 56, SPECIES_GHOLDENGO})
         //.frontAnimId = ANIM_V_SQUISH_AND_BOUNCE,
         //.backAnimId = BACK_ANIM_NONE,
         //.footprint = gMonFootprint_Gimmighoul,
@@ -5152,7 +5152,7 @@ const struct SpeciesInfo gSpeciesInfoGen9[] =
             "expensive tea caddy. It takes an\n"
             "expert to distinguish the expensive\n"
             "tea caddies from the cheap ones."),
-        .evolutions = EVOLUTION({EVO_ITEM, ITEM_MASTERPIECE_TEACUP, SPECIES_SINISTCHA_MASTERPIECE}),
+        .evolutions = EVOLUTION({EVO_ITEM, ITEM_LEAF_STONE, SPECIES_SINISTCHA_MASTERPIECE}),
     },
 
 #define SINISTCHA_MISC_INFO                                                     \

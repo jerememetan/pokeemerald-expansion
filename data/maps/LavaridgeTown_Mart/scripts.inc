@@ -33,7 +33,7 @@ LavaridgeTown_Mart_Pokemart:
 # 17 "data/maps/LavaridgeTown_Mart/scripts.pory"
 	.2byte ITEM_GREAT_BALL
 # 18 "data/maps/LavaridgeTown_Mart/scripts.pory"
-	.2byte ITEM_SUPER_POTION
+	.2byte ITEM_ULTRA_BALL
 # 19 "data/maps/LavaridgeTown_Mart/scripts.pory"
 	.2byte ITEM_SUPER_REPEL
 # 20 "data/maps/LavaridgeTown_Mart/scripts.pory"

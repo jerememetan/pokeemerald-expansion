@@ -377,7 +377,7 @@ const struct SpeciesInfo gSpeciesInfoGen7[] =
         ICON(Popplio, 0),
         .footprint = gMonFootprint_Popplio,
         LEARNSETS(Popplio),
-        .evolutions = EVOLUTION({EVO_LEVEL, 17, SPECIES_BRIONNE}),
+        .evolutions = EVOLUTION({EVO_LEVEL, 16, SPECIES_BRIONNE}),
     },
 
     [SPECIES_BRIONNE] =
@@ -425,7 +425,7 @@ const struct SpeciesInfo gSpeciesInfoGen7[] =
         ICON(Brionne, 0),
         .footprint = gMonFootprint_Brionne,
         LEARNSETS(Brionne),
-        .evolutions = EVOLUTION({EVO_LEVEL, 34, SPECIES_PRIMARINA}),
+        .evolutions = EVOLUTION({EVO_LEVEL, 36, SPECIES_PRIMARINA}),
     },
 
     [SPECIES_PRIMARINA] =
@@ -671,7 +671,7 @@ const struct SpeciesInfo gSpeciesInfoGen7[] =
         ICON(Yungoos, 2),
         .footprint = gMonFootprint_Yungoos,
         LEARNSETS(Yungoos),
-        .evolutions = EVOLUTION({EVO_LEVEL_DAY, 20, SPECIES_GUMSHOOS}),
+        .evolutions = EVOLUTION({EVO_LEVEL, 20, SPECIES_GUMSHOOS}),
     },
 
     [SPECIES_GUMSHOOS] =
@@ -4758,7 +4758,7 @@ const struct SpeciesInfo gSpeciesInfoGen7[] =
         ICON(Meltan, 2),
         .footprint = gMonFootprint_Meltan,
         LEARNSETS(Meltan),
-        .evolutions = EVOLUTION({EVO_ITEM, ITEM_METAL_COAT, SPECIES_MELMETAL}),
+        .evolutions = EVOLUTION({EVO_ITEM_HOLD, ITEM_METAL_COAT, SPECIES_MELMETAL}),
     },
 
 #define MELMETAL_MISC_INFO                                                              \

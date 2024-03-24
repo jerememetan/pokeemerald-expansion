@@ -96,7 +96,7 @@ const struct SpeciesInfo gSpeciesInfoGen8[] =
         ICON(Thwackey, 1),
         .footprint = gMonFootprint_Thwackey,
         LEARNSETS(Thwackey),
-        .evolutions = EVOLUTION({EVO_LEVEL, 35, SPECIES_RILLABOOM}),
+        .evolutions = EVOLUTION({EVO_LEVEL, 36, SPECIES_RILLABOOM}),
     },
 
 #define RILLABOOM_MISC_INFO                                                     \
@@ -449,7 +449,7 @@ const struct SpeciesInfo gSpeciesInfoGen8[] =
         ICON(Drizzile, 2),
         .footprint = gMonFootprint_Drizzile,
         LEARNSETS(Drizzile),
-        .evolutions = EVOLUTION({EVO_LEVEL, 35, SPECIES_INTELEON}),
+        .evolutions = EVOLUTION({EVO_LEVEL, 36, SPECIES_INTELEON}),
     },
 
 #define INTELEON_MISC_INFO                                              \
@@ -2622,7 +2622,7 @@ const struct SpeciesInfo gSpeciesInfoGen8[] =
         ICON(Clobbopus, 0),
         .footprint = gMonFootprint_Clobbopus,
         LEARNSETS(Clobbopus),
-        .evolutions = EVOLUTION({EVO_MOVE, MOVE_TAUNT, SPECIES_GRAPPLOCT}),
+        .evolutions = EVOLUTION({EVO_LEVEL, 28, SPECIES_GRAPPLOCT}),
     },
 
     [SPECIES_GRAPPLOCT] =
@@ -2734,7 +2734,7 @@ const struct SpeciesInfo gSpeciesInfoGen8[] =
             "stirred, the swirl loses its shape, and\n"
             "Sinistea gets dizzy."),
         .enemyMonElevation = 10,
-        .evolutions = EVOLUTION({EVO_ITEM, ITEM_CHIPPED_POT, SPECIES_POLTEAGEIST_ANTIQUE}),
+        .evolutions = EVOLUTION({EVO_ITEM, ITEM_DUSK_STONE, SPECIES_POLTEAGEIST_ANTIQUE}),
     },
 
 #define POLTEAGEIST_MISC_INFO                                                   \
@@ -3503,7 +3503,7 @@ const struct SpeciesInfo gSpeciesInfoGen8[] =
         ICON(Snom, 0),
         .footprint = gMonFootprint_Snom,
         LEARNSETS(Snom),
-        .evolutions = EVOLUTION({EVO_FRIENDSHIP_NIGHT, 0, SPECIES_FROSMOTH}),
+        .evolutions = EVOLUTION({EVO_LEVEL, 28, SPECIES_FROSMOTH}),
     },
 
     [SPECIES_FROSMOTH] =
@@ -4295,7 +4295,7 @@ const struct SpeciesInfo gSpeciesInfoGen8[] =
         ICON(Dreepy, 0),
         .footprint = gMonFootprint_Dreepy,
         LEARNSETS(Dreepy),
-        .evolutions = EVOLUTION({EVO_LEVEL, 50, SPECIES_DRAKLOAK}),
+        .evolutions = EVOLUTION({EVO_LEVEL, 38, SPECIES_DRAKLOAK}),
     },
 
     [SPECIES_DRAKLOAK] =
@@ -4343,7 +4343,7 @@ const struct SpeciesInfo gSpeciesInfoGen8[] =
         ICON(Drakloak, 0),
         .footprint = gMonFootprint_Drakloak,
         LEARNSETS(Drakloak),
-        .evolutions = EVOLUTION({EVO_LEVEL, 60, SPECIES_DRAGAPULT}),
+        .evolutions = EVOLUTION({EVO_LEVEL, 55, SPECIES_DRAGAPULT}),
     },
 
     [SPECIES_DRAGAPULT] =
@@ -4697,9 +4697,7 @@ const struct SpeciesInfo gSpeciesInfoGen8[] =
         ICON(Kubfu, 1),
         .footprint = gMonFootprint_Kubfu,
         LEARNSETS(Kubfu),
-        .evolutions = EVOLUTION({EVO_DARK_SCROLL, 0, SPECIES_URSHIFU_SINGLE_STRIKE_STYLE},
-                                {EVO_ITEM, ITEM_DUSK_STONE, SPECIES_URSHIFU_SINGLE_STRIKE_STYLE},
-                                {EVO_WATER_SCROLL, 0, SPECIES_URSHIFU_RAPID_STRIKE_STYLE},
+        .evolutions = EVOLUTION({EVO_ITEM, ITEM_DUSK_STONE, SPECIES_URSHIFU_SINGLE_STRIKE_STYLE},
                                 {EVO_ITEM, ITEM_WATER_STONE, SPECIES_URSHIFU_RAPID_STRIKE_STYLE}),
     },
 

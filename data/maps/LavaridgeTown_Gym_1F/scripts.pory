@@ -87,6 +87,8 @@ LavaridgeTown_Gym_1F_EventScript_FlanneryDefeated::
 LavaridgeTown_Gym_1F_EventScript_GiveOverheat2::
 	giveitem ITEM_TM_OVERHEAT
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
+	giveitem ITEM_HOUNDOOMINITE
+	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
 	msgbox LavaridgeTown_Gym_1F_Text_ExplainOverheat, MSGBOX_DEFAULT
 	setflag FLAG_RECEIVED_TM_OVERHEAT
 	release
@@ -94,6 +96,8 @@ LavaridgeTown_Gym_1F_EventScript_GiveOverheat2::
 
 LavaridgeTown_Gym_1F_EventScript_GiveOverheat::
 	giveitem ITEM_TM_OVERHEAT
+	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
+	giveitem ITEM_HOUNDOOMINITE
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_BagIsFull
 	msgbox LavaridgeTown_Gym_1F_Text_ExplainOverheat, MSGBOX_DEFAULT
 	setflag FLAG_RECEIVED_TM_OVERHEAT
@@ -351,7 +355,10 @@ LavaridgeTown_Gym_1F_Text_ExplainOverheat:
 	.string "the opponent.\p"
 	.string "But it also sharply cuts the SP. ATK\n"
 	.string "of the POKéMON using it. It might not\l"
-	.string "be suitable for longer battles.$"
+	.string "be suitable for longer battles.\p"
+	.string "This Mega Stone mega evolves\n"
+	.string "Houndoom. It's one of the best\l"
+	.string "Special Attacker in the Sun.$"
 
 LavaridgeTown_Gym_1F_Text_RegisteredFlannery:
 	.string "Registered GYM LEADER FLANNERY\n"

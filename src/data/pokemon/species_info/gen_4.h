@@ -49,7 +49,7 @@ const struct SpeciesInfo gSpeciesInfoGen4[] =
         ICON(Turtwig, 1),
         .footprint = gMonFootprint_Turtwig,
         LEARNSETS(Turtwig),
-        .evolutions = EVOLUTION({EVO_LEVEL, 18, SPECIES_GROTLE}),
+        .evolutions = EVOLUTION({EVO_LEVEL, 16, SPECIES_GROTLE}),
     },
 
     [SPECIES_GROTLE] =
@@ -98,7 +98,7 @@ const struct SpeciesInfo gSpeciesInfoGen4[] =
         ICON(Grotle, 1),
         .footprint = gMonFootprint_Grotle,
         LEARNSETS(Grotle),
-        .evolutions = EVOLUTION({EVO_LEVEL, 32, SPECIES_TORTERRA}),
+        .evolutions = EVOLUTION({EVO_LEVEL, 36, SPECIES_TORTERRA}),
     },
 
     [SPECIES_TORTERRA] =
@@ -198,7 +198,7 @@ const struct SpeciesInfo gSpeciesInfoGen4[] =
         ICON(Chimchar, 1),
         .footprint = gMonFootprint_Chimchar,
         LEARNSETS(Chimchar),
-        .evolutions = EVOLUTION({EVO_LEVEL, 14, SPECIES_MONFERNO}),
+        .evolutions = EVOLUTION({EVO_LEVEL, 16, SPECIES_MONFERNO}),
     },
 
     [SPECIES_MONFERNO] =
@@ -2783,7 +2783,7 @@ const struct SpeciesInfo gSpeciesInfoGen4[] =
         ICON(Riolu, 2),
         .footprint = gMonFootprint_Riolu,
         LEARNSETS(Riolu),
-        .evolutions = EVOLUTION({EVO_FRIENDSHIP_DAY, 0, SPECIES_LUCARIO}),
+        .evolutions = EVOLUTION({EVO_FRIENDSHIP, 0, SPECIES_LUCARIO}),
     },
 
 #define LUCARIO_MISC_INFO                                       \
@@ -3282,7 +3282,7 @@ const struct SpeciesInfo gSpeciesInfoGen4[] =
         ICON(Finneon, 0),
         .footprint = gMonFootprint_Finneon,
         LEARNSETS(Finneon),
-        .evolutions = EVOLUTION({EVO_LEVEL, 31, SPECIES_LUMINEON}),
+        .evolutions = EVOLUTION({EVO_LEVEL, 25, SPECIES_LUMINEON}),
     },
 
     [SPECIES_LUMINEON] =

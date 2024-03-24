@@ -2133,8 +2133,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         ICON(Spritzee, 0),
         .footprint = gMonFootprint_Spritzee,
         LEARNSETS(Spritzee),
-        .evolutions = EVOLUTION({EVO_TRADE_ITEM, ITEM_SACHET, SPECIES_AROMATISSE},
-                                {EVO_ITEM, ITEM_SACHET, SPECIES_AROMATISSE}),
+        .evolutions = EVOLUTION({EVO_ITEM, ITEM_SHINY_STONE, SPECIES_AROMATISSE}),
     },
 
     [SPECIES_AROMATISSE] =
@@ -2231,8 +2230,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         ICON(Swirlix, 1),
         .footprint = gMonFootprint_Swirlix,
         LEARNSETS(Swirlix),
-        .evolutions = EVOLUTION({EVO_TRADE_ITEM, ITEM_WHIPPED_DREAM, SPECIES_SLURPUFF},
-                                {EVO_ITEM, ITEM_WHIPPED_DREAM, SPECIES_SLURPUFF}),
+        .evolutions = EVOLUTION({EVO_ITEM, ITEM_DAWN_STONE, SPECIES_SLURPUFF}),
     },
 
     [SPECIES_SLURPUFF] =
@@ -2819,7 +2817,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         ICON(Tyrunt, 2),
         .footprint = gMonFootprint_Tyrunt,
         LEARNSETS(Tyrunt),
-        .evolutions = EVOLUTION({EVO_LEVEL_DAY, 39, SPECIES_TYRANTRUM}),
+        .evolutions = EVOLUTION({EVO_LEVEL, 35, SPECIES_TYRANTRUM}),
     },
 
     [SPECIES_TYRANTRUM] =
@@ -2916,7 +2914,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         ICON(Amaura, 0),
         .footprint = gMonFootprint_Amaura,
         LEARNSETS(Amaura),
-        .evolutions = EVOLUTION({EVO_LEVEL_NIGHT, 39, SPECIES_AURORUS}),
+        .evolutions = EVOLUTION({EVO_LEVEL, 35, SPECIES_AURORUS}),
     },
 
     [SPECIES_AURORUS] =
@@ -3168,7 +3166,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         ICON(Goomy, 5),
         .footprint = gMonFootprint_Goomy,
         LEARNSETS(Goomy),
-        .evolutions = EVOLUTION({EVO_LEVEL, 40, SPECIES_SLIGGOO},
+        .evolutions = EVOLUTION({EVO_LEVEL, 35, SPECIES_SLIGGOO},
                                 {EVO_ITEM_HOLD, ITEM_METAL_COAT, SPECIES_SLIGGOO_HISUIAN}),
     },
 
@@ -3222,8 +3220,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         PALETTES(Sliggoo),
         ICON(Sliggoo, 5),
         LEARNSETS(Sliggoo),
-        .evolutions = EVOLUTION({EVO_LEVEL, 50, SPECIES_GOODRA},
-                                {EVO_LEVEL, 50, SPECIES_GOODRA}),
+        .evolutions = EVOLUTION({EVO_LEVEL, 50, SPECIES_GOODRA}),
     },
 
 #define GOODRA_MISC_INFO                                        \
@@ -3312,8 +3309,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         ICON(SliggooHisuian, 2),
         LEARNSETS(SliggooHisuian),
         .isHisuianForm = TRUE,
-        .evolutions = EVOLUTION({EVO_LEVEL_RAIN, 50, SPECIES_GOODRA_HISUIAN},
-                                {EVO_LEVEL_FOG, 50, SPECIES_GOODRA_HISUIAN}),
+        .evolutions = EVOLUTION({EVO_LEVEL, 50, SPECIES_GOODRA_HISUIAN}),
     },
 
     [SPECIES_GOODRA_HISUIAN] =
@@ -3831,8 +3827,8 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         ICON(Bergmite, 0),
         .footprint = gMonFootprint_Bergmite,
         LEARNSETS(Bergmite),
-        .evolutions = EVOLUTION({EVO_LEVEL, 37, SPECIES_AVALUGG},
-                                {EVO_NONE, 0, SPECIES_AVALUGG_HISUIAN}),
+        .evolutions = EVOLUTION({EVO_LEVEL_DAY, 37, SPECIES_AVALUGG},
+                                {EVO_LEVEL_NIGHT, 37, SPECIES_AVALUGG_HISUIAN}),
     },
 
 #define AVALUGG_MISC_INFO                               \

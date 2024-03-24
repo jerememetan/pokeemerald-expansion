@@ -732,6 +732,7 @@ static void (*const sTextPrinterTasks[])(u8 taskId) =
 static const u8 sMemoNatureTextColor[] = _("{COLOR LIGHT_RED}{SHADOW GREEN}");
 static const u8 sMemoMiscTextColor[] = _("{COLOR WHITE}{SHADOW DARK_GRAY}"); // This is also affected by palettes, apparently
 static const u8 sStatsLeftColumnLayout[] = _("{DYNAMIC 0}/{DYNAMIC 1}\n{DYNAMIC 2}\n{DYNAMIC 3}");
+static const u8 sStatsLeftColumnLayoutIVEV[] = _("{DYNAMIC 0}\n{DYNAMIC 1}\n{DYNAMIC 2}");
 static const u8 sStatsRightColumnLayout[] = _("{DYNAMIC 0}\n{DYNAMIC 1}\n{DYNAMIC 2}");
 static const u8 sMovesPPLayout[] = _("{PP}{DYNAMIC 0}/{DYNAMIC 1}");
 
@@ -3589,12 +3590,13 @@ static void BufferIvOrEvStats(u8 mode)
 
     Free(currHPString);
 }
+
 static void BufferLeftColumnStats(void)
 {
-    u8 *currentHPString = Alloc(20);
-    u8 *maxHPString = Alloc(20);
-    u8 *attackString = Alloc(20);
-    u8 *defenseString = Alloc(20);
+	u8 *currentHPString = Alloc(20);
+	u8 *maxHPString = Alloc(20);
+	u8 *attackString = Alloc(20);
+	u8 *defenseString = Alloc(20);
 
 	u8 hpIV = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_HP_IV);
 	u8 atkIV = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_ATK_IV);

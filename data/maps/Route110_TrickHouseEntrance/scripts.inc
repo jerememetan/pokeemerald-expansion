@@ -681,7 +681,7 @@ Route110_TrickHouseEntrance_EventScript_GiveReward::
 # 341 "data/maps/Route110_TrickHouseEntrance/scripts.pory"
 Route110_TrickHouseEntrance_EventScript_GivePuzzle1Reward::
 # 342 "data/maps/Route110_TrickHouseEntrance/scripts.pory"
-	giveitem ITEM_RARE_CANDY
+	giveitem ITEM_DAMP_ROCK
 # 343 "data/maps/Route110_TrickHouseEntrance/scripts.pory"
 	goto_if_eq VAR_RESULT, TRUE, Route110_TrickHouseEntrance_EventScript_GotReward
 # 344 "data/maps/Route110_TrickHouseEntrance/scripts.pory"
@@ -697,7 +697,7 @@ Route110_TrickHouseEntrance_EventScript_GivePuzzle1Reward::
 # 349 "data/maps/Route110_TrickHouseEntrance/scripts.pory"
 Route110_TrickHouseEntrance_EventScript_GivePuzzle2Reward::
 # 350 "data/maps/Route110_TrickHouseEntrance/scripts.pory"
-	giveitem ITEM_TIMER_BALL
+	giveitem ITEM_HEAT_ROCK
 # 351 "data/maps/Route110_TrickHouseEntrance/scripts.pory"
 	goto_if_eq VAR_RESULT, TRUE, Route110_TrickHouseEntrance_EventScript_GotReward
 # 352 "data/maps/Route110_TrickHouseEntrance/scripts.pory"
@@ -713,7 +713,7 @@ Route110_TrickHouseEntrance_EventScript_GivePuzzle2Reward::
 # 357 "data/maps/Route110_TrickHouseEntrance/scripts.pory"
 Route110_TrickHouseEntrance_EventScript_GivePuzzle3Reward::
 # 358 "data/maps/Route110_TrickHouseEntrance/scripts.pory"
-	giveitem ITEM_HARD_STONE
+	giveitem ITEM_SMOOTH_ROCK
 # 359 "data/maps/Route110_TrickHouseEntrance/scripts.pory"
 	goto_if_eq VAR_RESULT, TRUE, Route110_TrickHouseEntrance_EventScript_GotReward
 # 360 "data/maps/Route110_TrickHouseEntrance/scripts.pory"
@@ -729,7 +729,7 @@ Route110_TrickHouseEntrance_EventScript_GivePuzzle3Reward::
 # 365 "data/maps/Route110_TrickHouseEntrance/scripts.pory"
 Route110_TrickHouseEntrance_EventScript_GivePuzzle4Reward::
 # 366 "data/maps/Route110_TrickHouseEntrance/scripts.pory"
-	giveitem ITEM_SMOKE_BALL
+	giveitem ITEM_ICY_ROCK
 # 367 "data/maps/Route110_TrickHouseEntrance/scripts.pory"
 	goto_if_eq VAR_RESULT, TRUE, Route110_TrickHouseEntrance_EventScript_GotReward
 # 368 "data/maps/Route110_TrickHouseEntrance/scripts.pory"
@@ -761,7 +761,7 @@ Route110_TrickHouseEntrance_EventScript_GivePuzzle5Reward::
 # 381 "data/maps/Route110_TrickHouseEntrance/scripts.pory"
 Route110_TrickHouseEntrance_EventScript_GivePuzzle6Reward::
 # 382 "data/maps/Route110_TrickHouseEntrance/scripts.pory"
-	giveitem ITEM_MAGNET
+	giveitem ITEM_EXP_ALL
 # 383 "data/maps/Route110_TrickHouseEntrance/scripts.pory"
 	goto_if_eq VAR_RESULT, TRUE, Route110_TrickHouseEntrance_EventScript_GotReward
 # 384 "data/maps/Route110_TrickHouseEntrance/scripts.pory"
@@ -777,7 +777,7 @@ Route110_TrickHouseEntrance_EventScript_GivePuzzle6Reward::
 # 389 "data/maps/Route110_TrickHouseEntrance/scripts.pory"
 Route110_TrickHouseEntrance_EventScript_GivePuzzle7Reward::
 # 390 "data/maps/Route110_TrickHouseEntrance/scripts.pory"
-	giveitem ITEM_PP_MAX
+	giveitem ITEM_PINSIRITE
 # 391 "data/maps/Route110_TrickHouseEntrance/scripts.pory"
 	goto_if_eq VAR_RESULT, TRUE, Route110_TrickHouseEntrance_EventScript_GotReward
 # 392 "data/maps/Route110_TrickHouseEntrance/scripts.pory"

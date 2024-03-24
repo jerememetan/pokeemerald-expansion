@@ -127,7 +127,7 @@ Route110_TrickHouseEnd_EventScript_CompletedPuzzle1::
 # 64 "data/maps/Route110_TrickHouseEnd/scripts.pory"
 	setvar VAR_TRICK_HOUSE_PRIZE_PICKUP, 0
 # 65 "data/maps/Route110_TrickHouseEnd/scripts.pory"
-	giveitem ITEM_RARE_CANDY
+	giveitem ITEM_DAMP_ROCK 
 # 66 "data/maps/Route110_TrickHouseEnd/scripts.pory"
 	call_if_eq VAR_RESULT, FALSE, Route110_TrickHouseEnd_EventScript_BagFull
 # 67 "data/maps/Route110_TrickHouseEnd/scripts.pory"
@@ -151,7 +151,7 @@ Route110_TrickHouseEnd_EventScript_CompletedPuzzle2::
 # 76 "data/maps/Route110_TrickHouseEnd/scripts.pory"
 	setvar VAR_TRICK_HOUSE_PRIZE_PICKUP, 0
 # 77 "data/maps/Route110_TrickHouseEnd/scripts.pory"
-	giveitem ITEM_TIMER_BALL
+	giveitem ITEM_HEAT_ROCK
 # 78 "data/maps/Route110_TrickHouseEnd/scripts.pory"
 	call_if_eq VAR_RESULT, FALSE, Route110_TrickHouseEnd_EventScript_BagFull
 # 79 "data/maps/Route110_TrickHouseEnd/scripts.pory"
@@ -175,7 +175,7 @@ Route110_TrickHouseEnd_EventScript_CompletedPuzzle3::
 # 88 "data/maps/Route110_TrickHouseEnd/scripts.pory"
 	setvar VAR_TRICK_HOUSE_PRIZE_PICKUP, 0
 # 89 "data/maps/Route110_TrickHouseEnd/scripts.pory"
-	giveitem ITEM_HARD_STONE
+	giveitem ITEM_SMOOTH_ROCK
 # 90 "data/maps/Route110_TrickHouseEnd/scripts.pory"
 	call_if_eq VAR_RESULT, FALSE, Route110_TrickHouseEnd_EventScript_BagFull
 # 91 "data/maps/Route110_TrickHouseEnd/scripts.pory"
@@ -199,7 +199,7 @@ Route110_TrickHouseEnd_EventScript_CompletedPuzzle4::
 # 100 "data/maps/Route110_TrickHouseEnd/scripts.pory"
 	setvar VAR_TRICK_HOUSE_PRIZE_PICKUP, 0
 # 101 "data/maps/Route110_TrickHouseEnd/scripts.pory"
-	giveitem ITEM_SMOKE_BALL
+	giveitem ITEM_ICY_ROCK
 # 102 "data/maps/Route110_TrickHouseEnd/scripts.pory"
 	call_if_eq VAR_RESULT, FALSE, Route110_TrickHouseEnd_EventScript_BagFull
 # 103 "data/maps/Route110_TrickHouseEnd/scripts.pory"
@@ -247,7 +247,7 @@ Route110_TrickHouseEnd_EventScript_CompletedPuzzle6::
 # 124 "data/maps/Route110_TrickHouseEnd/scripts.pory"
 	setvar VAR_TRICK_HOUSE_PRIZE_PICKUP, 0
 # 125 "data/maps/Route110_TrickHouseEnd/scripts.pory"
-	giveitem ITEM_MAGNET
+	giveitem ITEM_EXP_ALL
 # 126 "data/maps/Route110_TrickHouseEnd/scripts.pory"
 	call_if_eq VAR_RESULT, FALSE, Route110_TrickHouseEnd_EventScript_BagFull
 # 127 "data/maps/Route110_TrickHouseEnd/scripts.pory"
@@ -271,7 +271,7 @@ Route110_TrickHouseEnd_EventScript_CompletedPuzzle7::
 # 136 "data/maps/Route110_TrickHouseEnd/scripts.pory"
 	setvar VAR_TRICK_HOUSE_PRIZE_PICKUP, 0
 # 137 "data/maps/Route110_TrickHouseEnd/scripts.pory"
-	giveitem ITEM_PP_MAX
+	giveitem ITEM_PINSIRITE
 # 138 "data/maps/Route110_TrickHouseEnd/scripts.pory"
 	call_if_eq VAR_RESULT, FALSE, Route110_TrickHouseEnd_EventScript_BagFull
 # 139 "data/maps/Route110_TrickHouseEnd/scripts.pory"
