@@ -13660,9 +13660,36 @@ static const struct TrainerMon sParty_Red[] = {
 
 static const struct TrainerMon sParty_Leaf[] = {
     {
-    .lvl = 5,
-    .species = SPECIES_BULBASAUR,
+    .lvl = 23,
+    .species = SPECIES_RATICATE,
+    .ability = ABILITY_HUSTLE,
+    .moves = {MOVE_BITE, MOVE_HYPER_FANG, MOVE_QUICK_ATTACK, MOVE_FLAME_WHEEL},
+    },
+    {
+    .lvl = 23,
+    .species = SPECIES_IVYSAUR,
+    .ability = ABILITY_OVERGROW,
+    .moves = {MOVE_RAZOR_LEAF, MOVE_LEECH_SEED, MOVE_SLUDGE, MOVE_SLEEP_POWDER},
+    },
+    {
+    .lvl = 23,
+    .species = SPECIES_GROWLITHE,
+    .ability = ABILITY_INTIMIDATE,
+    .moves = {MOVE_BITE, MOVE_EMBER, MOVE_THUNDER_FANG, MOVE_WILL_O_WISP},
+    },
+    {
+    .lvl = 23,
+    .species = SPECIES_GYARADOS,
+    .ability = ABILITY_INTIMIDATE,
+    .moves = {MOVE_BITE, MOVE_THRASH, MOVE_LEER, MOVE_WATER_PULSE},
+    },
+    {
+    .lvl = 22,
+    .species = SPECIES_KADABRA,
+    .ability = ABILITY_MAGIC_GUARD,
+    .moves = {MOVE_CONFUSION, MOVE_MIRACLE_EYE, MOVE_HIDDEN_POWER, MOVE_SHOCK_WAVE},
     }
+
 };
 
 static const struct TrainerMon sParty_BrendanLinkPlaceholder[] = {

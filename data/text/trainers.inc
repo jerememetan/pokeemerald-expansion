@@ -4794,3 +4794,20 @@ VSSeeker_Text_TrainersNotReady::
 	.string "The other Trainers don't appear\n"
 	.string "to be ready for battle.\p"
 	.string "Let's wait till later.{PAUSE_UNTIL_PRESS}$"
+
+VerdanturfExtension_LeafIntro:
+	.string "Nice to Meet you! I'm Leaf.\n"
+	.string "I'm from a faraway region called KANTO.\p"
+	.string "You're a strong trainer, aren't you?\p"
+	.string "Let's battle!$"
+
+VerdanturfExtension_LeafDefeat:
+	.string "Wow! You're strong indeed!\n"
+	.string "Let's battle again in the near future!\p"
+	.string "Next time, I will win!$"
+
+VerdanturfExtension_LeafPostBattle:
+	.string "There's another strong trainer that\n"
+	.string "came too HEONN too.\p"
+	.string "He's name is....\n"
+	.string "...Red$"

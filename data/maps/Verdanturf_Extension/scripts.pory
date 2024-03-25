@@ -1,0 +1,10 @@
+raw `
+Verdanturf_Extension_MapScripts::
+	.byte 0
+
+Verdanturf_Extension_EventScript_Leaf::
+    trainerbattle_single TRAINER_LEAF, VerdanturfExtension_LeafIntro, VerdanturfExtension_LeafDefeat
+	msgbox VerdanturfExtension_LeafPostBattle, MSGBOX_AUTOCLOSE
+	end
+`
+

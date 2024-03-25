@@ -813,6 +813,6 @@ LavaridgeTown_Text_GymSign:
 # 407 "data/maps/LavaridgeTown/scripts.pory"
 LavaridgeTown_Text_HerbShopSign:
 # 408 "data/maps/LavaridgeTown/scripts.pory"
-	.string "POKéMON HERB SHOP\n"
+	.string "POKéMON EV SHOP\n"
 # 409 "data/maps/LavaridgeTown/scripts.pory"
-	.string "“Bitter taste--better cure!”$"
+	.string "EV Training made EASY!!”$"

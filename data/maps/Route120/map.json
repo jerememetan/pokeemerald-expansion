@@ -596,6 +596,19 @@
       "trainer_sight_or_berry_tree_id": "0",
       "script": "Route120_EventScript_ItemRevive",
       "flag": "FLAG_ITEM_ROUTE_120_REVIVE"
+    },
+    {
+      "graphics_id": "OBJ_EVENT_GFX_GENTLEMAN",
+      "x": 5,
+      "y": 22,
+      "elevation": 0,
+      "movement_type": "MOVEMENT_TYPE_FACE_UP",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "Route120_EventScript_BadgeCheck",
+      "flag": "FLAG_ROUTE120_BADGECHECKED"
     }
   ],
   "warp_events": [

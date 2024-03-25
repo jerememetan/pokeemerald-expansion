@@ -617,7 +617,7 @@ const u16 sLevelCapFlags[NUM_SOFT_CAPS] =
     FLAG_BADGE05_GET, FLAG_BADGE06_GET, FLAG_BADGE07_GET, FLAG_BADGE08_GET,
 };
 
-const u16 sLevelCaps[NUM_SOFT_CAPS] = { 15, 19, 25, 35, 40, 45, 54, 75 };
+const u16 sLevelCaps[NUM_SOFT_CAPS] = { 15, 19, 25, 35, 40, 49, 59, 81 };
 const double sLevelCapReduction[7] = { .05, .05, .05, .05, .05, .05, .05 };
 const double sRelativePartyScaling[27] =
 {
@@ -4152,6 +4152,7 @@ double GetPkmnExpMultiplier(u8 level)
     return lvlCapMultiplier * sRelativePartyScaling[avgDiff];
 }
 
+
 static void Cmd_getexp(void)
 {
     CMD_ARGS(u8 battler);
@@ -4292,17 +4293,18 @@ static void Cmd_getexp(void)
                     gBattleStruct->wildVictorySong++;
                 }
 
-                if (IsValidForBattle(&gPlayerParty[*expMonId]))
+                if (IsValidForBattle(&gPlayerParty[*expMonId]));
+                double expMultiplier = GetPkmnExpMultiplier(gPlayerParty[*expMonId].level);
                 {
                     if (wasSentOut)
-                        gBattleMoveDamage = gBattleStruct->expValue;
+                        gBattleMoveDamage = gBattleStruct->expValue * expMultiplier;
                     else
                         gBattleMoveDamage = 0;
 
                     if ((holdEffect == HOLD_EFFECT_EXP_SHARE || IsGen6ExpShareEnabled())
                         && (B_SPLIT_EXP < GEN_6 || gBattleMoveDamage == 0)) // only give exp share bonus in later gens if the mon wasn't sent out
                     {
-                        gBattleMoveDamage += gBattleStruct->expShareExpValue;
+                        gBattleMoveDamage += gBattleStruct->expShareExpValue * expMultiplier;
                     }
 
                     ApplyExperienceMultipliers(&gBattleMoveDamage, *expMonId, gBattlerFainted);

@@ -2,6 +2,7 @@ raw `
 .set LOCALID_BRIDGE_KECLEON, 30
 .set LOCALID_STEVEN, 31
 .set LOCALID_BRIDGE_KECLEON_SHADOW, 36  @ They use a second object which is identical to Kecleon but has a reflection palette tag for the bridge shadow
+.set LOCAL_ID_BADGECHECKER, 45
 
 Route120_MapScripts::
 	map_script MAP_SCRIPT_ON_RESUME, Route120_OnResume
@@ -39,6 +40,7 @@ Route120_OnLoad:
 	call_if_unset FLAG_REGI_DOORS_OPENED, Route120_EventScript_CloseAncientTomb
 	call_if_set FLAG_RECEIVED_DEVON_SCOPE, Route120_EventScript_SetBridgeClearMetatiles
 	call_if_unset FLAG_RECEIVED_DEVON_SCOPE, Route120_EventScript_SetBridgeKecleonMovement
+	call_if_set FLAG_ROUTE120_BADGECHECKED, Route120_EventScript_RemoveBadgeChecker
 	end
 
 Route120_EventScript_CloseAncientTomb::
@@ -51,6 +53,10 @@ Route120_EventScript_SetBridgeClearMetatiles::
 	setmetatile 12, 16, METATILE_Fortree_WoodBridge1_Bottom, FALSE
 	setmetatile 12, 17, METATILE_General_ReflectiveWater, FALSE
 	setmetatile 13, 17, METATILE_General_ReflectiveWater, FALSE
+	return
+
+Route120_EventScript_RemoveBadgeChecker::
+    removeobject LOCAL_ID_BADGECHECKER
 	return
 
 Route120_EventScript_SetBridgeKecleonMovement::
@@ -154,6 +160,24 @@ Route120_EventScript_BerryLove::
 Route120_EventScript_BerryNotLove::
 	msgbox Route120_Text_MakeYourOwnImpressions, MSGBOX_DEFAULT
 	return
+
+Route120_EventScript_BadgeCheck::
+    lock
+	faceplayer
+	goto_if_unset FLAG_BADGE06_GET, Route120_EventScript_BadgeCheckNotEnoughBadges
+	msgbox Route120_Text_SixBadgesGoodLuck, MSGBOX_DEFAULT
+	closemessage
+	fadescreen FADE_TO_BLACK
+	removeobject LOCAL_ID_BADGECHECKER
+	fadescreen FADE_FROM_BLACK
+	setflag FLAG_ROUTE120_BADGECHECKED
+	release
+	end
+
+Route120_EventScript_BadgeCheckNotEnoughBadges::
+    msgbox Route120_Text_NotEnoughBadges, MSGBOX_DEFAULT
+	release
+	end
 
 Route120_EventScript_Steven::
 	lock
@@ -363,6 +387,7 @@ Route120_EventScript_Callie::
 	msgbox Route120_Text_CalliePostBattle, MSGBOX_AUTOCLOSE
 	end
 
+
 Route120_Text_StevenGreeting:
 	.string "STEVEN: Hm? {PLAYER}{KUN}, hi.\n"
 	.string "It's been a while.\p"
@@ -431,4 +456,16 @@ Route120_Text_RouteSignFortree:
 Route120_Text_RouteSign121:
 	.string "{RIGHT_ARROW} ROUTE 121\n"
 	.string "{LEFT_ARROW} ROUTE 120$"
+Route120_Text_NotEnoughBadges:
+    .string "Past this route there is a tough \n"
+	.string "guanlet of trainers.\p"
+	.string "If you can defeat a strong trainer\n"
+	.string "like WINONA and I will let you pass.$"
+
+Route120_Text_SixBadgesGoodLuck:
+    .string "Is that...\n"
+	.string "Six Badges!?!\p"
+	.string "Very well. I shall let you through.\n"
+	.string "All the best ahead. Goodbye!$"
 `
+
