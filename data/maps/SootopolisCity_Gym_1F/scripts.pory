@@ -117,7 +117,7 @@ SootopolisCity_Gym_1F_EventScript_JuanDefeated::
 	end
 
 SootopolisCity_Gym_1F_EventScript_GiveWaterPulse::
-	giveitem ITEM_TM_WATER_PULSE
+	giveitem ITEM_TM_FLIP_TURN
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_BagIsFull
 	giveitem ITEM_GYARADOSITE
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_BagIsFull
@@ -126,7 +126,7 @@ SootopolisCity_Gym_1F_EventScript_GiveWaterPulse::
 	return
 
 SootopolisCity_Gym_1F_EventScript_GiveWaterPulse2::
-	giveitem ITEM_TM_WATER_PULSE
+	giveitem ITEM_TM_FLIP_TURN
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
 	giveitem ITEM_GYARADOSITE
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_BagIsFull
@@ -253,9 +253,9 @@ SootopolisCity_Gym_1F_Text_ExplainRainBadgeTakeThis:
 
 SootopolisCity_Gym_1F_Text_ExplainWaterPulse:
 	.string "The TECHNICAL MACHINE I handed you\n"
-	.string "contains WATER PULSE.\p"
-	.string "In use, it will occasionally confuse\n"
-	.string "the target with ultrasonic waves.\p"
+	.string "contains FLIP TURN.\p"
+	.string "It's deals damage and switches\n"
+	.string "out to another POKéMON.\p"
 	.string "… … … … … …$"
 
 SootopolisCity_Gym_1F_Text_RegisteredJuan:

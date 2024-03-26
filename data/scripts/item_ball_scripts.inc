@@ -107,7 +107,7 @@ Route115_EventScript_ItemSuperPotion::
 	end
 
 Route115_EventScript_ItemTMFocusPunch::
-	finditem ITEM_TM_FOCUS_PUNCH
+	finditem ITEM_TM_DRAIN_PUNCH
 	end
 
 Route115_EventScript_ItemIron::

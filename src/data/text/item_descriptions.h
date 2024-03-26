@@ -3032,9 +3032,9 @@ static const u8 sEnigmaBerryEReaderDesc[] = _(
 
 // TMs/HMs
 static const u8 sTM01Desc[] = _(
-    "Powerful, but makes\n"
-    "the user flinch if\n"
-    "hit by the foe.");
+    "An attack that\n"
+    "absorbs half the\n"
+    "inflicted.");
 
 static const u8 sTM02Desc[] = _(
     "Hooks and slashes\n"
@@ -3042,9 +3042,9 @@ static const u8 sTM02Desc[] = _(
     "sharp claws.");
 
 static const u8 sTM03Desc[] = _(
-    "Generates an\n"
-    "ultrasonic wave\n"
-    "that may confuse.");
+    "Attacks and rushes\n"
+    "back to switch with\n"
+    "another Pokémon.");
 
 static const u8 sTM04Desc[] = _(
     "Raises Sp. Atk and\n"
@@ -3187,9 +3187,9 @@ static const u8 sTM31Desc[] = _(
     "and causes damage.");
 
 static const u8 sTM32Desc[] = _(
-    "Creates illusory\n"
-    "copies to enhance\n"
-    "elusiveness.");
+    "Does damage then\n"
+    "switches out the\n"
+    "user.");
 
 static const u8 sTM33Desc[] = _(
     "Creates a wall of\n"
@@ -3197,9 +3197,9 @@ static const u8 sTM33Desc[] = _(
     "physical attacks.");
 
 static const u8 sTM34Desc[] = _(
-    "Zaps the foe with a\n"
-    "jolt of electricity\n"
-    "that never misses.");
+    "Does damage then\n"
+    "switches out the\n"
+    "user.");
 
 static const u8 sTM35Desc[] = _(
     "Looses a stream of\n"
@@ -3227,9 +3227,9 @@ static const u8 sTM39Desc[] = _(
     "May lower Speed.");
 
 static const u8 sTM40Desc[] = _(
-    "An extremely fast\n"
-    "attack that can't\n"
-    "be avoided.");
+    "Traps the foe in a\n"
+    "fierce wind. May\n"
+    "cause confusion.");
 
 static const u8 sTM41Desc[] = _(
     "Prevents the foe\n"

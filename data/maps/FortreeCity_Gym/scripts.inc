@@ -103,7 +103,7 @@ FortreeCity_Gym_EventScript_WinonaDefeated::
 # 52 "data/maps/FortreeCity_Gym/scripts.pory"
 FortreeCity_Gym_EventScript_GiveAerialAce2::
 # 53 "data/maps/FortreeCity_Gym/scripts.pory"
-	giveitem ITEM_TM_AERIAL_ACE
+	giveitem ITEM_TM_HURRICANE
 # 54 "data/maps/FortreeCity_Gym/scripts.pory"
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
 # 55 "data/maps/FortreeCity_Gym/scripts.pory"
@@ -123,7 +123,7 @@ FortreeCity_Gym_EventScript_GiveAerialAce2::
 # 62 "data/maps/FortreeCity_Gym/scripts.pory"
 FortreeCity_Gym_EventScript_GiveAerialAce::
 # 63 "data/maps/FortreeCity_Gym/scripts.pory"
-	giveitem ITEM_TM_AERIAL_ACE
+	giveitem ITEM_TM_HURRICANE
 # 64 "data/maps/FortreeCity_Gym/scripts.pory"
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
 # 65 "data/maps/FortreeCity_Gym/scripts.pory"
@@ -537,11 +537,11 @@ FortreeCity_Gym_Text_ExplainFeatherBadgeTakeThis:
 # 269 "data/maps/FortreeCity_Gym/scripts.pory"
 FortreeCity_Gym_Text_ExplainAerialAce:
 # 270 "data/maps/FortreeCity_Gym/scripts.pory"
-	.string "TM40 contains AERIAL ACE.\p"
+	.string "TM40 contains HURRICANE.\p"
 # 271 "data/maps/FortreeCity_Gym/scripts.pory"
-	.string "Its speed…\n"
+	.string "It's powerful…\n"
 # 272 "data/maps/FortreeCity_Gym/scripts.pory"
-	.string "No POKéMON should be able to avoid it.\p"
+	.string "It might even confuse the foe.\p"
 # 273 "data/maps/FortreeCity_Gym/scripts.pory"
 	.string "With this Mega Stone, you can Mega\n"
 # 274 "data/maps/FortreeCity_Gym/scripts.pory"

@@ -159,7 +159,7 @@ MauvilleCity_Gym_EventScript_Wattson::
 # 80 "data/maps/MauvilleCity_Gym/scripts.pory"
 	goto_if_eq VAR_RESULT, TRUE, MauvilleCity_Gym_EventScript_WattsonRematch
 # 81 "data/maps/MauvilleCity_Gym/scripts.pory"
-	goto_if_unset FLAG_RECEIVED_TM_SHOCK_WAVE, MauvilleCity_Gym_EventScript_GiveShockWave2
+	goto_if_unset FLAG_RECEIVED_TM_VOLT_SWITCH, MauvilleCity_Gym_EventScript_GiveShockWave2
 # 82 "data/maps/MauvilleCity_Gym/scripts.pory"
 	goto_if_eq VAR_NEW_MAUVILLE_STATE, 2, MauvilleCity_Gym_EventScript_CompletedNewMauville
 # 83 "data/maps/MauvilleCity_Gym/scripts.pory"
@@ -229,7 +229,7 @@ MauvilleCity_Gym_EventScript_WattsonDefeated::
 # 115 "data/maps/MauvilleCity_Gym/scripts.pory"
 MauvilleCity_Gym_EventScript_GiveShockWave2::
 # 116 "data/maps/MauvilleCity_Gym/scripts.pory"
-	giveitem ITEM_TM_SHOCK_WAVE
+	giveitem ITEM_TM_VOLT_SWITCH
 # 117 "data/maps/MauvilleCity_Gym/scripts.pory"
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
 # 118 "data/maps/MauvilleCity_Gym/scripts.pory"
@@ -239,7 +239,7 @@ MauvilleCity_Gym_EventScript_GiveShockWave2::
 # 120 "data/maps/MauvilleCity_Gym/scripts.pory"
 	msgbox MauvilleCity_Gym_Text_ExplainShockWave, MSGBOX_DEFAULT
 # 121 "data/maps/MauvilleCity_Gym/scripts.pory"
-	setflag FLAG_RECEIVED_TM_SHOCK_WAVE
+	setflag FLAG_RECEIVED_TM_VOLT_SWITCH
 # 122 "data/maps/MauvilleCity_Gym/scripts.pory"
 	release
 # 123 "data/maps/MauvilleCity_Gym/scripts.pory"
@@ -249,7 +249,7 @@ MauvilleCity_Gym_EventScript_GiveShockWave2::
 # 125 "data/maps/MauvilleCity_Gym/scripts.pory"
 MauvilleCity_Gym_EventScript_GiveShockWave::
 # 126 "data/maps/MauvilleCity_Gym/scripts.pory"
-	giveitem ITEM_TM_SHOCK_WAVE
+	giveitem ITEM_TM_VOLT_SWITCH
 # 127 "data/maps/MauvilleCity_Gym/scripts.pory"
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
 # 128 "data/maps/MauvilleCity_Gym/scripts.pory"
@@ -259,7 +259,7 @@ MauvilleCity_Gym_EventScript_GiveShockWave::
 # 130 "data/maps/MauvilleCity_Gym/scripts.pory"
 	msgbox MauvilleCity_Gym_Text_ExplainShockWave, MSGBOX_DEFAULT
 # 131 "data/maps/MauvilleCity_Gym/scripts.pory"
-	setflag FLAG_RECEIVED_TM_SHOCK_WAVE
+	setflag FLAG_RECEIVED_TM_VOLT_SWITCH
 # 132 "data/maps/MauvilleCity_Gym/scripts.pory"
 	return
 # 133 "data/maps/MauvilleCity_Gym/scripts.pory"
@@ -741,11 +741,11 @@ MauvilleCity_Gym_Text_ExplainDynamoBadgeTakeThis:
 # 371 "data/maps/MauvilleCity_Gym/scripts.pory"
 MauvilleCity_Gym_Text_ExplainShockWave:
 # 372 "data/maps/MauvilleCity_Gym/scripts.pory"
-	.string "That TM34 there contains SHOCK WAVE.\p"
+	.string "That TM34 there contains VOLT SWITCH.\p"
 # 373 "data/maps/MauvilleCity_Gym/scripts.pory"
-	.string "It's a trustworthy move that never\n"
+	.string "It's a electric move that damage and \n"
 # 374 "data/maps/MauvilleCity_Gym/scripts.pory"
-	.string "misses! You can count on it!\p"
+	.string "switches out your POKéMON too! Wahaha!\p"
 # 375 "data/maps/MauvilleCity_Gym/scripts.pory"
 	.string "The Manectite is AWESOME TOO!\p"
 # 376 "data/maps/MauvilleCity_Gym/scripts.pory"

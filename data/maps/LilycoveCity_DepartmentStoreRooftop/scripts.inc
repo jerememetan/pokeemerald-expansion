@@ -157,11 +157,11 @@ LilycoveCity_DepartmentStoreRooftop_EventScript_ChooseDrink::
 # 79 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
 	switch VAR_TEMP_1
 # 80 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
-	case 0, LilycoveCity_DepartmentStoreRooftop_EventScript_FreshWater
+	case 0, LilycoveCity_DepartmentStoreRooftop_EventScript_ElectricSeed
 # 81 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
-	case 1, LilycoveCity_DepartmentStoreRooftop_EventScript_SodaPop
+	case 1, LilycoveCity_DepartmentStoreRooftop_EventScript_PsychicSeed
 # 82 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
-	case 2, LilycoveCity_DepartmentStoreRooftop_EventScript_Lemonade
+	case 2, LilycoveCity_DepartmentStoreRooftop_EventScript_MistySeed
 # 83 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
 	msgbox LilycoveCity_DepartmentStoreRooftop_Text_DecidedAgainstBuyingDrink, MSGBOX_DEFAULT
 # 84 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
@@ -171,9 +171,9 @@ LilycoveCity_DepartmentStoreRooftop_EventScript_ChooseDrink::
 # 86 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
 
 # 87 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
-LilycoveCity_DepartmentStoreRooftop_EventScript_FreshWater::
+LilycoveCity_DepartmentStoreRooftop_EventScript_ElectricSeed::
 # 88 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
-	setvar VAR_TEMP_0, ITEM_FRESH_WATER
+	setvar VAR_TEMP_0, ITEM_ELECTRIC_SEED
 # 89 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
 	goto LilycoveCity_DepartmentStoreRooftop_EventScript_TryBuyDrink
 # 90 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
@@ -181,9 +181,9 @@ LilycoveCity_DepartmentStoreRooftop_EventScript_FreshWater::
 # 91 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
 
 # 92 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
-LilycoveCity_DepartmentStoreRooftop_EventScript_SodaPop::
+LilycoveCity_DepartmentStoreRooftop_EventScript_PsychicSeed::
 # 93 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
-	setvar VAR_TEMP_0, ITEM_SODA_POP
+	setvar VAR_TEMP_0, ITEM_PSYCHIC_SEED
 # 94 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
 	goto LilycoveCity_DepartmentStoreRooftop_EventScript_TryBuyDrink
 # 95 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
@@ -191,9 +191,9 @@ LilycoveCity_DepartmentStoreRooftop_EventScript_SodaPop::
 # 96 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
 
 # 97 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
-LilycoveCity_DepartmentStoreRooftop_EventScript_Lemonade::
+LilycoveCity_DepartmentStoreRooftop_EventScript_MistySeed::
 # 98 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
-	setvar VAR_TEMP_0, ITEM_LEMONADE
+	setvar VAR_TEMP_0, ITEM_MISTY_SEED
 # 99 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
 	goto LilycoveCity_DepartmentStoreRooftop_EventScript_TryBuyDrink
 # 100 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
@@ -201,49 +201,49 @@ LilycoveCity_DepartmentStoreRooftop_EventScript_Lemonade::
 # 101 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
 
 # 102 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
-LilycoveCity_DepartmentStoreRooftop_EventScript_CheckMoneyFreshWater::
+LilycoveCity_DepartmentStoreRooftop_EventScript_CheckMoneyElectricSeed::
 # 103 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
-	checkmoney 200
+	checkmoney 800
 # 104 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
 	return
 # 105 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
 
 # 106 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
-LilycoveCity_DepartmentStoreRooftop_EventScript_CheckMoneySodaPop::
+LilycoveCity_DepartmentStoreRooftop_EventScript_CheckMoneyPsychicSeed::
 # 107 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
-	checkmoney 300
+	checkmoney 800
 # 108 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
 	return
 # 109 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
 
 # 110 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
-LilycoveCity_DepartmentStoreRooftop_EventScript_CheckMoneyLemonade::
+LilycoveCity_DepartmentStoreRooftop_EventScript_CheckMoneyMistySeed::
 # 111 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
-	checkmoney 350
+	checkmoney 800
 # 112 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
 	return
 # 113 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
 
 # 114 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
-LilycoveCity_DepartmentStoreRooftop_EventScript_RemoveMoneyFreshWater::
+LilycoveCity_DepartmentStoreRooftop_EventScript_RemoveMoneyElectricSeed::
 # 115 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
-	removemoney 200
+	removemoney 800
 # 116 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
 	return
 # 117 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
 
 # 118 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
-LilycoveCity_DepartmentStoreRooftop_EventScript_RemoveMoneySodaPop::
+LilycoveCity_DepartmentStoreRooftop_EventScript_RemoveMoneyPsychicSeed::
 # 119 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
-	removemoney 300
+	removemoney 800
 # 120 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
 	return
 # 121 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
 
 # 122 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
-LilycoveCity_DepartmentStoreRooftop_EventScript_RemoveMoneyLemonade::
+LilycoveCity_DepartmentStoreRooftop_EventScript_RemoveMoneyMistySeed::
 # 123 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
-	removemoney 350
+	removemoney 800
 # 124 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
 	return
 # 125 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
@@ -251,11 +251,11 @@ LilycoveCity_DepartmentStoreRooftop_EventScript_RemoveMoneyLemonade::
 # 126 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
 LilycoveCity_DepartmentStoreRooftop_EventScript_TryBuyDrink::
 # 127 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
-	call_if_eq VAR_TEMP_1, 0, LilycoveCity_DepartmentStoreRooftop_EventScript_CheckMoneyFreshWater
+	call_if_eq VAR_TEMP_1, 0, LilycoveCity_DepartmentStoreRooftop_EventScript_CheckMoneyElectricSeed
 # 128 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
-	call_if_eq VAR_TEMP_1, 1, LilycoveCity_DepartmentStoreRooftop_EventScript_CheckMoneySodaPop
+	call_if_eq VAR_TEMP_1, 1, LilycoveCity_DepartmentStoreRooftop_EventScript_CheckMoneyPsychicSeed
 # 129 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
-	call_if_eq VAR_TEMP_1, 2, LilycoveCity_DepartmentStoreRooftop_EventScript_CheckMoneyLemonade
+	call_if_eq VAR_TEMP_1, 2, LilycoveCity_DepartmentStoreRooftop_EventScript_CheckMoneyMistySeed
 # 130 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
 	goto_if_eq VAR_RESULT, FALSE, LilycoveCity_DepartmentStoreRooftop_EventScript_NotEnoughMoneyForDrink
 # 131 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
@@ -263,11 +263,11 @@ LilycoveCity_DepartmentStoreRooftop_EventScript_TryBuyDrink::
 # 132 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
 	goto_if_eq VAR_RESULT, FALSE, LilycoveCity_DepartmentStoreRooftop_EventScript_NoRoomForDrink
 # 133 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
-	call_if_eq VAR_TEMP_1, 0, LilycoveCity_DepartmentStoreRooftop_EventScript_RemoveMoneyFreshWater
+	call_if_eq VAR_TEMP_1, 0, LilycoveCity_DepartmentStoreRooftop_EventScript_RemoveMoneyElectricSeed
 # 134 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
-	call_if_eq VAR_TEMP_1, 1, LilycoveCity_DepartmentStoreRooftop_EventScript_RemoveMoneySodaPop
+	call_if_eq VAR_TEMP_1, 1, LilycoveCity_DepartmentStoreRooftop_EventScript_RemoveMoneyPsychicSeed
 # 135 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
-	call_if_eq VAR_TEMP_1, 2, LilycoveCity_DepartmentStoreRooftop_EventScript_RemoveMoneyLemonade
+	call_if_eq VAR_TEMP_1, 2, LilycoveCity_DepartmentStoreRooftop_EventScript_RemoveMoneyMistySeed
 # 136 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
 	updatemoneybox
 # 137 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
@@ -399,7 +399,7 @@ LilycoveCity_DepartmentStoreRooftop_Text_BeenWaitingForClearOutSale:
 # 200 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
 LilycoveCity_DepartmentStoreRooftop_Text_BoneDryThirsty:
 # 201 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
-	.string "Ohh… I'm bone-dry thirsty!$"
+	.string "Ohh… I'm bone-dry thirsty!$" 
 # 202 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
 
 # 203 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
@@ -407,7 +407,7 @@ LilycoveCity_DepartmentStoreRooftop_Text_WhichDrinkWouldYouLike:
 # 204 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
 	.string "It's a VENDING MACHINE.\n"
 # 205 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
-	.string "Which drink would you like?$"
+	.string "Which Seed would you like?$"
 # 206 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
 
 # 207 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
@@ -415,7 +415,7 @@ LilycoveCity_DepartmentStoreRooftop_Text_CanOfDrinkDroppedDown:
 # 208 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
 	.string "Clang!\p"
 # 209 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
-	.string "A can of {STR_VAR_1} dropped down.$"
+	.string "A box of {STR_VAR_1} dropped down.$"
 # 210 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
 
 # 211 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
@@ -423,7 +423,7 @@ LilycoveCity_DepartmentStoreRooftop_Text_ExtraCanOfDrinkDroppedDown:
 # 212 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
 	.string "Clang!\p"
 # 213 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
-	.string "Score! An extra can of {STR_VAR_1}\n"
+	.string "Score! An extra box of {STR_VAR_1}\n"
 # 214 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
 	.string "dropped down!$"
 # 215 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
@@ -437,4 +437,4 @@ LilycoveCity_DepartmentStoreRooftop_Text_NotEnoughMoney:
 # 219 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
 LilycoveCity_DepartmentStoreRooftop_Text_DecidedAgainstBuyingDrink:
 # 220 "data/maps/LilycoveCity_DepartmentStoreRooftop/scripts.pory"
-	.string "Decided against buying a drink.$"
+	.string "Decided against buying a Seed.$"

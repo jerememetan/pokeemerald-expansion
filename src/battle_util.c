@@ -9422,6 +9422,10 @@ static inline u32 CalcAttackStat(u32 move, u32 battlerAtk, u32 battlerDef, u32 m
         if (IS_MOVE_SPECIAL(move) && !IsDynamaxed(battlerAtk))
             modifier = uq4_12_multiply_half_down(modifier, UQ_4_12(1.5));
         break;
+    case HOLD_EFFECT_LEEK:
+        if ((atkBaseSpeciesId == SPECIES_FARFETCHD || atkBaseSpeciesId == SPECIES_FARFETCHD_GALARIAN|| atkBaseSpeciesId == SPECIES_SIRFETCHD) && IS_MOVE_PHYSICAL(move))
+            modifier = uq4_12_multiply_half_down(modifier, UQ_4_12(1.5));
+        break;
     }
 
     // The offensive stats of a Player's Pokémon are boosted by x1.1 (+10%) if they have the 1st badge and 7th badges.

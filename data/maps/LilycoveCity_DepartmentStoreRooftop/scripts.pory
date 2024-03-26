@@ -77,62 +77,62 @@ LilycoveCity_DepartmentStoreRooftop_EventScript_ChooseDrink::
 	multichoice 16, 0, MULTI_VENDING_MACHINE, FALSE
 	copyvar VAR_TEMP_1, VAR_RESULT
 	switch VAR_TEMP_1
-	case 0, LilycoveCity_DepartmentStoreRooftop_EventScript_FreshWater
-	case 1, LilycoveCity_DepartmentStoreRooftop_EventScript_SodaPop
-	case 2, LilycoveCity_DepartmentStoreRooftop_EventScript_Lemonade
+	case 0, LilycoveCity_DepartmentStoreRooftop_EventScript_ElectricSeed
+	case 1, LilycoveCity_DepartmentStoreRooftop_EventScript_PsychicSeed
+	case 2, LilycoveCity_DepartmentStoreRooftop_EventScript_MistySeed
 	msgbox LilycoveCity_DepartmentStoreRooftop_Text_DecidedAgainstBuyingDrink, MSGBOX_DEFAULT
 	goto LilycoveCity_DepartmentStoreRooftop_EventScript_ExitVendingMachine
 	end
 
-LilycoveCity_DepartmentStoreRooftop_EventScript_FreshWater::
-	setvar VAR_TEMP_0, ITEM_FRESH_WATER
+LilycoveCity_DepartmentStoreRooftop_EventScript_ElectricSeed::
+	setvar VAR_TEMP_0, ITEM_ELECTRIC_SEED
 	goto LilycoveCity_DepartmentStoreRooftop_EventScript_TryBuyDrink
 	end
 
-LilycoveCity_DepartmentStoreRooftop_EventScript_SodaPop::
-	setvar VAR_TEMP_0, ITEM_SODA_POP
+LilycoveCity_DepartmentStoreRooftop_EventScript_PsychicSeed::
+	setvar VAR_TEMP_0, ITEM_PSYCHIC_SEED
 	goto LilycoveCity_DepartmentStoreRooftop_EventScript_TryBuyDrink
 	end
 
-LilycoveCity_DepartmentStoreRooftop_EventScript_Lemonade::
-	setvar VAR_TEMP_0, ITEM_LEMONADE
+LilycoveCity_DepartmentStoreRooftop_EventScript_MistySeed::
+	setvar VAR_TEMP_0, ITEM_MISTY_SEED
 	goto LilycoveCity_DepartmentStoreRooftop_EventScript_TryBuyDrink
 	end
 
-LilycoveCity_DepartmentStoreRooftop_EventScript_CheckMoneyFreshWater::
-	checkmoney 200
+LilycoveCity_DepartmentStoreRooftop_EventScript_CheckMoneyElectricSeed::
+	checkmoney 800
 	return
 
-LilycoveCity_DepartmentStoreRooftop_EventScript_CheckMoneySodaPop::
-	checkmoney 300
+LilycoveCity_DepartmentStoreRooftop_EventScript_CheckMoneyPsychicSeed::
+	checkmoney 800
 	return
 
-LilycoveCity_DepartmentStoreRooftop_EventScript_CheckMoneyLemonade::
-	checkmoney 350
+LilycoveCity_DepartmentStoreRooftop_EventScript_CheckMoneyMistySeed::
+	checkmoney 800
 	return
 
-LilycoveCity_DepartmentStoreRooftop_EventScript_RemoveMoneyFreshWater::
-	removemoney 200
+LilycoveCity_DepartmentStoreRooftop_EventScript_RemoveMoneyElectricSeed::
+	removemoney 800
 	return
 
-LilycoveCity_DepartmentStoreRooftop_EventScript_RemoveMoneySodaPop::
-	removemoney 300
+LilycoveCity_DepartmentStoreRooftop_EventScript_RemoveMoneyPsychicSeed::
+	removemoney 800
 	return
 
-LilycoveCity_DepartmentStoreRooftop_EventScript_RemoveMoneyLemonade::
-	removemoney 350
+LilycoveCity_DepartmentStoreRooftop_EventScript_RemoveMoneyMistySeed::
+	removemoney 800
 	return
 
 LilycoveCity_DepartmentStoreRooftop_EventScript_TryBuyDrink::
-	call_if_eq VAR_TEMP_1, 0, LilycoveCity_DepartmentStoreRooftop_EventScript_CheckMoneyFreshWater
-	call_if_eq VAR_TEMP_1, 1, LilycoveCity_DepartmentStoreRooftop_EventScript_CheckMoneySodaPop
-	call_if_eq VAR_TEMP_1, 2, LilycoveCity_DepartmentStoreRooftop_EventScript_CheckMoneyLemonade
+	call_if_eq VAR_TEMP_1, 0, LilycoveCity_DepartmentStoreRooftop_EventScript_CheckMoneyElectricSeed
+	call_if_eq VAR_TEMP_1, 1, LilycoveCity_DepartmentStoreRooftop_EventScript_CheckMoneyPsychicSeed
+	call_if_eq VAR_TEMP_1, 2, LilycoveCity_DepartmentStoreRooftop_EventScript_CheckMoneyMistySeed
 	goto_if_eq VAR_RESULT, FALSE, LilycoveCity_DepartmentStoreRooftop_EventScript_NotEnoughMoneyForDrink
 	checkitemspace VAR_TEMP_0
 	goto_if_eq VAR_RESULT, FALSE, LilycoveCity_DepartmentStoreRooftop_EventScript_NoRoomForDrink
-	call_if_eq VAR_TEMP_1, 0, LilycoveCity_DepartmentStoreRooftop_EventScript_RemoveMoneyFreshWater
-	call_if_eq VAR_TEMP_1, 1, LilycoveCity_DepartmentStoreRooftop_EventScript_RemoveMoneySodaPop
-	call_if_eq VAR_TEMP_1, 2, LilycoveCity_DepartmentStoreRooftop_EventScript_RemoveMoneyLemonade
+	call_if_eq VAR_TEMP_1, 0, LilycoveCity_DepartmentStoreRooftop_EventScript_RemoveMoneyElectricSeed
+	call_if_eq VAR_TEMP_1, 1, LilycoveCity_DepartmentStoreRooftop_EventScript_RemoveMoneyPsychicSeed
+	call_if_eq VAR_TEMP_1, 2, LilycoveCity_DepartmentStoreRooftop_EventScript_RemoveMoneyMistySeed
 	updatemoneybox
 	bufferitemname STR_VAR_1, VAR_TEMP_0
 	playse SE_VEND
@@ -198,24 +198,24 @@ LilycoveCity_DepartmentStoreRooftop_Text_BeenWaitingForClearOutSale:
 	.string "here. I'm going to load up, that I am!$"
 
 LilycoveCity_DepartmentStoreRooftop_Text_BoneDryThirsty:
-	.string "Ohh… I'm bone-dry thirsty!$"
+	.string "Ohh… I'm bone-dry thirsty!$" 
 
 LilycoveCity_DepartmentStoreRooftop_Text_WhichDrinkWouldYouLike:
 	.string "It's a VENDING MACHINE.\n"
-	.string "Which drink would you like?$"
+	.string "Which Seed would you like?$"
 
 LilycoveCity_DepartmentStoreRooftop_Text_CanOfDrinkDroppedDown:
 	.string "Clang!\p"
-	.string "A can of {STR_VAR_1} dropped down.$"
+	.string "A box of {STR_VAR_1} dropped down.$"
 
 LilycoveCity_DepartmentStoreRooftop_Text_ExtraCanOfDrinkDroppedDown:
 	.string "Clang!\p"
-	.string "Score! An extra can of {STR_VAR_1}\n"
+	.string "Score! An extra box of {STR_VAR_1}\n"
 	.string "dropped down!$"
 
 LilycoveCity_DepartmentStoreRooftop_Text_NotEnoughMoney:
 	.string "Not enough money…$"
 
 LilycoveCity_DepartmentStoreRooftop_Text_DecidedAgainstBuyingDrink:
-	.string "Decided against buying a drink.$"
+	.string "Decided against buying a Seed.$"
 `
