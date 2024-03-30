@@ -55,7 +55,7 @@
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_MAN_5",
-      "x": 3,
+      "x": 1,
       "y": 10,
       "elevation": 3,
       "movement_type": "MOVEMENT_TYPE_FACE_DOWN",
@@ -68,8 +68,8 @@
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_GIRL_3",
-      "x": 5,
-      "y": 2,
+      "x": 1,
+      "y": 5,
       "elevation": 3,
       "movement_type": "MOVEMENT_TYPE_FACE_DOWN",
       "movement_range_x": 0,
@@ -173,13 +173,13 @@
     },
     {
       "x": 0,
-      "y": 10,
+      "y": 9,
       "elevation": 3,
       "dest_map": "MAP_LAVARIDGE_TOWN_GYM_B1F",
       "dest_warp_id": "9"
     },
     {
-      "x": 3,
+      "x": 1,
       "y": 10,
       "elevation": 3,
       "dest_map": "MAP_LAVARIDGE_TOWN_GYM_B1F",
@@ -214,8 +214,8 @@
       "dest_warp_id": "14"
     },
     {
-      "x": 5,
-      "y": 2,
+      "x": 1,
+      "y": 5,
       "elevation": 3,
       "dest_map": "MAP_LAVARIDGE_TOWN_GYM_B1F",
       "dest_warp_id": "15"

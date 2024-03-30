@@ -5,7 +5,7 @@
   "music": "MUS_MT_PYRE",
   "region_map_section": "MAPSEC_MT_PYRE",
   "requires_flash": false,
-  "weather": "WEATHER_NONE",
+  "weather": "WEATHER_FOG_DIAGONAL",
   "map_type": "MAP_TYPE_INDOOR",
   "allow_cycling": false,
   "allow_escaping": false,
@@ -91,8 +91,8 @@
       "dest_warp_id": "0"
     },
     {
-      "x": 20,
-      "y": 9,
+      "x": 7,
+      "y": 5,
       "elevation": 3,
       "dest_map": "MAP_MT_PYRE_2F",
       "dest_warp_id": "4"

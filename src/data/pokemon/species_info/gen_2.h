@@ -3275,7 +3275,7 @@ const struct SpeciesInfo gSpeciesInfoGen2[] =
         ICON(Gligar, 0),
         .footprint = gMonFootprint_Gligar,
         LEARNSETS(Gligar),
-        .evolutions = EVOLUTION({EVO_ITEM_HOLD, ITEM_RAZOR_FANG, SPECIES_GLISCOR}),
+        .evolutions = EVOLUTION({EVO_ITEM, ITEM_DUSK_STONE, SPECIES_GLISCOR}),
     },
 
 #if P_GEN_4_CROSS_EVOS
@@ -3762,7 +3762,7 @@ const struct SpeciesInfo gSpeciesInfoGen2[] =
         PALETTES(Sneasel),
         ICON(Sneasel, 0),
         LEARNSETS(Sneasel),
-        .evolutions = EVOLUTION({EVO_ITEM_HOLD, ITEM_RAZOR_CLAW, SPECIES_WEAVILE}),
+        .evolutions = EVOLUTION({EVO_ITEM, ITEM_DUSK_STONE, SPECIES_WEAVILE}),
     },
 
 #if P_GEN_4_CROSS_EVOS
@@ -3844,7 +3844,7 @@ const struct SpeciesInfo gSpeciesInfoGen2[] =
         ICON(SneaselHisuian, 2),
         LEARNSETS(SneaselHisuian),
         .isHisuianForm = TRUE,
-        .evolutions = EVOLUTION({EVO_ITEM_HOLD, ITEM_RAZOR_CLAW, SPECIES_SNEASLER}),
+        .evolutions = EVOLUTION({EVO_ITEM, ITEM_DUSK_STONE, SPECIES_SNEASLER}),
     },
 
     [SPECIES_SNEASLER] =

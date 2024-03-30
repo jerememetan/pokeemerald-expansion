@@ -73,7 +73,7 @@ SootopolisCity_LotadAndSeedotHouse_EventScript_BigSeedot::
 # 37 "data/maps/SootopolisCity_LotadAndSeedotHouse/scripts.pory"
 	msgbox SootopolisCity_LotadAndSeedotHouse_Text_GoshMightBeBiggerThanLotad, MSGBOX_DEFAULT
 # 38 "data/maps/SootopolisCity_LotadAndSeedotHouse/scripts.pory"
-	giveitem ITEM_ELIXIR
+	giveitem ITEM_BIG_ROOT
 # 39 "data/maps/SootopolisCity_LotadAndSeedotHouse/scripts.pory"
 	goto_if_eq VAR_RESULT, FALSE, SootopolisCity_LotadAndSeedotHouse_EventScript_NoRoomForElixir1
 # 40 "data/maps/SootopolisCity_LotadAndSeedotHouse/scripts.pory"
@@ -161,7 +161,7 @@ SootopolisCity_LotadAndSeedotHouse_EventScript_BigLotad::
 # 81 "data/maps/SootopolisCity_LotadAndSeedotHouse/scripts.pory"
 	msgbox SootopolisCity_LotadAndSeedotHouse_Text_WowMightBeBiggerThanSeedot, MSGBOX_DEFAULT
 # 82 "data/maps/SootopolisCity_LotadAndSeedotHouse/scripts.pory"
-	giveitem ITEM_ELIXIR
+	giveitem ITEM_BIG_ROOT
 # 83 "data/maps/SootopolisCity_LotadAndSeedotHouse/scripts.pory"
 	goto_if_eq VAR_RESULT, FALSE, SootopolisCity_LotadAndSeedotHouse_EventScript_NoRoomForElixir2
 # 84 "data/maps/SootopolisCity_LotadAndSeedotHouse/scripts.pory"

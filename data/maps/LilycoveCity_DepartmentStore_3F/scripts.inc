@@ -41,9 +41,9 @@ LilycoveCity_DepartmentStore_3F_Pokemart_Vitamins:
 # 21 "data/maps/LilycoveCity_DepartmentStore_3F/scripts.pory"
 	.2byte ITEM_ABILITY_SHIELD
 # 22 "data/maps/LilycoveCity_DepartmentStore_3F/scripts.pory"
-	.2byte ITEM_RAZOR_CLAW
+	.2byte ITEM_SCOPE_LENS
 # 23 "data/maps/LilycoveCity_DepartmentStore_3F/scripts.pory"
-	.2byte ITEM_RAZOR_FANG
+	.2byte ITEM_METAL_COAT
 # 24 "data/maps/LilycoveCity_DepartmentStore_3F/scripts.pory"
 	.2byte ITEM_EVIOLITE
 # 25 "data/maps/LilycoveCity_DepartmentStore_3F/scripts.pory"
@@ -95,19 +95,19 @@ LilycoveCity_DepartmentStore_3F_EventScript_ClerkRight::
 # 48 "data/maps/LilycoveCity_DepartmentStore_3F/scripts.pory"
 LilycoveCity_DepartmentStore_3F_Pokemart_StatBoosters:
 # 49 "data/maps/LilycoveCity_DepartmentStore_3F/scripts.pory"
-	.2byte ITEM_X_SPEED
+	.2byte ITEM_CELL_BATTERY
 # 50 "data/maps/LilycoveCity_DepartmentStore_3F/scripts.pory"
-	.2byte ITEM_X_SP_ATK
+	.2byte ITEM_ABSORB_BULB
 # 51 "data/maps/LilycoveCity_DepartmentStore_3F/scripts.pory"
-	.2byte ITEM_X_ATTACK
+	.2byte ITEM_LUMINOUS_MOSS
 # 52 "data/maps/LilycoveCity_DepartmentStore_3F/scripts.pory"
-	.2byte ITEM_X_DEFENSE
+	.2byte ITEM_SNOWBALL
 # 53 "data/maps/LilycoveCity_DepartmentStore_3F/scripts.pory"
-	.2byte ITEM_DIRE_HIT
+	.2byte ITEM_EJECT_BUTTON
 # 54 "data/maps/LilycoveCity_DepartmentStore_3F/scripts.pory"
-	.2byte ITEM_GUARD_SPEC
+	.2byte ITEM_EJECT_PACK
 # 55 "data/maps/LilycoveCity_DepartmentStore_3F/scripts.pory"
-	.2byte ITEM_X_ACCURACY
+	.2byte ITEM_BLUNDER_POLICY
 # 56 "data/maps/LilycoveCity_DepartmentStore_3F/scripts.pory"
 	.2byte ITEM_NONE
 # 57 "data/maps/LilycoveCity_DepartmentStore_3F/scripts.pory"

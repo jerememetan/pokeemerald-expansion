@@ -45,6 +45,8 @@ PetalburgCity_Mart_Pokemart_Expanded:
 	.2byte ITEM_SMOKE_BALL
 	.2byte ITEM_HONEY
 	.2byte ITEM_LINKING_CORD
+	.2byte ITEM_FLAME_ORB
+	.2byte ITEM_TOXIC_ORB
 	.2byte ITEM_NONE
 	release
 	end

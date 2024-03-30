@@ -12,7 +12,7 @@
   "allow_running": false,
   "show_map_name": false,
   "battle_scene": "MAP_BATTLE_SCENE_GYM",
-  "connections": null,
+  "connections": 0,
   "object_events": [
     {
       "graphics_id": "OBJ_EVENT_GFX_TATE",
@@ -42,10 +42,10 @@
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_PSYCHIC_M",
-      "x": 5,
+      "x": 4,
       "y": 20,
       "elevation": 3,
-      "movement_type": "MOVEMENT_TYPE_FACE_UP",
+      "movement_type": "MOVEMENT_TYPE_FACE_LEFT",
       "movement_range_x": 0,
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NORMAL",
@@ -185,7 +185,7 @@
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_TRICK_HOUSE_STATUE",
-      "x": 5,
+      "x": 4,
       "y": 21,
       "elevation": 3,
       "movement_type": "MOVEMENT_TYPE_LOOK_AROUND",
@@ -586,8 +586,8 @@
   "coord_events": [
     {
       "type": "trigger",
-      "x": 2,
-      "y": 21,
+      "x": 4,
+      "y": 22,
       "elevation": 3,
       "var": "VAR_TEMP_1",
       "var_value": "0",
@@ -596,7 +596,7 @@
     {
       "type": "trigger",
       "x": 8,
-      "y": 10,
+      "y": 9,
       "elevation": 3,
       "var": "VAR_TEMP_1",
       "var_value": "0",
@@ -622,8 +622,8 @@
     },
     {
       "type": "trigger",
-      "x": 23,
-      "y": 24,
+      "x": 24,
+      "y": 25,
       "elevation": 3,
       "var": "VAR_TEMP_1",
       "var_value": "0",
@@ -632,7 +632,7 @@
     {
       "type": "trigger",
       "x": 23,
-      "y": 21,
+      "y": 22,
       "elevation": 3,
       "var": "VAR_TEMP_1",
       "var_value": "0",
@@ -640,8 +640,8 @@
     },
     {
       "type": "trigger",
-      "x": 8,
-      "y": 6,
+      "x": 6,
+      "y": 4,
       "elevation": 3,
       "var": "VAR_TEMP_1",
       "var_value": "0",

@@ -5289,6 +5289,7 @@ static const u16 sElectrodeTeachableLearnset[] = {
     MOVE_THIEF,
     MOVE_THUNDER,
     MOVE_THUNDERBOLT,
+    MOVE_VOLT_SWITCH,
     MOVE_TORMENT,
     MOVE_TOXIC,
     MOVE_ENDURE,

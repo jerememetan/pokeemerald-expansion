@@ -3,15 +3,15 @@ Route102_EventScript_ItemPotion::
 	end
 
 Route103_EventScript_ItemGuardSpec::
-	finditem ITEM_GUARD_SPEC
+	finditem ITEM_FULL_HEAL
 	end
 
 Route103_EventScript_ItemPPUp::
-	finditem ITEM_PP_UP
+	finditem ITEM_PP_MAX
 	end
 
 Route104_EventScript_ItemPPUp::
-	finditem ITEM_PP_UP
+	finditem ITEM_PP_MAX
 	end
 
 Route104_EventScript_ItemPokeBall::
@@ -19,7 +19,7 @@ Route104_EventScript_ItemPokeBall::
 	end
 
 Route104_EventScript_ItemXAccuracy::
-	finditem ITEM_X_ACCURACY
+	finditem ITEM_NUGGET
 	end
 
 Route104_EventScript_ItemPotion::
@@ -27,11 +27,11 @@ Route104_EventScript_ItemPotion::
 	end
 
 Route105_EventScript_ItemIron::
-	finditem ITEM_IRON
+	finditem ITEM_FULL_RESTORE
 	end
 
 Route106_EventScript_ItemProtein::
-	finditem ITEM_PROTEIN
+	finditem ITEM_MAX_POTION
 	end
 
 Route108_EventScript_ItemStarPiece::
@@ -39,7 +39,7 @@ Route108_EventScript_ItemStarPiece::
 	end
 
 Route109_EventScript_ItemPPUp::
-	finditem ITEM_PP_UP
+	finditem ITEM_PP_MAX
 	end
 
 Route109_EventScript_ItemPotion::
@@ -47,11 +47,11 @@ Route109_EventScript_ItemPotion::
 	end
 
 Route110_EventScript_ItemRareCandy::
-	finditem ITEM_RARE_CANDY
+	finditem ITEM_MAX_POTION
 	end
 
 Route110_EventScript_ItemDireHit::
-	finditem ITEM_DIRE_HIT
+	finditem ITEM_NUGGET
 	end
 
 Route110_EventScript_ItemElixir::
@@ -67,7 +67,7 @@ Route111_EventScript_ItemStardust::
 	end
 
 Route111_EventScript_ItemHPUp::
-	finditem ITEM_HP_UP
+	finditem ITEM_NUGGET
 	end
 
 Route111_EventScript_ItemElixir::
@@ -91,11 +91,11 @@ Route113_EventScript_ItemHyperPotion::
 	end
 
 Route114_EventScript_ItemRareCandy::
-	finditem ITEM_RARE_CANDY
+	finditem ITEM_MAX_POTION
 	end
 
 Route114_EventScript_ItemProtein::
-	finditem ITEM_PROTEIN
+	finditem ITEM_MAX_POTION
 	end
 
 Route114_EventScript_ItemEnergyPowder::
@@ -111,7 +111,7 @@ Route115_EventScript_ItemTMFocusPunch::
 	end
 
 Route115_EventScript_ItemIron::
-	finditem ITEM_IRON
+	finditem ITEM_FULL_RESTORE
 	end
 
 Route115_EventScript_ItemGreatBall::
@@ -123,11 +123,11 @@ Route115_EventScript_ItemHealPowder::
 	end
 
 Route115_EventScript_ItemPPUp::
-	finditem ITEM_PP_UP
+	finditem ITEM_PP_MAX
 	end
 
 Route116_EventScript_ItemXSpecial::
-	finditem ITEM_X_SP_ATK
+	finditem ITEM_ULTRA_BALL
 	end
 
 Route116_EventScript_ItemEther::
@@ -139,7 +139,7 @@ Route116_EventScript_ItemRepel::
 	end
 
 Route116_EventScript_ItemHPUp::
-	finditem ITEM_HP_UP
+	finditem ITEM_NUGGET
 	end
 
 Route116_EventScript_ItemPotion::
@@ -151,7 +151,7 @@ Route117_EventScript_ItemGreatBall::
 	end
 
 Route117_EventScript_ItemRevive::
-	finditem ITEM_REVIVE
+	finditem ITEM_SUPER_POTION
 	end
 
 Route118_EventScript_ItemHyperPotion::
@@ -163,7 +163,7 @@ Route119_EventScript_ItemSuperRepel::
 	end
 
 Route119_EventScript_ItemZinc::
-	finditem ITEM_ZINC
+	finditem ITEM_ETHER
 	end
 
 Route119_EventScript_ItemElixir::
@@ -175,7 +175,7 @@ Route119_EventScript_ItemLeafStone::
 	end
 
 Route119_EventScript_ItemRareCandy::
-	finditem ITEM_RARE_CANDY
+	finditem ITEM_MAX_POTION
 	end
 
 Route119_EventScript_ItemHyperPotion::
@@ -207,23 +207,23 @@ Route120_EventScript_ItemNestBall::
 	end
 
 Route120_EventScript_ItemRevive::
-	finditem ITEM_REVIVE
+	finditem ITEM_SUPER_POTION
 	end
 
 Route121_EventScript_ItemCarbos::
-	finditem ITEM_CARBOS
+	finditem ITEM_SUPER_POTION
 	end
 
 Route121_EventScript_ItemRevive::
-	finditem ITEM_REVIVE
+	finditem ITEM_SUPER_POTION
 	end
 
 Route121_EventScript_ItemZinc::
-	finditem ITEM_ZINC
+	finditem ITEM_ETHER
 	end
 
 Route123_EventScript_ItemCalcium::
-	finditem ITEM_CALCIUM
+	finditem ITEM_FULL_RESTORE
 	end
 
 Route123_EventScript_ItemUltraBall::
@@ -235,11 +235,11 @@ Route123_EventScript_ItemElixir::
 	end
 
 Route123_EventScript_ItemPPUp::
-	finditem ITEM_PP_UP
+	finditem ITEM_PP_MAX
 	end
 
 Route123_EventScript_ItemRevivalHerb::
-	finditem ITEM_REVIVAL_HERB
+	finditem ITEM_FULL_RESTORE
 	end
 
 Route124_EventScript_ItemRedShard::
@@ -263,23 +263,23 @@ Route126_EventScript_ItemGreenShard::
 	end
 
 Route127_EventScript_ItemZinc::
-	finditem ITEM_ZINC
+	finditem ITEM_ETHER
 	end
 
 Route127_EventScript_ItemCarbos::
-	finditem ITEM_CARBOS
+	finditem ITEM_SUPER_POTION
 	end
 
 Route127_EventScript_ItemRareCandy::
-	finditem ITEM_RARE_CANDY
+	finditem ITEM_MAX_POTION
 	end
 
 Route132_EventScript_ItemRareCandy::
-	finditem ITEM_RARE_CANDY
+	finditem ITEM_MAX_POTION
 	end
 
 Route132_EventScript_ItemProtein::
-	finditem ITEM_PROTEIN
+	finditem ITEM_MAX_POTION
 	end
 
 Route133_EventScript_ItemBigPearl::
@@ -295,7 +295,7 @@ Route133_EventScript_ItemMaxRevive::
 	end
 
 Route134_EventScript_ItemCarbos::
-	finditem ITEM_CARBOS
+	finditem ITEM_SUPER_POTION
 	end
 
 Route134_EventScript_ItemStarPiece::
@@ -339,7 +339,7 @@ PetalburgWoods_EventScript_ItemEther::
 	end
 
 PetalburgWoods_EventScript_ItemParalyzeHeal::
-	finditem ITEM_PARALYZE_HEAL
+	finditem ITEM_FULL_HEAL
 	end
 
 RusturfTunnel_EventScript_ItemPokeBall::
@@ -351,7 +351,7 @@ RusturfTunnel_EventScript_ItemMaxEther::
 	end
 
 GraniteCave_1F_EventScript_ItemEscapeRope::
-	finditem ITEM_ESCAPE_ROPE
+	finditem ITEM_HYPER_POTION
 	end
 
 GraniteCave_B1F_EventScript_ItemPokeBall::
@@ -363,11 +363,11 @@ GraniteCave_B2F_EventScript_ItemRepel::
 	end
 
 GraniteCave_B2F_EventScript_ItemRareCandy::
-	finditem ITEM_RARE_CANDY
+	finditem ITEM_MAX_POTION
 	end
 
 JaggedPass_EventScript_ItemBurnHeal::
-	finditem ITEM_BURN_HEAL
+	finditem ITEM_FULL_HEAL
 	end
 
 FieryPath_EventScript_ItemFireStone::
@@ -391,7 +391,7 @@ MeteorFalls_1F_1R_EventScript_ItemMoonStone::
 	end
 
 MeteorFalls_1F_1R_EventScript_ItemPPUP::
-	finditem ITEM_PP_UP
+	finditem ITEM_PP_MAX
 	end
 
 MeteorFalls_B1F_2R_EventScript_ItemTMDragonClaw::
@@ -403,7 +403,7 @@ NewMauville_Inside_EventScript_ItemUltraBall::
 	end
 
 NewMauville_Inside_EventScript_ItemEscapeRope::
-	finditem ITEM_ESCAPE_ROPE
+	finditem ITEM_HYPER_POTION
 	end
 
 NewMauville_Inside_EventScript_ItemThunderStone::
@@ -415,7 +415,7 @@ NewMauville_Inside_EventScript_ItemFullHeal::
 	end
 
 NewMauville_Inside_EventScript_ItemParalyzeHeal::
-	finditem ITEM_PARALYZE_HEAL
+	finditem ITEM_FULL_HEAL
 	end
 
 AbandonedShip_Rooms_1F_EventScript_ItemHarborMail::
@@ -423,7 +423,7 @@ AbandonedShip_Rooms_1F_EventScript_ItemHarborMail::
 	end
 
 AbandonedShip_Rooms_B1F_EventScript_ItemEscapeRope::
-	finditem ITEM_ESCAPE_ROPE
+	finditem ITEM_HYPER_POTION
 	end
 
 AbandonedShip_Rooms2_B1F_EventScript_ItemDiveBall::
@@ -435,7 +435,7 @@ AbandonedShip_Room_B1F_EventScript_ItemTMIceBeam::
 	end
 
 AbandonedShip_Rooms2_1F_EventScript_ItemRevive::
-	finditem ITEM_REVIVE
+	finditem ITEM_SUPER_POTION
 	end
 
 AbandonedShip_CaptainsOffice_EventScript_ItemStorageKey::
@@ -467,7 +467,7 @@ SafariZone_Northwest_EventScript_ItemTMSolarBeam::
 	end
 
 SafariZone_North_EventScript_ItemCalcium::
-	finditem ITEM_CALCIUM
+	finditem ITEM_FULL_RESTORE
 	end
 
 SafariZone_Southwest_EventScript_ItemMaxRevive::
@@ -547,11 +547,11 @@ ShoalCave_LowTideEntranceRoom_EventScript_ItemBigPearl::
 	end
 
 ShoalCave_LowTideInnerRoom_EventScript_ItemRareCandy::
-	finditem ITEM_RARE_CANDY
+	finditem ITEM_MAX_POTION
 	end
 
 ShoalCave_LowTideStairsRoom_EventScript_ItemIceHeal::
-	finditem ITEM_ICE_HEAL
+	finditem ITEM_FULL_HEAL
 	end
 
 ShoalCave_LowTideIceRoom_EventScript_ItemTMHail::
@@ -607,7 +607,7 @@ VictoryRoad_1F_EventScript_ItemMaxElixir::
 	end
 
 VictoryRoad_1F_EventScript_ItemPPUp::
-	finditem ITEM_PP_UP
+	finditem ITEM_PP_MAX
 	end
 
 VictoryRoad_B1F_EventScript_ItemTMPsychic::
@@ -623,15 +623,15 @@ VictoryRoad_B2F_EventScript_ItemFullHeal::
 	end
 
 ArtisanCave_B1F_EventScript_ItemHPUp::
-	finditem ITEM_HP_UP
+	finditem ITEM_NUGGET
 	end
 
 ArtisanCave_1F_EventScript_ItemCarbos::
-	finditem ITEM_CARBOS
+	finditem ITEM_SUPER_POTION
 	end
 
 MagmaHideout_1F_EventScript_ItemRareCandy::
-	finditem ITEM_RARE_CANDY
+	finditem ITEM_MAX_POTION
 	end
 
 MagmaHideout_2F_2R_EventScript_ItemMaxElixir::
@@ -655,5 +655,5 @@ MagmaHideout_4F_EventScript_ItemMaxRevive::
 	end
 
 MagmaHideout_3F_3R_EventScript_ItemEscapeRope::
-	finditem ITEM_ESCAPE_ROPE
+	finditem ITEM_HYPER_POTION
 	end

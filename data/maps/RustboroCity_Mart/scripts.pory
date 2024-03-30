@@ -46,7 +46,6 @@ RustboroCity_Mart_Pokemart_Expanded:
 	.2byte ITEM_MOON_BALL
 	.2byte ITEM_TIMER_BALL
 	.2byte ITEM_REPEAT_BALL
-	.2byte ITEM_ESCAPE_ROPE
 	.2byte ITEM_REPEL
 	.2byte ITEM_SUPER_REPEL
 	.2byte ITEM_RED_NECTAR
@@ -54,6 +53,11 @@ RustboroCity_Mart_Pokemart_Expanded:
 	.2byte ITEM_PURPLE_NECTAR
 	.2byte ITEM_PINK_NECTAR
 	.2byte ITEM_THICK_CLUB
+	.2byte ITEM_LIGHT_BALL
+	.2byte ITEM_LUCKY_PUNCH
+	.2byte ITEM_LEEK
+	.2byte ITEM_LUCKY_PUNCH
+	.2byte ITEM_QUICK_POWDER
 	.2byte ITEM_NONE
 	release
 	end

@@ -93,68 +93,72 @@ PetalburgCity_Mart_Pokemart_Expanded:
 # 47 "data/maps/PetalburgCity_Mart/scripts.pory"
 	.2byte ITEM_LINKING_CORD
 # 48 "data/maps/PetalburgCity_Mart/scripts.pory"
-	.2byte ITEM_NONE
+	.2byte ITEM_FLAME_ORB
 # 49 "data/maps/PetalburgCity_Mart/scripts.pory"
-	release
+	.2byte ITEM_TOXIC_ORB
 # 50 "data/maps/PetalburgCity_Mart/scripts.pory"
-	end
+	.2byte ITEM_NONE
 # 51 "data/maps/PetalburgCity_Mart/scripts.pory"
-
+	release
 # 52 "data/maps/PetalburgCity_Mart/scripts.pory"
-PetalburgCity_Mart_EventScript_Woman::
+	end
 # 53 "data/maps/PetalburgCity_Mart/scripts.pory"
-	msgbox PetalburgCity_Mart_Text_WeakWillGrowStronger, MSGBOX_NPC
+
 # 54 "data/maps/PetalburgCity_Mart/scripts.pory"
-	end
+PetalburgCity_Mart_EventScript_Woman::
 # 55 "data/maps/PetalburgCity_Mart/scripts.pory"
-
+	msgbox PetalburgCity_Mart_Text_WeakWillGrowStronger, MSGBOX_NPC
 # 56 "data/maps/PetalburgCity_Mart/scripts.pory"
-PetalburgCity_Mart_EventScript_Boy::
+	end
 # 57 "data/maps/PetalburgCity_Mart/scripts.pory"
-	msgbox PetalburgCity_Mart_Text_RepelIsUseful, MSGBOX_NPC
+
 # 58 "data/maps/PetalburgCity_Mart/scripts.pory"
-	end
+PetalburgCity_Mart_EventScript_Boy::
 # 59 "data/maps/PetalburgCity_Mart/scripts.pory"
-
+	msgbox PetalburgCity_Mart_Text_RepelIsUseful, MSGBOX_NPC
 # 60 "data/maps/PetalburgCity_Mart/scripts.pory"
-PetalburgCity_Mart_EventScript_Man::
-# 61 "data/maps/PetalburgCity_Mart/scripts.pory"
-	msgbox PetalburgCity_Mart_Text_TakeSomeAntidotesWithYou, MSGBOX_NPC
-# 62 "data/maps/PetalburgCity_Mart/scripts.pory"
 	end
+# 61 "data/maps/PetalburgCity_Mart/scripts.pory"
+
+# 62 "data/maps/PetalburgCity_Mart/scripts.pory"
+PetalburgCity_Mart_EventScript_Man::
 # 63 "data/maps/PetalburgCity_Mart/scripts.pory"
-
+	msgbox PetalburgCity_Mart_Text_TakeSomeAntidotesWithYou, MSGBOX_NPC
 # 64 "data/maps/PetalburgCity_Mart/scripts.pory"
-PetalburgCity_Mart_Text_WeakWillGrowStronger:
+	end
 # 65 "data/maps/PetalburgCity_Mart/scripts.pory"
-	.string "Even if a POKéMON is weak now,\n"
+
 # 66 "data/maps/PetalburgCity_Mart/scripts.pory"
-	.string "it will grow stronger.\p"
+PetalburgCity_Mart_Text_WeakWillGrowStronger:
 # 67 "data/maps/PetalburgCity_Mart/scripts.pory"
-	.string "The most important thing is love!\n"
+	.string "Even if a POKéMON is weak now,\n"
 # 68 "data/maps/PetalburgCity_Mart/scripts.pory"
-	.string "Love for your POKéMON!$"
+	.string "it will grow stronger.\p"
 # 69 "data/maps/PetalburgCity_Mart/scripts.pory"
-
+	.string "The most important thing is love!\n"
 # 70 "data/maps/PetalburgCity_Mart/scripts.pory"
-PetalburgCity_Mart_Text_RepelIsUseful:
+	.string "Love for your POKéMON!$"
 # 71 "data/maps/PetalburgCity_Mart/scripts.pory"
-	.string "Do you use REPEL?\n"
-# 72 "data/maps/PetalburgCity_Mart/scripts.pory"
-	.string "It keeps POKéMON away, so it's\l"
-# 73 "data/maps/PetalburgCity_Mart/scripts.pory"
-	.string "useful when you're in a hurry.$"
-# 74 "data/maps/PetalburgCity_Mart/scripts.pory"
 
+# 72 "data/maps/PetalburgCity_Mart/scripts.pory"
+PetalburgCity_Mart_Text_RepelIsUseful:
+# 73 "data/maps/PetalburgCity_Mart/scripts.pory"
+	.string "Do you use REPEL?\n"
+# 74 "data/maps/PetalburgCity_Mart/scripts.pory"
+	.string "It keeps POKéMON away, so it's\l"
 # 75 "data/maps/PetalburgCity_Mart/scripts.pory"
-PetalburgCity_Mart_Text_TakeSomeAntidotesWithYou:
+	.string "useful when you're in a hurry.$"
 # 76 "data/maps/PetalburgCity_Mart/scripts.pory"
-	.string "Do you have any ANTIDOTES with\n"
+
 # 77 "data/maps/PetalburgCity_Mart/scripts.pory"
-	.string "you?\p"
+PetalburgCity_Mart_Text_TakeSomeAntidotesWithYou:
 # 78 "data/maps/PetalburgCity_Mart/scripts.pory"
-	.string "If you walk around with a poisoned\n"
+	.string "Do you have any ANTIDOTES with\n"
 # 79 "data/maps/PetalburgCity_Mart/scripts.pory"
-	.string "POKéMON, it will lose HP until it faints.\l"
+	.string "you?\p"
 # 80 "data/maps/PetalburgCity_Mart/scripts.pory"
+	.string "If you walk around with a poisoned\n"
+# 81 "data/maps/PetalburgCity_Mart/scripts.pory"
+	.string "POKéMON, it will lose HP until it faints.\l"
+# 82 "data/maps/PetalburgCity_Mart/scripts.pory"
 	.string "Take some ANTIDOTES with you.$"
