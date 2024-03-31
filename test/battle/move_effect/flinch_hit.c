@@ -3,7 +3,7 @@
 
 ASSUMPTIONS
 {
-    ASSUME(MoveHasAdditionalEffect(MOVE_HEADBUTT, MOVE_EFFECT_FLINCH) == TRUE);
+    ASSUME(gBattleMoves[MOVE_HEADBUTT].effect == EFFECT_FLINCH_HIT);
 }
 
 SINGLE_BATTLE_TEST("Headbutt flinches the target if attacker is faster")

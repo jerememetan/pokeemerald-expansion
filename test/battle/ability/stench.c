@@ -5,7 +5,7 @@ SINGLE_BATTLE_TEST("Stench has a 10% chance to flinch")
 {
     PASSES_RANDOMLY(1, 10, RNG_STENCH);
     GIVEN {
-        ASSUME(gMovesInfo[MOVE_TACKLE].power > 0);
+        ASSUME(gBattleMoves[MOVE_TACKLE].power > 0);
         PLAYER(SPECIES_GRIMER) { Ability(ABILITY_STENCH); }
         OPPONENT(SPECIES_WOBBUFFET);
     } WHEN {
@@ -19,8 +19,8 @@ SINGLE_BATTLE_TEST("Stench does not stack with King's Rock")
 {
     PASSES_RANDOMLY(1, 10, RNG_STENCH);
     GIVEN {
-        ASSUME(gItemsInfo[ITEM_KINGS_ROCK].holdEffect == HOLD_EFFECT_FLINCH);
-        ASSUME(gMovesInfo[MOVE_TACKLE].power > 0);
+        ASSUME(gItems[ITEM_KINGS_ROCK].holdEffect == HOLD_EFFECT_FLINCH);
+        ASSUME(gBattleMoves[MOVE_TACKLE].power > 0);
 
         PLAYER(SPECIES_GRIMER) { Ability(ABILITY_STENCH); Item(ITEM_KINGS_ROCK); }
         OPPONENT(SPECIES_WOBBUFFET);
@@ -34,8 +34,8 @@ SINGLE_BATTLE_TEST("Stench does not stack with King's Rock")
 DOUBLE_BATTLE_TEST("Stench only triggers if target takes damage")
 {
     GIVEN {
-        ASSUME(gMovesInfo[MOVE_TACKLE].power > 0);
-        ASSUME(MoveHasAdditionalEffectWithChance(MOVE_FAKE_OUT, MOVE_EFFECT_FLINCH, 100));
+        ASSUME(gBattleMoves[MOVE_TACKLE].power > 0);
+        ASSUME(gBattleMoves[MOVE_FAKE_OUT].effect == EFFECT_FAKE_OUT);
         PLAYER(SPECIES_WOBBUFFET);
         PLAYER(SPECIES_WYNAUT);
         OPPONENT(SPECIES_GRIMER) { Ability(ABILITY_STENCH); }
@@ -58,8 +58,8 @@ DOUBLE_BATTLE_TEST("Stench only triggers if target takes damage")
 DOUBLE_BATTLE_TEST("Stench doesn't trigger if partner uses a move")
 {
     GIVEN {
-        ASSUME(gMovesInfo[MOVE_TACKLE].power > 0);
-        ASSUME(MoveHasAdditionalEffectWithChance(MOVE_FAKE_OUT, MOVE_EFFECT_FLINCH, 100));
+        ASSUME(gBattleMoves[MOVE_TACKLE].power > 0);
+        ASSUME(gBattleMoves[MOVE_FAKE_OUT].effect == EFFECT_FAKE_OUT);
         PLAYER(SPECIES_WOBBUFFET) { Speed(20); }
         PLAYER(SPECIES_WYNAUT) { Speed(10); }
         OPPONENT(SPECIES_GRIMER) { Speed(100); Ability(ABILITY_STENCH); }

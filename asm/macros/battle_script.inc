@@ -72,10 +72,6 @@
 	.2byte \id
 	.endm
 
-	.macro printsavedstring
-	printstring 0
-	.endm
-
 	.macro printselectionstring id:req
 	.byte 0x11
 	.2byte \id
@@ -96,30 +92,19 @@
 	.4byte \ptr
 	.endm
 
-	.macro setadditionaleffects
-	1:
+	.macro seteffectwithchance
 	.byte 0x15
-	jumpifhalfword CMP_EQUAL, sMOVE_EFFECT, MOVE_EFFECT_CONTINUE, 1b
 	.endm
 
-	.macro seteffectprimary moveEffect=0
-	.if \moveEffect != 0
-		setmoveeffect \moveEffect
-	.endif
+	.macro seteffectprimary
 	.byte 0x16
 	.endm
 
-	.macro seteffectsecondary moveEffect=0
-	.if \moveEffect != 0
-		setmoveeffect \moveEffect
-	.endif
+	.macro seteffectsecondary
 	.byte 0x17
 	.endm
 
-	.macro clearstatusfromeffect battler:req, moveEffect=0
-	.if \moveEffect != 0
-		setmoveeffect \moveEffect
-	.endif
+	.macro clearstatusfromeffect battler:req
 	.byte 0x18
 	.byte \battler
 	.endm
@@ -531,10 +516,9 @@
 	.byte 0x57
 	.endm
 
-	.macro returntoball battler:req, changingForm:req
+	.macro returntoball battler:req
 	.byte 0x58
 	.byte \battler
-	.byte \changingForm
 	.endm
 
 	.macro handlelearnnewmove learnedMoveInstr:req, nothingToLearnInstr:req, isFirstMove:req
@@ -780,21 +764,8 @@
 	.byte 0x8b
 	.endm
 
-	.macro twoturnmoveschargestringandanimation
+	.macro confuseifrepeatingattackends
 	.byte 0x8c
-	.4byte 1f @animation then attack string
-	@default - attack string then animation
-	printsavedstring
-	waitmessage B_WAIT_TIME_LONG
-	attackanimation
-	waitanimation
-	goto 2f
-	1:
-	attackanimation
-	waitanimation
-	printsavedstring
-	waitmessage B_WAIT_TIME_LONG
-	2:
 	.endm
 
 	.macro setmultihitcounter value:req
@@ -1009,7 +980,7 @@
 	.byte 0xbb
 	.endm
 
-	.macro halvehp failInstr:req
+	.macro maxattackhalvehp failInstr:req
 	.byte 0xbc
 	.4byte \failInstr
 	.endm
@@ -1052,28 +1023,12 @@
 	.4byte \failInstr
 	.endm
 
-	.macro setsemiinvulnerablebit clear=FALSE
+	.macro setsemiinvulnerablebit
 	.byte 0xc5
-	.byte \clear
 	.endm
 
 	.macro clearsemiinvulnerablebit
-	setsemiinvulnerablebit TRUE
-	.endm
-
-	.macro tryfiretwoturnmovenowbyeffect battler:req, checkChargeTurnEffects:req, jumpInstr:req
 	.byte 0xc6
-	.byte \battler
-	.byte \checkChargeTurnEffects
-	.4byte \jumpInstr
-	.endm
-
-	.macro tryfiretwoturnmovewithoutcharging battler:req, jumpInstr:req
-	tryfiretwoturnmovenowbyeffect \battler, TRUE, \jumpInstr
-	.endm
-
-	.macro tryfiretwoturnmoveaftercharging battler:req, jumpInstr:req
-	tryfiretwoturnmovenowbyeffect \battler, FALSE, \jumpInstr
 	.endm
 
 	.macro setminimize
@@ -1132,9 +1087,8 @@
 	.4byte \failInstr
 	.endm
 
-	.macro trycopyability battler:req, failInstr:req
+	.macro trycopyability failInstr:req
 	.byte 0xd3
-	.byte \battler
 	.4byte \failInstr
 	.endm
 
@@ -1220,10 +1174,8 @@
 	.4byte \jumpInstr
 	.endm
 
-	.macro jumpifnotcurrentmoveargtype battler:req, failInstr:req
+	.macro getsecretpowereffect
 	.byte 0xe4
-	.byte \battler
-	.4byte \failInstr
 	.endm
 
 	.macro pickup
@@ -1361,12 +1313,10 @@
 	.4byte \jumpInstr
 	.endm
 
-	.macro allyswitchswapbattlers
-	callnative BS_AllySwitchSwapBattler
-	.endm
-
-	.macro allyswitchfailchance jumpInstr:req
-	callnative BS_AllySwitchFailChance
+	.macro jumpifholdeffect battler:req, holdEffect:req, jumpInstr:req
+	callnative BS_JumpIfHoldEffect
+	.byte \battler
+	.2byte \holdEffect
 	.4byte \jumpInstr
 	.endm
 
@@ -1612,21 +1562,6 @@
 	callnative BS_SetPhotonGeyserCategory
 	.endm
 
-	.macro tryupperhand failInstr:req
-	callnative BS_TryUpperHand
-	.4byte \failInstr
-	.endm
-
-	.macro tryupdaterecoiltracker
-	callnative BS_TryUpdateRecoilTracker
-	.endm
-
-	.macro trytidyup clear:req, jumpInstr:req
-	callnative BS_TryTidyUp
-	.byte \clear
-	.4byte \jumpInstr
-	.endm
-
 @ various command changed to more readable macros
 	.macro cancelmultiturnmoves battler:req
 	various \battler, VARIOUS_CANCEL_MULTI_TURN_MOVES
@@ -1867,8 +1802,8 @@
 	.4byte \jumpInstr
 	.endm
 
-	.macro setargtobattledamage
-	various BS_ATTACKER, VARIOUS_SET_ARG_TO_BATTLE_DAMAGE
+	.macro argumentstatuseffect
+	various BS_ATTACKER, VARIOUS_ARGUMENT_STATUS_EFFECT
 	.endm
 
 	.macro tryhitswitchtarget failInstr:req
@@ -1910,6 +1845,10 @@
 
 	.macro powertrick battler:req
 	various \battler, VARIOUS_POWER_TRICK
+	.endm
+
+	.macro argumenttomoveeffect
+	various BS_ATTACKER, VARIOUS_ARGUMENT_TO_MOVE_EFFECT
 	.endm
 
 	.macro jumpifnotgrounded battler:req, jumpInstr:req
@@ -2039,15 +1978,10 @@
 	.4byte \jumpInstr
 	.endm
 
-	.macro jumpifholdeffect battler:req, holdEffect:req, jumpInstr:req, equal=TRUE
-	various \battler, VARIOUS_JUMP_IF_HOLD_EFFECT
+	.macro jumpifnoholdeffect battler:req, holdEffect:req, jumpInstr:req
+	various \battler, VARIOUS_JUMP_IF_NO_HOLD_EFFECT
 	.byte \holdEffect
 	.4byte \jumpInstr
-	.byte \equal
-	.endm
-
-	.macro jumpifnoholdeffect battler:req, holdEffect:req, jumpInstr:req
-	jumpifholdeffect \battler, \holdEffect, \jumpInstr, FALSE
 	.endm
 
 	.macro infatuatewithbattler battler:req, infatuateWith:req
@@ -2388,15 +2322,6 @@
 	goto \jumpInstr
 	1:
 	subbyte gBattlerTarget, 0x2
-	goto \jumpInstr
-	.endm
-
-	.macro setallytonextattacker jumpInstr:req
-	jumpifbyte CMP_GREATER_THAN, gBattlerAttacker, 0x1, 1f
-	addbyte gBattlerAttacker, 0x2
-	goto \jumpInstr
-	1:
-	subbyte gBattlerAttacker, 0x2
 	goto \jumpInstr
 	.endm
 

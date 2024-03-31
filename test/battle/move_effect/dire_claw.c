@@ -3,7 +3,7 @@
 
 ASSUMPTIONS
 {
-    ASSUME(MoveHasAdditionalEffect(MOVE_DIRE_CLAW, MOVE_EFFECT_DIRE_CLAW) == TRUE);
+    ASSUME(gBattleMoves[MOVE_DIRE_CLAW].effect == EFFECT_DIRE_CLAW);
 }
 
 SINGLE_BATTLE_TEST("Dire Claw can inflict poison, paralysis or sleep")

@@ -3,7 +3,7 @@
 
 ASSUMPTIONS
 {
-    ASSUME(MoveHasAdditionalEffectSelf(MOVE_THRASH, MOVE_EFFECT_THRASH) == TRUE);
+    ASSUME(gBattleMoves[MOVE_THRASH].effect == EFFECT_RAMPAGE);
 }
 
 SINGLE_BATTLE_TEST("Thrash lasts for 2 or 3 turns")
@@ -26,7 +26,7 @@ SINGLE_BATTLE_TEST("Thrash lasts for 2 or 3 turns")
 SINGLE_BATTLE_TEST("Thrash confuses the user after it finishes")
 {
     GIVEN {
-        PLAYER(SPECIES_WOBBUFFET) { MovesWithPP({MOVE_THRASH, 10}); }
+        PLAYER(SPECIES_WOBBUFFET);
         OPPONENT(SPECIES_WOBBUFFET);
     } WHEN {
         TURN { MOVE(player, MOVE_THRASH); }
@@ -37,9 +37,6 @@ SINGLE_BATTLE_TEST("Thrash confuses the user after it finishes")
         ANIMATION(ANIM_TYPE_MOVE, MOVE_THRASH, player);
         ANIMATION(ANIM_TYPE_MOVE, MOVE_THRASH, player);
         ANIMATION(ANIM_TYPE_STATUS, B_ANIM_STATUS_CONFUSION, player);
-    } THEN {
-        // Check that PP has been consumed correctly
-        EXPECT_EQ(player->pp[0], 9);
     }
 }
 
@@ -86,21 +83,5 @@ SINGLE_BATTLE_TEST("Thrash confuses the user if it is canceled on turn 3 of 3")
         TURN { MOVE(opponent, MOVE_PROTECT); SKIP_TURN(player); }
     } SCENE {
         ANIMATION(ANIM_TYPE_STATUS, B_ANIM_STATUS_CONFUSION, player);
-    }
-}
-
-SINGLE_BATTLE_TEST("Petal Dance does not lock mons that copy the move with Dancer")
-{
-    GIVEN {
-        PLAYER(SPECIES_VILEPLUME);
-        OPPONENT(SPECIES_ORICORIO);
-    } WHEN {
-        TURN { MOVE(player, MOVE_PETAL_DANCE); }
-        TURN { SKIP_TURN(player); }
-    } SCENE {
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_PETAL_DANCE, player);
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_PETAL_DANCE, opponent);
-        // How do you actually test locking?
-        EXPECT(!(opponent->status2 & STATUS2_MULTIPLETURNS));
     }
 }

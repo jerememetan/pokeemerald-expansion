@@ -2,7 +2,6 @@
 #define GUARD_RECORDED_BATTLE_H
 
 #include "constants/battle.h"
-#include "random.h"
 
 #define BATTLER_RECORD_SIZE 664
 
@@ -14,7 +13,7 @@ struct RecordedBattleSave
     u8 playersGender[MAX_BATTLERS_COUNT];
     u32 playersTrainerId[MAX_BATTLERS_COUNT];
     u8 playersLanguage[MAX_BATTLERS_COUNT];
-    rng_value_t rngSeed;
+    u32 rngSeed;
     u32 battleFlags;
     u8 playersBattlers[MAX_BATTLERS_COUNT];
     u16 opponentA;
@@ -50,8 +49,8 @@ enum
     RECORDED_ITEM_MOVE,
 };
 
-extern rng_value_t gRecordedBattleRngSeed;
-extern rng_value_t gBattlePalaceMoveSelectionRngValue;
+extern u32 gRecordedBattleRngSeed;
+extern u32 gBattlePalaceMoveSelectionRngValue;
 extern u8 gRecordedBattleMultiplayerId;
 
 #define B_RECORD_MODE_RECORDING 1

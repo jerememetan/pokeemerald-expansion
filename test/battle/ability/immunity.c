@@ -4,7 +4,7 @@
 SINGLE_BATTLE_TEST("Immunity prevents Poison Sting poison")
 {
     GIVEN {
-        ASSUME(MoveHasAdditionalEffect(MOVE_POISON_STING, MOVE_EFFECT_POISON) == TRUE);
+        ASSUME(gBattleMoves[MOVE_POISON_STING].effect == EFFECT_POISON_HIT);
         PLAYER(SPECIES_WOBBUFFET);
         OPPONENT(SPECIES_SNORLAX) { Ability(ABILITY_IMMUNITY); }
     } WHEN {
@@ -18,7 +18,7 @@ SINGLE_BATTLE_TEST("Immunity prevents Poison Sting poison")
 SINGLE_BATTLE_TEST("Immunity prevents Toxic bad poison")
 {
     GIVEN {
-        ASSUME(gMovesInfo[MOVE_TOXIC].effect == EFFECT_TOXIC);
+        ASSUME(gBattleMoves[MOVE_TOXIC].effect == EFFECT_TOXIC);
         PLAYER(SPECIES_WOBBUFFET);
         OPPONENT(SPECIES_SNORLAX) { Ability(ABILITY_IMMUNITY); }
     } WHEN {
@@ -34,7 +34,7 @@ SINGLE_BATTLE_TEST("Immunity prevents Toxic bad poison")
 SINGLE_BATTLE_TEST("Immunity prevents Toxic Spikes poison")
 {
     GIVEN {
-        ASSUME(gMovesInfo[MOVE_TOXIC_SPIKES].effect == EFFECT_TOXIC_SPIKES);
+        ASSUME(gBattleMoves[MOVE_TOXIC_SPIKES].effect == EFFECT_TOXIC_SPIKES);
         PLAYER(SPECIES_WOBBUFFET);
         OPPONENT(SPECIES_WOBBUFFET);
         OPPONENT(SPECIES_SNORLAX) { Ability(ABILITY_IMMUNITY); }

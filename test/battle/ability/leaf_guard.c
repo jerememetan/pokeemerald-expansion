@@ -9,21 +9,29 @@ SINGLE_BATTLE_TEST("Leaf Guard prevents non-volatile status conditions in sun")
     PARAMETRIZE { move = MOVE_HYPNOSIS; status = STATUS1_SLEEP; }
     PARAMETRIZE { move = MOVE_THUNDER_WAVE; status = STATUS1_PARALYSIS; }
     PARAMETRIZE { move = MOVE_TOXIC; status = STATUS1_TOXIC_POISON; }
-    // PARAMETRIZE { move = MOVE_POWDER_SNOW; status = STATUS1_FREEZE; } // Pointless since you can't freeze in sunlight anyway
+    PARAMETRIZE { move = MOVE_POWDER_SNOW; status = STATUS1_FREEZE; }
     GIVEN {
-        ASSUME(gMovesInfo[MOVE_WILL_O_WISP].effect == EFFECT_WILL_O_WISP);
-        ASSUME(gMovesInfo[MOVE_HYPNOSIS].effect == EFFECT_SLEEP);
-        ASSUME(gMovesInfo[MOVE_THUNDER_WAVE].effect == EFFECT_PARALYZE);
-        ASSUME(gMovesInfo[MOVE_TOXIC].effect == EFFECT_TOXIC);
+        ASSUME(gBattleMoves[MOVE_WILL_O_WISP].effect == EFFECT_WILL_O_WISP);
+        ASSUME(gBattleMoves[MOVE_HYPNOSIS].effect == EFFECT_SLEEP);
+        ASSUME(gBattleMoves[MOVE_THUNDER_WAVE].effect == EFFECT_PARALYZE);
+        ASSUME(gBattleMoves[MOVE_TOXIC].effect == EFFECT_TOXIC);
+        ASSUME(gBattleMoves[MOVE_POWDER_SNOW].effect == EFFECT_FREEZE_HIT);
         PLAYER(SPECIES_LEAFEON) { Ability(ABILITY_LEAF_GUARD); }
         OPPONENT(SPECIES_WOBBUFFET);
     } WHEN {
         TURN { MOVE(player, MOVE_SUNNY_DAY); MOVE(opponent, move); }
     } SCENE {
-        NOT ANIMATION(ANIM_TYPE_MOVE, move, opponent);
-        ABILITY_POPUP(player, ABILITY_LEAF_GUARD);
-        MESSAGE("It doesn't affect Leafeon…");
-        NOT STATUS_ICON(player, status);
+        if (move != MOVE_POWDER_SNOW) {
+            NOT ANIMATION(ANIM_TYPE_MOVE, move, opponent);
+            ABILITY_POPUP(player, ABILITY_LEAF_GUARD);
+            MESSAGE("It doesn't affect Leafeon…");
+            NOT STATUS_ICON(player, status);
+        } else {
+            NONE_OF {
+                ABILITY_POPUP(player, ABILITY_LEAF_GUARD);
+                STATUS_ICON(player, status);
+            }
+        }
     }
 }
 
@@ -33,8 +41,8 @@ SINGLE_BATTLE_TEST("Leaf Guard prevents status conditions from Flame Orb and Tox
     PARAMETRIZE { item = ITEM_FLAME_ORB; }
     PARAMETRIZE { item = ITEM_TOXIC_ORB; }
     GIVEN {
-        ASSUME(gItemsInfo[ITEM_FLAME_ORB].holdEffect == HOLD_EFFECT_FLAME_ORB);
-        ASSUME(gItemsInfo[ITEM_TOXIC_ORB].holdEffect == HOLD_EFFECT_TOXIC_ORB);
+        ASSUME(gItems[ITEM_FLAME_ORB].holdEffect == HOLD_EFFECT_FLAME_ORB);
+        ASSUME(gItems[ITEM_TOXIC_ORB].holdEffect == HOLD_EFFECT_TOXIC_ORB);
         PLAYER(SPECIES_LEAFEON) { Ability(ABILITY_LEAF_GUARD); Item(item); }
         OPPONENT(SPECIES_WOBBUFFET);
     } WHEN {
@@ -53,7 +61,7 @@ SINGLE_BATTLE_TEST("Leaf Guard prevents Rest during sun")
 {
     GIVEN {
         ASSUME(B_LEAF_GUARD_PREVENTS_REST >= GEN_5);
-        ASSUME(gMovesInfo[MOVE_REST].effect == EFFECT_REST);
+        ASSUME(gBattleMoves[MOVE_REST].effect == EFFECT_REST);
         PLAYER(SPECIES_LEAFEON) { Ability(ABILITY_LEAF_GUARD); HP(100); MaxHP(200); }
         OPPONENT(SPECIES_WOBBUFFET);
     } WHEN {

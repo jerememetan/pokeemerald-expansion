@@ -420,7 +420,9 @@ static void RecordedOpponentHandleDrawTrainerPic(u32 battler)
         }
     }
 
-    BtlController_HandleDrawTrainerPic(battler, trainerPicId, TRUE, xPos, 40, -1);
+    BtlController_HandleDrawTrainerPic(battler, trainerPicId, TRUE,
+                                       xPos, 40 + 4 * (8 - gTrainerFrontPicCoords[trainerPicId].size),
+                                       -1);
 }
 
 static void RecordedOpponentHandleTrainerSlideBack(u32 battler)

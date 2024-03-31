@@ -122,7 +122,6 @@
 #define MULTI_SLATEPORT_TENT_RULES         111
 #define MULTI_FALLARBOR_TENT_RULES         112
 #define MULTI_TAG_MATCH_TYPE               113
-#define MULTI_BERRY_PLOT                   114
 
 // Lilycove SS Tidal Multichoice Selections
 #define SSTIDAL_SELECTION_SLATEPORT        0
@@ -171,11 +170,5 @@
 #define STDSTRING_TREASURES        32
 #define STDSTRING_MEGASTONES       33
 #define STDSTRING_ZCRYSTALS        34
-
-// Dynamic Multichoice Callbacks
-
-#define DYN_MULTICHOICE_CB_DEBUG      0
-#define DYN_MULTICHOICE_CB_SHOW_ITEM  1
-#define DYN_MULTICHOICE_CB_NONE       255
 
 #endif //GUARD_SCRIPT_MENU_CONSTANTS_H

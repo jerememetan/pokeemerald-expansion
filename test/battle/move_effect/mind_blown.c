@@ -3,7 +3,7 @@
 
 ASSUMPTIONS
 {
-    ASSUME(gMovesInfo[MOVE_MIND_BLOWN].effect == EFFECT_MIND_BLOWN);
+    ASSUME(gBattleMoves[MOVE_MIND_BLOWN].effect == EFFECT_MIND_BLOWN);
 }
 
 SINGLE_BATTLE_TEST("Mind Blown makes the user lose 1/2 of its HP")

@@ -3,7 +3,7 @@
 
 ASSUMPTIONS
 {
-    ASSUME(gMovesInfo[MOVE_UPROAR].effect == EFFECT_UPROAR);
+    ASSUME(gBattleMoves[MOVE_UPROAR].effect == EFFECT_UPROAR);
 }
 
 DOUBLE_BATTLE_TEST("Uproar status causes sleeping pokemon to wake up during an attack")

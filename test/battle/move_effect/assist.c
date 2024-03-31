@@ -3,7 +3,7 @@
 
 ASSUMPTIONS
 {
-    ASSUME(gMovesInfo[MOVE_ASSIST].effect == EFFECT_ASSIST);
+    ASSUME(gBattleMoves[MOVE_ASSIST].effect == EFFECT_ASSIST);
 }
 
 SINGLE_BATTLE_TEST("Assist fails if there are no valid moves to choose from")

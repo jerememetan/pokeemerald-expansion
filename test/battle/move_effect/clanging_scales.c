@@ -3,11 +3,12 @@
 
 ASSUMPTIONS
 {
-    ASSUME(MoveHasAdditionalEffectSelf(MOVE_CLANGING_SCALES, MOVE_EFFECT_DEF_MINUS_1) == TRUE);
+    ASSUME(gBattleMoves[MOVE_CLANGING_SCALES].effect == EFFECT_ATTACKER_DEFENSE_DOWN_HIT);
 }
 
 DOUBLE_BATTLE_TEST("Clanging Scales lowers defense by one stage if it hits both targets")
 {
+    KNOWN_FAILING; // Will be fixed by PR #3577 (move refactor)
     GIVEN {
         PLAYER(SPECIES_WOBBUFFET)
         PLAYER(SPECIES_WOBBUFFET);

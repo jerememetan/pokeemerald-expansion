@@ -1460,11 +1460,7 @@ static void Task_SpinPokenavIcon(u8 taskId)
 
 static bool32 TrainerIsEligibleForRematch(int matchCallId)
 {
-#if FREE_MATCH_CALL == FALSE
     return gSaveBlock1Ptr->trainerRematches[matchCallId] > 0;
-#else
-    return FALSE;
-#endif //FREE_MATCH_CALL
 }
 
 static u16 GetRematchTrainerLocation(int matchCallId)
@@ -1693,7 +1689,7 @@ static void PopulateTrainerName(int matchCallId, u8 *destStr)
         }
     }
 
-    StringCopy(destStr, GetTrainerNameFromId(trainerId));
+    StringCopy(destStr, gTrainers[trainerId].trainerName);
 }
 
 static void PopulateMapName(int matchCallId, u8 *destStr)
@@ -1799,12 +1795,9 @@ static void PopulateSpeciesFromTrainerParty(int matchCallId, u8 *destStr)
     const u8 *speciesName;
 
     trainerId = GetLastBeatenRematchTrainerId(sMatchCallTrainers[matchCallId].trainerId);
-    party = GetTrainerPartyFromId(trainerId);
-    monId = Random() % GetTrainerPartySizeFromId(trainerId);
-    if (party != NULL)
-        speciesName = GetSpeciesName(party[monId].species);
-    else
-        speciesName = GetSpeciesName(SPECIES_NONE);
+    party = gTrainers[trainerId].party;
+    monId = Random() % gTrainers[trainerId].partySize;
+    speciesName = GetSpeciesName(party[monId].species);
 
     StringCopy(destStr, speciesName);
 }

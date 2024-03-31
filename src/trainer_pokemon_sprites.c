@@ -11,7 +11,7 @@
 
 #define PICS_COUNT 8
 
-// Needs to be large enough to store either a decompressed Pokémon pic or trainer pic
+// Needs to be large enough to store either a decompressed pokemon pic or trainer pic
 #define PIC_SPRITE_SIZE max(MON_PIC_SIZE, TRAINER_PIC_SIZE)
 #define MAX_PIC_FRAMES  max(MAX_MON_PIC_FRAMES, MAX_TRAINER_PIC_FRAMES)
 
@@ -66,26 +66,26 @@ static bool16 DecompressPic(u16 species, u32 personality, bool8 isFrontPic, u8 *
     else
     {
         if (isFrontPic)
-            DecompressPicFromTable(&gTrainerSprites[species].frontPic, dest);
+            DecompressPicFromTable(&gTrainerFrontPicTable[species], dest);
         else
-            DecompressPicFromTable(&gTrainerBacksprites[species].backPic, dest);
+            DecompressPicFromTable(&gTrainerBackPicTable[species], dest);
     }
     return FALSE;
 }
 
-static void LoadPicPaletteByTagOrSlot(u16 species, bool8 isShiny, u32 personality, u8 paletteSlot, u16 paletteTag, bool8 isTrainer)
+static void LoadPicPaletteByTagOrSlot(u16 species, u32 otId, u32 personality, u8 paletteSlot, u16 paletteTag, bool8 isTrainer)
 {
     if (!isTrainer)
     {
         if (paletteTag == TAG_NONE)
         {
             sCreatingSpriteTemplate.paletteTag = TAG_NONE;
-            LoadCompressedPalette(GetMonSpritePalFromSpeciesAndPersonality(species, isShiny, personality), OBJ_PLTT_ID(paletteSlot), PLTT_SIZE_4BPP);
+            LoadCompressedPalette(GetMonSpritePalFromSpeciesAndPersonality(species, otId, personality), OBJ_PLTT_ID(paletteSlot), PLTT_SIZE_4BPP);
         }
         else
         {
             sCreatingSpriteTemplate.paletteTag = paletteTag;
-            LoadCompressedSpritePaletteWithTag(GetMonSpritePalFromSpeciesAndPersonality(species, isShiny, personality), species);
+            LoadCompressedSpritePaletteWithTag(GetMonSpritePalFromSpeciesAndPersonality(species, otId, personality), species);
         }
     }
     else
@@ -93,22 +93,22 @@ static void LoadPicPaletteByTagOrSlot(u16 species, bool8 isShiny, u32 personalit
         if (paletteTag == TAG_NONE)
         {
             sCreatingSpriteTemplate.paletteTag = TAG_NONE;
-            LoadCompressedPalette(gTrainerSprites[species].palette.data, OBJ_PLTT_ID(paletteSlot), PLTT_SIZE_4BPP);
+            LoadCompressedPalette(gTrainerFrontPicPaletteTable[species].data, OBJ_PLTT_ID(paletteSlot), PLTT_SIZE_4BPP);
         }
         else
         {
             sCreatingSpriteTemplate.paletteTag = paletteTag;
-            LoadCompressedSpritePalette(&gTrainerSprites[species].palette);
+            LoadCompressedSpritePalette(&gTrainerFrontPicPaletteTable[species]);
         }
     }
 }
 
-static void LoadPicPaletteBySlot(u16 species, bool8 isShiny, u32 personality, u8 paletteSlot, bool8 isTrainer)
+static void LoadPicPaletteBySlot(u16 species, u32 otId, u32 personality, u8 paletteSlot, bool8 isTrainer)
 {
     if (!isTrainer)
-        LoadCompressedPalette(GetMonSpritePalFromSpeciesAndPersonality(species, isShiny, personality), PLTT_ID(paletteSlot), PLTT_SIZE_4BPP);
+        LoadCompressedPalette(GetMonSpritePalFromSpeciesAndPersonality(species, otId, personality), PLTT_ID(paletteSlot), PLTT_SIZE_4BPP);
     else
-        LoadCompressedPalette(gTrainerSprites[species].palette.data, PLTT_ID(paletteSlot), PLTT_SIZE_4BPP);
+        LoadCompressedPalette(gTrainerFrontPicPaletteTable[species].data, PLTT_ID(paletteSlot), PLTT_SIZE_4BPP);
 }
 
 static void AssignSpriteAnimsTable(bool8 isTrainer)
@@ -116,10 +116,10 @@ static void AssignSpriteAnimsTable(bool8 isTrainer)
     if (!isTrainer)
         sCreatingSpriteTemplate.anims = gAnims_MonPic;
     else
-        sCreatingSpriteTemplate.anims = sAnims_Trainer;
+        sCreatingSpriteTemplate.anims = gTrainerFrontAnimsPtrTable[0];
 }
 
-static u16 CreatePicSprite(u16 species, bool8 isShiny, u32 personality, bool8 isFrontPic, s16 x, s16 y, u8 paletteSlot, u16 paletteTag, bool8 isTrainer)
+static u16 CreatePicSprite(u16 species, u32 otId, u32 personality, bool8 isFrontPic, s16 x, s16 y, u8 paletteSlot, u16 paletteTag, bool8 isTrainer)
 {
     u8 i;
     u8 *framePics;
@@ -161,7 +161,7 @@ static u16 CreatePicSprite(u16 species, bool8 isShiny, u32 personality, bool8 is
     sCreatingSpriteTemplate.images = images;
     sCreatingSpriteTemplate.affineAnims = gDummySpriteAffineAnimTable;
     sCreatingSpriteTemplate.callback = DummyPicSpriteCallback;
-    LoadPicPaletteByTagOrSlot(species, isShiny, personality, paletteSlot, paletteTag, isTrainer);
+    LoadPicPaletteByTagOrSlot(species, otId, personality, paletteSlot, paletteTag, isTrainer);
     spriteId = CreateSprite(&sCreatingSpriteTemplate, x, y, 0);
     if (paletteTag == TAG_NONE)
         gSprites[spriteId].oam.paletteNum = paletteSlot;
@@ -173,7 +173,7 @@ static u16 CreatePicSprite(u16 species, bool8 isShiny, u32 personality, bool8 is
     return spriteId;
 }
 
-u16 CreateMonPicSprite_Affine(u16 species, bool8 isShiny, u32 personality, u8 flags, s16 x, s16 y, u8 paletteSlot, u16 paletteTag)
+u16 CreateMonPicSprite_Affine(u16 species, u32 otId, u32 personality, u8 flags, s16 x, s16 y, u8 paletteSlot, u16 paletteTag)
 {
     u8 *framePics;
     struct SpriteFrameImage *images;
@@ -239,7 +239,7 @@ u16 CreateMonPicSprite_Affine(u16 species, bool8 isShiny, u32 personality, u8 fl
         sCreatingSpriteTemplate.affineAnims = gDummySpriteAffineAnimTable;
     }
     sCreatingSpriteTemplate.callback = DummyPicSpriteCallback;
-    LoadPicPaletteByTagOrSlot(species, isShiny, personality, paletteSlot, paletteTag, FALSE);
+    LoadPicPaletteByTagOrSlot(species, otId, personality, paletteSlot, paletteTag, FALSE);
     spriteId = CreateSprite(&sCreatingSpriteTemplate, x, y, 0);
     if (paletteTag == TAG_NONE)
         gSprites[spriteId].oam.paletteNum = paletteSlot;
@@ -276,16 +276,16 @@ static u16 FreeAndDestroyPicSpriteInternal(u16 spriteId)
     return 0;
 }
 
-static u16 LoadPicSpriteInWindow(u16 species, bool8 isShiny, u32 personality, bool8 isFrontPic, u8 paletteSlot, u8 windowId, bool8 isTrainer)
+static u16 LoadPicSpriteInWindow(u16 species, u32 otId, u32 personality, bool8 isFrontPic, u8 paletteSlot, u8 windowId, bool8 isTrainer)
 {
     if (DecompressPic(species, personality, isFrontPic, (u8 *)GetWindowAttribute(windowId, WINDOW_TILE_DATA), FALSE))
         return 0xFFFF;
 
-    LoadPicPaletteBySlot(species, isShiny, personality, paletteSlot, isTrainer);
+    LoadPicPaletteBySlot(species, otId, personality, paletteSlot, isTrainer);
     return 0;
 }
 
-static u16 CreateTrainerCardSprite(u16 species, bool8 isShiny, u32 personality, bool8 isFrontPic, u16 destX, u16 destY, u8 paletteSlot, u8 windowId, bool8 isTrainer)
+static u16 CreateTrainerCardSprite(u16 species, u32 otId, u32 personality, bool8 isFrontPic, u16 destX, u16 destY, u8 paletteSlot, u8 windowId, bool8 isTrainer)
 {
     u8 *framePics;
 
@@ -293,16 +293,16 @@ static u16 CreateTrainerCardSprite(u16 species, bool8 isShiny, u32 personality, 
     if (framePics && !DecompressPic(species, personality, isFrontPic, framePics, isTrainer))
     {
         BlitBitmapRectToWindow(windowId, framePics, 0, 0, TRAINER_PIC_WIDTH, TRAINER_PIC_HEIGHT, destX, destY, TRAINER_PIC_WIDTH, TRAINER_PIC_HEIGHT);
-        LoadPicPaletteBySlot(species, isShiny, personality, paletteSlot, isTrainer);
+        LoadPicPaletteBySlot(species, otId, personality, paletteSlot, isTrainer);
         Free(framePics);
         return 0;
     }
     return 0xFFFF;
 }
 
-u16 CreateMonPicSprite(u16 species, bool8 isShiny, u32 personality, bool8 isFrontPic, s16 x, s16 y, u8 paletteSlot, u16 paletteTag)
+u16 CreateMonPicSprite(u16 species, u32 otId, u32 personality, bool8 isFrontPic, s16 x, s16 y, u8 paletteSlot, u16 paletteTag)
 {
-    return CreatePicSprite(species, isShiny, personality, isFrontPic, x, y, paletteSlot, paletteTag, FALSE);
+    return CreatePicSprite(species, otId, personality, isFrontPic, x, y, paletteSlot, paletteTag, FALSE);
 }
 
 u16 FreeAndDestroyMonPicSprite(u16 spriteId)
@@ -310,20 +310,20 @@ u16 FreeAndDestroyMonPicSprite(u16 spriteId)
     return FreeAndDestroyPicSpriteInternal(spriteId);
 }
 
-static u16 UNUSED LoadMonPicInWindow(u16 species, bool8 isShiny, u32 personality, bool8 isFrontPic, u8 paletteSlot, u8 windowId)
+static u16 UNUSED LoadMonPicInWindow(u16 species, u32 otId, u32 personality, bool8 isFrontPic, u8 paletteSlot, u8 windowId)
 {
-    return LoadPicSpriteInWindow(species, isShiny, personality, isFrontPic, paletteSlot, windowId, FALSE);
+    return LoadPicSpriteInWindow(species, otId, personality, isFrontPic, paletteSlot, windowId, FALSE);
 }
 
 // Unused, FRLG only
-u16 CreateTrainerCardMonIconSprite(u16 species, bool8 isShiny, u32 personality, bool8 isFrontPic, u16 destX, u16 destY, u8 paletteSlot, u8 windowId)
+u16 CreateTrainerCardMonIconSprite(u16 species, u32 otId, u32 personality, bool8 isFrontPic, u16 destX, u16 destY, u8 paletteSlot, u8 windowId)
 {
-    return CreateTrainerCardSprite(species, isShiny, personality, isFrontPic, destX, destY, paletteSlot, windowId, FALSE);
+    return CreateTrainerCardSprite(species, otId, personality, isFrontPic, destX, destY, paletteSlot, windowId, FALSE);
 }
 
 u16 CreateTrainerPicSprite(u16 species, bool8 isFrontPic, s16 x, s16 y, u8 paletteSlot, u16 paletteTag)
 {
-    return CreatePicSprite(species, FALSE, 0, isFrontPic, x, y, paletteSlot, paletteTag, TRUE);
+    return CreatePicSprite(species, 0, 0, isFrontPic, x, y, paletteSlot, paletteTag, TRUE);
 }
 
 u16 FreeAndDestroyTrainerPicSprite(u16 spriteId)
@@ -333,12 +333,12 @@ u16 FreeAndDestroyTrainerPicSprite(u16 spriteId)
 
 static u16 UNUSED LoadTrainerPicInWindow(u16 species, bool8 isFrontPic, u8 paletteSlot, u8 windowId)
 {
-    return LoadPicSpriteInWindow(species, FALSE, 0, isFrontPic, paletteSlot, windowId, TRUE);
+    return LoadPicSpriteInWindow(species, 0, 0, isFrontPic, paletteSlot, windowId, TRUE);
 }
 
 u16 CreateTrainerCardTrainerPicSprite(u16 species, bool8 isFrontPic, u16 destX, u16 destY, u8 paletteSlot, u8 windowId)
 {
-    return CreateTrainerCardSprite(species, FALSE, 0, isFrontPic, destX, destY, paletteSlot, windowId, TRUE);
+    return CreateTrainerCardSprite(species, 0, 0, isFrontPic, destX, destY, paletteSlot, windowId, TRUE);
 }
 
 u16 PlayerGenderToFrontTrainerPicId_Debug(u8 gender, bool8 getClass)

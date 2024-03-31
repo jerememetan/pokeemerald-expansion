@@ -3,7 +3,6 @@
 #include "battle.h"
 #include "daycare.h"
 #include "string_util.h"
-#include "level_caps.h"
 #include "mail.h"
 #include "pokemon_storage_system.h"
 #include "event_data.h"
@@ -194,7 +193,9 @@ static void TransferEggMoves(void)
 
                 // Check if you can inherit from them
                 if (GetBoxMonData(&gSaveBlock1Ptr->daycare.mons[k].mon, MON_DATA_SPECIES) != GetBoxMonData(&gSaveBlock1Ptr->daycare.mons[i].mon, MON_DATA_SPECIES)
-                    && (P_EGG_MOVE_TRANSFER < GEN_9 || GetBoxMonData(&gSaveBlock1Ptr->daycare.mons[i].mon, MON_DATA_HELD_ITEM) != ITEM_MIRROR_HERB)
+            #if P_EGG_MOVE_TRANSFER >= GEN_9
+                    && GetBoxMonData(&gSaveBlock1Ptr->daycare.mons[i].mon, MON_DATA_HELD_ITEM) != ITEM_MIRROR_HERB
+            #endif
                 )
                     continue;
 
@@ -228,6 +229,7 @@ static void StorePokemonInDaycare(struct Pokemon *mon, struct DaycareMon *daycar
     }
 
     daycareMon->mon = mon->box;
+    BoxMonRestorePP(&daycareMon->mon);
     daycareMon->steps = 0;
     ZeroMonData(mon);
     CompactPartySlots();
@@ -249,10 +251,10 @@ void StoreSelectedPokemonInDaycare(void)
     StorePokemonInEmptyDaycareSlot(&gPlayerParty[monId], &gSaveBlock1Ptr->daycare);
 }
 
-// Shifts the second daycare Pokémon slot into the first slot.
+// Shifts the second daycare pokemon slot into the first slot.
 static void ShiftDaycareSlots(struct DayCare *daycare)
 {
-    // This condition is only satisfied when the player takes out the first Pokémon from the daycare.
+    // This condition is only satisfied when the player takes out the first pokemon from the daycare.
     if (GetBoxMonData(&daycare->mons[1].mon, MON_DATA_SPECIES) != SPECIES_NONE
         && GetBoxMonData(&daycare->mons[0].mon, MON_DATA_SPECIES) == SPECIES_NONE)
     {
@@ -315,7 +317,7 @@ static u16 TakeSelectedPokemonFromDaycare(struct DaycareMon *daycareMon)
         species = newSpecies;
     }
 
-    if (GetMonData(&pokemon, MON_DATA_LEVEL) < GetCurrentLevelCap())
+    if (GetMonData(&pokemon, MON_DATA_LEVEL) != MAX_LEVEL)
     {
         experience = GetMonData(&pokemon, MON_DATA_EXP) + daycareMon->steps;
         SetMonData(&pokemon, MON_DATA_EXP, &experience);
@@ -364,8 +366,6 @@ static u8 GetNumLevelsGainedFromSteps(struct DaycareMon *daycareMon)
 
     levelBefore = GetLevelFromBoxMonExp(&daycareMon->mon);
     levelAfter = GetLevelAfterDaycareSteps(&daycareMon->mon, daycareMon->steps);
-    if (levelAfter > GetCurrentLevelCap())
-        levelAfter = GetCurrentLevelCap();
     return levelAfter - levelBefore;
 }
 
@@ -490,8 +490,10 @@ static s32 GetParentToInheritNature(struct DayCare *daycare)
     for (i = 0; i < DAYCARE_MON_COUNT; i++)
     {
         if (ItemId_GetHoldEffect(GetBoxMonData(&daycare->mons[i].mon, MON_DATA_HELD_ITEM)) == HOLD_EFFECT_PREVENT_EVOLVE
-            && (P_NATURE_INHERITANCE != GEN_3 || GetBoxMonGender(&daycare->mons[i].mon) == MON_FEMALE || IS_DITTO(GetBoxMonData(&daycare->mons[i].mon, MON_DATA_SPECIES))))
-        {
+        #if P_NATURE_INHERITANCE == GEN_3
+            && (GetBoxMonGender(&daycare->mons[i].mon) == MON_FEMALE || IS_DITTO(GetBoxMonData(&daycare->mons[i].mon, MON_DATA_SPECIES)))
+        #endif
+        ) {
             slot = i;
             numWithEverstone++;
         }
@@ -499,11 +501,11 @@ static s32 GetParentToInheritNature(struct DayCare *daycare)
 
     if (numWithEverstone >= DAYCARE_MON_COUNT)
         return Random() & 1;
-
-    if (P_NATURE_INHERITANCE > GEN_4)
-        return slot;
-
+#if P_NATURE_INHERITANCE > GEN_4
+    return slot;
+#else
     return Random() & 1 ? slot : -1;
+#endif
 }
 
 static void _TriggerPendingDaycareEgg(struct DayCare *daycare)
@@ -737,7 +739,7 @@ static void InheritAbility(struct Pokemon *egg, struct BoxPokemon *father, struc
     }
 }
 
-// Counts the number of egg moves a Pokémon learns and stores the moves in
+// Counts the number of egg moves a pokemon learns and stores the moves in
 // the given array.
 static u8 GetEggMoves(struct Pokemon *pokemon, u16 *eggMoves)
 {
@@ -854,28 +856,27 @@ static void BuildEggMoveset(struct Pokemon *egg, struct BoxPokemon *father, stru
 
     numEggMoves = GetEggMoves(egg, sHatchedEggEggMoves);
 
-    if (P_MOTHER_EGG_MOVE_INHERITANCE >= GEN_6)
+#if P_MOTHER_EGG_MOVE_INHERITANCE >= GEN_6
+    for (i = 0; i < MAX_MON_MOVES; i++)
     {
-        for (i = 0; i < MAX_MON_MOVES; i++)
+        if (sHatchedEggMotherMoves[i] != MOVE_NONE)
         {
-            if (sHatchedEggMotherMoves[i] != MOVE_NONE)
+            for (j = 0; j < numEggMoves; j++)
             {
-                for (j = 0; j < numEggMoves; j++)
+                if (sHatchedEggMotherMoves[i] == sHatchedEggEggMoves[j])
                 {
-                    if (sHatchedEggMotherMoves[i] == sHatchedEggEggMoves[j])
-                    {
-                        if (GiveMoveToMon(egg, sHatchedEggMotherMoves[i]) == MON_HAS_MAX_MOVES)
-                            DeleteFirstMoveAndGiveMoveToMon(egg, sHatchedEggMotherMoves[i]);
-                        break;
-                    }
+                    if (GiveMoveToMon(egg, sHatchedEggMotherMoves[i]) == MON_HAS_MAX_MOVES)
+                        DeleteFirstMoveAndGiveMoveToMon(egg, sHatchedEggMotherMoves[i]);
+                    break;
                 }
             }
-            else
-            {
-                break;
-            }
+        }
+        else
+        {
+            break;
         }
     }
+#endif
 
     for (i = 0; i < MAX_MON_MOVES; i++)
     {
@@ -896,26 +897,23 @@ static void BuildEggMoveset(struct Pokemon *egg, struct BoxPokemon *father, stru
             break;
         }
     }
-
-    if (P_TM_INHERITANCE < GEN_6)
+#if P_TM_INHERITANCE < GEN_6
+    for (i = 0; i < MAX_MON_MOVES; i++)
     {
-        for (i = 0; i < MAX_MON_MOVES; i++)
+        if (sHatchedEggFatherMoves[i] != MOVE_NONE)
         {
-            if (sHatchedEggFatherMoves[i] != MOVE_NONE)
+            for (j = 0; j < NUM_TECHNICAL_MACHINES + NUM_HIDDEN_MACHINES; j++)
             {
-                for (j = 0; j < NUM_TECHNICAL_MACHINES + NUM_HIDDEN_MACHINES; j++)
+                u16 moveId = ItemIdToBattleMoveId(ITEM_TM01 + j);
+                if (sHatchedEggFatherMoves[i] == moveId && CanLearnTeachableMove(GetMonData(egg, MON_DATA_SPECIES_OR_EGG), moveId))
                 {
-                    u16 moveId = ItemIdToBattleMoveId(ITEM_TM01 + j);
-                    if (sHatchedEggFatherMoves[i] == moveId && CanLearnTeachableMove(GetMonData(egg, MON_DATA_SPECIES_OR_EGG), moveId))
-                    {
-                        if (GiveMoveToMon(egg, sHatchedEggFatherMoves[i]) == MON_HAS_MAX_MOVES)
-                            DeleteFirstMoveAndGiveMoveToMon(egg, sHatchedEggFatherMoves[i]);
-                    }
+                    if (GiveMoveToMon(egg, sHatchedEggFatherMoves[i]) == MON_HAS_MAX_MOVES)
+                        DeleteFirstMoveAndGiveMoveToMon(egg, sHatchedEggFatherMoves[i]);
                 }
             }
         }
     }
-
+#endif
     for (i = 0; i < MAX_MON_MOVES; i++)
     {
         if (sHatchedEggFatherMoves[i] == MOVE_NONE)
@@ -1046,23 +1044,22 @@ static u16 DetermineEggSpeciesAndParentSlots(struct DayCare *daycare, u8 *parent
         eggSpecies = SPECIES_NIDORAN_M;
     else if (eggSpecies == SPECIES_ILLUMISE && daycare->offspringPersonality & EGG_GENDER_MALE)
         eggSpecies = SPECIES_VOLBEAT;
-    else if (P_NIDORAN_M_DITTO_BREED >= GEN_5 && eggSpecies == SPECIES_NIDORAN_M && !(daycare->offspringPersonality & EGG_GENDER_MALE))
+#if P_NIDORAN_M_DITTO_BREED >= GEN_5
+    else if (eggSpecies == SPECIES_NIDORAN_M && !(daycare->offspringPersonality & EGG_GENDER_MALE))
         eggSpecies = SPECIES_NIDORAN_F;
-    else if (P_NIDORAN_M_DITTO_BREED >= GEN_5 && eggSpecies == SPECIES_VOLBEAT && !(daycare->offspringPersonality & EGG_GENDER_MALE))
+    else if (eggSpecies == SPECIES_VOLBEAT && !(daycare->offspringPersonality & EGG_GENDER_MALE))
         eggSpecies = SPECIES_ILLUMISE;
+#endif
     else if (eggSpecies == SPECIES_MANAPHY)
         eggSpecies = SPECIES_PHIONE;
     else if (eggSpecies == SPECIES_SINISTEA_ANTIQUE)
         eggSpecies = SPECIES_SINISTEA_PHONY;
+    else if (GET_BASE_SPECIES_ID(eggSpecies) == SPECIES_VIVILLON)
+        eggSpecies = SPECIES_SCATTERBUG;
     else if (GET_BASE_SPECIES_ID(eggSpecies) == SPECIES_ROTOM)
         eggSpecies = SPECIES_ROTOM;
     else if (GET_BASE_SPECIES_ID(eggSpecies) == SPECIES_FURFROU)
         eggSpecies = SPECIES_FURFROU;
-    // To avoid single-stage Totem Pokémon to breed more of themselves.
-    else if (eggSpecies == SPECIES_MIMIKYU_TOTEM_DISGUISED)
-        eggSpecies = SPECIES_MIMIKYU_DISGUISED;
-    else if (eggSpecies == SPECIES_TOGEDEMARU_TOTEM)
-        eggSpecies = SPECIES_TOGEDEMARU;
 
     // Make Ditto the "mother" slot if the other daycare mon is male.
     if (species[parentSlots[1]] == SPECIES_DITTO && GetBoxMonGender(&daycare->mons[parentSlots[0]].mon) != MON_FEMALE)

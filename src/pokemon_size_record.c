@@ -8,7 +8,6 @@
 #include "text.h"
 
 #define DEFAULT_MAX_SIZE 0x8000 // was 0x8100 in Ruby/Sapphire
-static u8* ReturnHeightStringNoWhitespace(u32 size);
 
 struct UnknownStruct
 {
@@ -47,6 +46,8 @@ static const u8 sGiftRibbonsMonDataIds[GIFT_RIBBONS_COUNT - 4] =
 
 extern const u8 gText_DecimalPoint[];
 extern const u8 gText_Marco[];
+
+#define CM_PER_INCH 2.54
 
 static u32 GetMonSizeHash(struct Pokemon *pkmn)
 {
@@ -94,24 +95,14 @@ static u32 GetMonSize(u16 species, u16 b)
 
 static void FormatMonSizeRecord(u8 *string, u32 size)
 {
-    size = (f64)(size / 100);
-    StringCopy(string,ReturnHeightStringNoWhitespace(size));
-}
+#ifdef UNITS_IMPERIAL
+    //Convert size from centimeters to inches
+    size = (f64)(size * 10) / (CM_PER_INCH * 10);
+#endif
 
-static u8* ReturnHeightStringNoWhitespace(u32 size)
-{
-    u8* heightStr = ConvertMonHeightToString(size);
-    u32 length = StringLength(heightStr);
-    u32 i =  0, j =  0;
-
-    while (i < length && !(heightStr[i] >= CHAR_0 && heightStr[i] <= CHAR_9))
-        i++;
-
-    while (i < length)
-        heightStr[j++] = heightStr[i++];
-
-    heightStr[j] = EOS;
-    return heightStr;
+    string = ConvertIntToDecimalStringN(string, size / 10, STR_CONV_MODE_LEFT_ALIGN, 8);
+    string = StringAppend(string, gText_DecimalPoint);
+    ConvertIntToDecimalStringN(string, size % 10, STR_CONV_MODE_LEFT_ALIGN, 1);
 }
 
 static u8 CompareMonSize(u16 species, u16 *sizeRecord)

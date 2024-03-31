@@ -3,11 +3,10 @@
 
 ASSUMPTIONS
 {
-    ASSUME(gMovesInfo[MOVE_INFERNAL_PARADE].effect == EFFECT_DOUBLE_POWER_ON_ARG_STATUS);
-    ASSUME(gMovesInfo[MOVE_INFERNAL_PARADE].argument == STATUS1_ANY);
+    ASSUME(gBattleMoves[MOVE_INFERNAL_PARADE].effect == EFFECT_INFERNAL_PARADE);
 }
 
-SINGLE_BATTLE_TEST("Infernal Parade inflicts burn")
+SINGLE_BATTLE_TEST("Infernal Parade inflicts poison")
 {
     GIVEN {
         PLAYER(SPECIES_WOBBUFFET);

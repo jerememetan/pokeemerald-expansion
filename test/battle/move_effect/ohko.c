@@ -3,7 +3,7 @@
 
 ASSUMPTIONS
 {
-    ASSUME(gMovesInfo[MOVE_SHEER_COLD].effect == EFFECT_OHKO);
+    ASSUME(gBattleMoves[MOVE_SHEER_COLD].effect == EFFECT_OHKO);
 }
 
 SINGLE_BATTLE_TEST("Sheer Cold doesn't affect Ice-type Pokémon")

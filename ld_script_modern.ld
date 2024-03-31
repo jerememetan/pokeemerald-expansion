@@ -12,32 +12,20 @@ MEMORY
 }
 
 SECTIONS {
-
-
-    .ewram ORIGIN(EWRAM) : AT (__ewram_lma)
+    ewram 0x2000000 (NOLOAD) :
     ALIGN(4)
     {
-        __ewram_start = .;
-        *(.ewram*)
-        __ewram_end = .;
+        /* 
+           We link malloc.o here to prevent `gHeap` from landing in the middle of EWRAM.
+           Otherwise this causes corruption issues on some ld versions
+        */
+        gflib/malloc.o(ewram_data);
+        src/*.o(ewram_data);
+        gflib/*.o(ewram_data);
+
     } > EWRAM
 
-    .ewram.sbss (NOLOAD) :
-    ALIGN(4)
-    {
-        src/*.o(.sbss);
-        gflib/*.o(.sbss);
-    } > EWRAM
-
-    .iwram ORIGIN(IWRAM) : AT (__iwram_lma)
-    ALIGN(4)
-    {
-        __iwram_start = .;
-        *(.iwram*);
-        __iwram_end = .;
-    } > IWRAM
-
-    .iwram.bss (NOLOAD) :
+    iwram 0x3000000 (NOLOAD) :
     ALIGN(4)
     {
         src/*.o(.bss);
@@ -52,12 +40,12 @@ SECTIONS {
         gflib/*.o(COMMON);
         *libc.a:*.o(COMMON);
         *libnosys.a:*.o(COMMON);
-        gStackBase = .;
     } > IWRAM
 
     /* BEGIN ROM DATA */
+    . = 0x8000000;
 
-    .text ORIGIN(ROM) :
+    .text :
     ALIGN(4)
     {
         src/rom_header.o(.text*);
@@ -141,20 +129,6 @@ SECTIONS {
     {
         src/graphics.o(.rodata);
     } > ROM =0
-
-    .data.iwram :
-    ALIGN(4)
-    {
-        __iwram_lma = .;
-        . = . + (__iwram_end - __iwram_start);
-    } > ROM = 0
-
-    .data.ewram :
-    ALIGN(4)
-    {
-        __ewram_lma = .;
-        . = . + (__ewram_end - __ewram_start);
-    } > ROM = 0
 
     __rom_end = .;
 

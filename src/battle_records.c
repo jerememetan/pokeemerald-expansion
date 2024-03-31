@@ -88,7 +88,6 @@ static const u8 sText_DashesNoPlayer[] = _("-------");
 static const u8 sText_DashesNoScore[] = _("----");
 
 // code
-#if FREE_LINK_BATTLE_RECORDS == FALSE
 static void ClearLinkBattleRecord(struct LinkBattleRecord *record)
 {
     CpuFill16(0, record, sizeof(struct LinkBattleRecord));
@@ -220,16 +219,12 @@ static void UpdateLinkBattleRecords(struct LinkBattleRecords *records, const u8 
     UpdateLinkBattleRecord(&records->entries[index], battleOutcome);
     SortLinkBattleRecords(records);
 }
-#endif //FREE_LINK_BATTLE_RECORDS
 
 void ClearPlayerLinkBattleRecords(void)
 {
-#if FREE_LINK_BATTLE_RECORDS == FALSE
     ClearLinkBattleRecords(gSaveBlock1Ptr->linkBattleRecords.entries);
-#endif //FREE_LINK_BATTLE_RECORDS
 }
 
-#if FREE_LINK_BATTLE_RECORDS == FALSE
 static void IncTrainerCardWins(s32 battlerId)
 {
     u16 *wins = &gTrainerCards[battlerId].linkBattleWins;
@@ -260,11 +255,9 @@ static void UpdateTrainerCardWinsLosses(s32 battlerId)
         break;
     }
 }
-#endif //FREE_LINK_BATTLE_RECORDS
 
 void UpdatePlayerLinkBattleRecords(s32 battlerId)
 {
-#if FREE_LINK_BATTLE_RECORDS == FALSE
     if (InUnionRoom() != TRUE)
     {
         UpdateTrainerCardWinsLosses(battlerId);
@@ -275,10 +268,8 @@ void UpdatePlayerLinkBattleRecords(s32 battlerId)
             gBattleOutcome,
             battlerId);
     }
-#endif //FREE_LINK_BATTLE_RECORDS
 }
 
-#if FREE_LINK_BATTLE_RECORDS == FALSE
 static void PrintLinkBattleWinsLossesDraws(struct LinkBattleRecord *records)
 {
     s32 x;
@@ -320,12 +311,10 @@ static void PrintLinkBattleRecord(struct LinkBattleRecord *record, u8 y, s32 lan
         AddTextPrinterParameterized(gRecordsWindowId, FONT_NORMAL, gStringVar1, 176, (y * 8) + 1, 0, NULL);
     }
 }
-#endif //FREE_LINK_BATTLE_RECORDS
 
 void ShowLinkBattleRecords(void)
 {
-#if FREE_LINK_BATTLE_RECORDS == FALSE
-    s32 x, i;
+    s32 i, x;
 
     gRecordsWindowId = AddWindow(&sLinkBattleRecordsWindow);
     DrawStdWindowFrame(gRecordsWindowId, FALSE);
@@ -346,7 +335,6 @@ void ShowLinkBattleRecords(void)
 
     PutWindowTilemap(gRecordsWindowId);
     CopyWindowToVram(gRecordsWindowId, COPYWIN_FULL);
-#endif //FREE_LINK_BATTLE_RECORDS
 }
 
 void RemoveRecordsWindow(void)

@@ -52,7 +52,7 @@ const struct UCoords8 sBattlerCoords[][MAX_BATTLERS_COUNT] =
     },
 };
 
-// Placeholders for Pokémon sprites to be created for a move animation effect (e.g. Role Play / Snatch)
+// Placeholders for pokemon sprites to be created for a move animation effect (e.g. Role Play / Snatch)
 #define TAG_MOVE_EFFECT_MON_1 55125
 #define TAG_MOVE_EFFECT_MON_2 55126
 
@@ -309,51 +309,45 @@ u8 GetBattlerYCoordWithElevation(u8 battlerId)
 
 u8 GetAnimBattlerSpriteId(u8 animBattler)
 {
-    u32 partner;
+    u8 *sprites;
 
-    switch (animBattler)
+    if (animBattler == ANIM_ATTACKER)
     {
-    case ANIM_ATTACKER:
         if (IsBattlerSpritePresent(gBattleAnimAttacker))
         {
-            return gBattlerSpriteIds[gBattleAnimAttacker];
+            sprites = gBattlerSpriteIds;
+            return sprites[gBattleAnimAttacker];
         }
         else
         {
             return SPRITE_NONE;
         }
-        break;
-    case ANIM_TARGET:
+    }
+    else if (animBattler == ANIM_TARGET)
+    {
         if (IsBattlerSpritePresent(gBattleAnimTarget))
         {
-            return gBattlerSpriteIds[gBattleAnimTarget];
+            sprites = gBattlerSpriteIds;
+            return sprites[gBattleAnimTarget];
         }
         else
         {
             return SPRITE_NONE;
         }
-        break;
-    case ANIM_ATK_PARTNER:
+    }
+    else if (animBattler == ANIM_ATK_PARTNER)
+    {
         if (!IsBattlerSpriteVisible(BATTLE_PARTNER(gBattleAnimAttacker)))
             return SPRITE_NONE;
         else
             return gBattlerSpriteIds[BATTLE_PARTNER(gBattleAnimAttacker)];
-        break;
-    case ANIM_DEF_PARTNER:
+    }
+    else
+    {
         if (IsBattlerSpriteVisible(BATTLE_PARTNER(gBattleAnimTarget)))
             return gBattlerSpriteIds[BATTLE_PARTNER(gBattleAnimTarget)];
         else
             return SPRITE_NONE;
-        break;
-    case ANIM_PLAYER_LEFT ... ANIM_OPPONENT_RIGHT:
-        partner = animBattler - MAX_BATTLERS_COUNT;
-        if (IsBattlerSpriteVisible(partner))
-            return gBattlerSpriteIds[partner];
-        else
-            return SPRITE_NONE;
-        break;
-    default:
-        return SPRITE_NONE;
     }
 }
 
@@ -2058,8 +2052,8 @@ u8 GetBattlerSpriteBGPriorityRank(u8 battlerId)
     return 1;
 }
 
-// Create Pokémon sprite to be used for a move animation effect (e.g. Role Play / Snatch)
-u8 CreateAdditionalMonSpriteForMoveAnim(u16 species, bool8 isBackpic, u8 id, s16 x, s16 y, u8 subpriority, u32 personality, bool8 isShiny, u32 battlerId)
+// Create pokemon sprite to be used for a move animation effect (e.g. Role Play / Snatch)
+u8 CreateAdditionalMonSpriteForMoveAnim(u16 species, bool8 isBackpic, u8 id, s16 x, s16 y, u8 subpriority, u32 personality, u32 trainerId, u32 battlerId)
 {
     u8 spriteId;
     u16 sheet = LoadSpriteSheet(&sSpriteSheets_MoveEffectMons[id]);
@@ -2069,7 +2063,7 @@ u8 CreateAdditionalMonSpriteForMoveAnim(u16 species, bool8 isBackpic, u8 id, s16
         gMonSpritesGfxPtr->buffer = AllocZeroed(MON_PIC_SIZE * MAX_MON_PIC_FRAMES);
     if (!isBackpic)
     {
-        LoadCompressedPalette(GetMonSpritePalFromSpeciesAndPersonality(species, isShiny, personality), OBJ_PLTT_ID(palette), PLTT_SIZE_4BPP);
+        LoadCompressedPalette(GetMonSpritePalFromSpeciesAndPersonality(species, trainerId, personality), OBJ_PLTT_ID(palette), PLTT_SIZE_4BPP);
         LoadSpecialPokePic(gMonSpritesGfxPtr->buffer,
                            species,
                            personality,
@@ -2077,7 +2071,7 @@ u8 CreateAdditionalMonSpriteForMoveAnim(u16 species, bool8 isBackpic, u8 id, s16
     }
     else
     {
-        LoadCompressedPalette(GetMonSpritePalFromSpeciesAndPersonality(species, isShiny, personality), OBJ_PLTT_ID(palette), PLTT_SIZE_4BPP);
+        LoadCompressedPalette(GetMonSpritePalFromSpeciesAndPersonality(species, trainerId, personality), OBJ_PLTT_ID(palette), PLTT_SIZE_4BPP);
         LoadSpecialPokePic(gMonSpritesGfxPtr->buffer,
                            species,
                            personality,

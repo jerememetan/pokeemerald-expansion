@@ -3,7 +3,7 @@
 
 ASSUMPTIONS
 {
-    ASSUME(MoveHasAdditionalEffectSelf(MOVE_SPIN_OUT, MOVE_EFFECT_SPD_MINUS_2) == TRUE);
+    ASSUME(gBattleMoves[MOVE_SPIN_OUT].effect == EFFECT_SPIN_OUT);
 }
 
 SINGLE_BATTLE_TEST("Spin Out lowers speed by 2 stages")
