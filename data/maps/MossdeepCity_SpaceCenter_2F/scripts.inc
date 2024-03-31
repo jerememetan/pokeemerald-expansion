@@ -518,23 +518,7 @@ MossdeepCity_SpaceCenter_2F_EventScript_ChoosePartyForMultiBattle::
 
 # 260 "data/maps/MossdeepCity_SpaceCenter_2F/scripts.pory"
 MossdeepCity_SpaceCenter_2F_EventScript_DoStevenMultiBattle::
-# 261 "data/maps/MossdeepCity_SpaceCenter_2F/scripts.pory"
-	special ReducePlayerPartyToSelectedMons
-# 262 "data/maps/MossdeepCity_SpaceCenter_2F/scripts.pory"
-	frontier_set FRONTIER_DATA_SELECTED_MON_ORDER
-# 263 "data/maps/MossdeepCity_SpaceCenter_2F/scripts.pory"
-	setvar VAR_0x8004, SPECIAL_BATTLE_STEVEN
-# 264 "data/maps/MossdeepCity_SpaceCenter_2F/scripts.pory"
-	setvar VAR_0x8005, 0
-# 265 "data/maps/MossdeepCity_SpaceCenter_2F/scripts.pory"
-	special DoSpecialTrainerBattle
-# 266 "data/maps/MossdeepCity_SpaceCenter_2F/scripts.pory"
-	waitstate
-# 267 "data/maps/MossdeepCity_SpaceCenter_2F/scripts.pory"
-	frontier_saveparty
-# 268 "data/maps/MossdeepCity_SpaceCenter_2F/scripts.pory"
-	special LoadPlayerParty
-# 269 "data/maps/MossdeepCity_SpaceCenter_2F/scripts.pory"
+	multi_2_vs_2 TRAINER_MAXIE_MOSSDEEP, MossdeepCity_SpaceCenter_2F_Text_JustWantToExpandLand, TRAINER_TABITHA_MOSSDEEP, MossdeepCity_SpaceCenter_Text_TabithaDefeat, PARTNER_STEVEN, TRAINER_BACK_PIC_STEVEN
 	switch VAR_RESULT
 # 270 "data/maps/MossdeepCity_SpaceCenter_2F/scripts.pory"
 	case 1, MossdeepCity_SpaceCenter_2F_EventScript_DefeatedMaxieTabitha
