@@ -73,6 +73,7 @@ static void EncryptBoxMon(struct BoxPokemon *boxMon);
 static void DecryptBoxMon(struct BoxPokemon *boxMon);
 static void Task_PlayMapChosenOrBattleBGM(u8 taskId);
 static bool8 ShouldSkipFriendshipChange(void);
+// static u16 GetPreEvolution(u16 species);
 static void RemoveIVIndexFromList(u8 *ivs, u8 selectedIv);
 void TrySpecialOverworldEvo();
 
@@ -4830,6 +4831,25 @@ u8 CanLearnTeachableMove(u16 species, u16 move)
     }
 }
 
+// static u16 GetPreEvolution(u16 species){
+//     int i, j, k;
+
+//     for (i = 1; i < NUM_SPECIES; i++)
+//     {
+//         for (j = 0; evolutions[j].method != EVOLUTIONS_END; j++)
+//           const struct Evolution *evolutions = GetSpeciesEvolutions(j);
+//            if (evolutions == NULL)
+//                 continue;
+//             for (k = 0; evolutions[k].method != EVOLUTIONS_END; k++)
+//            {
+//              if (SanitizeSpeciesId(evolutions[k].targetSpecies) == species)
+//                 return i;
+//            }
+        
+//     }
+//     return SPECIES_NONE;
+// }
+
 u8 GetMoveRelearnerMoves(struct Pokemon *mon, u16 *moves)
 {
     u16 learnedMoves[4];
@@ -4847,6 +4867,13 @@ u8 GetMoveRelearnerMoves(struct Pokemon *mon, u16 *moves)
         u16 moveLevel;
 
         if (learnset[i].move == LEVEL_UP_MOVE_END)
+        // {
+        //    i = 0;
+        //     level = preEvLvl;
+        //     species = GetPreEvolution(species);
+        // }
+
+        // if (species == SPECIES_NONE)
             break;
 
         moveLevel = learnset[i].level;
@@ -4903,6 +4930,7 @@ u8 GetNumberOfRelearnableMoves(struct Pokemon *mon)
         u16 moveLevel;
 
         if (learnset[i].move == LEVEL_UP_MOVE_END)
+       
             break;
 
         moveLevel = learnset[i].level;

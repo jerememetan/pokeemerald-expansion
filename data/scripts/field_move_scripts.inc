@@ -218,7 +218,7 @@ Text_MonUsedWaterfall:
 
 EventScript_UseDive::
 	lockall
-	goto_if_unset FLAG_BADGE07_GET, EventScript_CantDive
+	goto_if_unset FLAG_RECEIVED_HM_DIVE, EventScript_CantDive
 	//checkpartymove MOVE_DIVE
 	//goto_if_eq VAR_RESULT, PARTY_SIZE, EventScript_CantDive
 	//bufferpartymonnick STR_VAR_1, VAR_RESULT

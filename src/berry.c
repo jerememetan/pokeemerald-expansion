@@ -1720,8 +1720,8 @@ static u8 CalcBerryYieldInternal(u16 max, u16 min, u8 water)
         return min;
     else
     {
-        randMin = (max - min) * (water - 1);
-        randMax = (max - min) * (water);
+        randMin = (max - min) * (water);
+        randMax = (max - min) * (water + 1);
         rand = randMin + Random() % (randMax - randMin + 1);
 
         // Round upwards

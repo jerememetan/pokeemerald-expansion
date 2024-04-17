@@ -1634,7 +1634,7 @@ const struct Item gItems[] =
     [ITEM_NUGGET] =
     {
         .name = _("Nugget"),
-        .price = 10000,
+        .price = 20000,
         .description = sNuggetDesc,
         .pocket = POCKET_TREASURES,
         .type = ITEM_USE_BAG_MENU,
@@ -5376,7 +5376,7 @@ const struct Item gItems[] =
     [ITEM_METAL_COAT] =
     {
         .name = _("Metal Coat"),
-        .price = 2000,
+        .price = 1000,
         .holdEffect = HOLD_EFFECT_STEEL_POWER,
         .holdEffectParam = TYPE_BOOST_PARAM,
         .description = sMetalCoatDesc,
@@ -5572,7 +5572,7 @@ const struct Item gItems[] =
     [ITEM_CELL_BATTERY] =
     {
         .name = _("Cell Battery"),
-        .price = 4000,
+        .price = 500,
         .holdEffect = HOLD_EFFECT_CELL_BATTERY,
         .holdEffectParam = 0,
         .description = sCellBatteryDesc,
@@ -5585,7 +5585,7 @@ const struct Item gItems[] =
     [ITEM_LUMINOUS_MOSS] =
     {
         .name = _("Luminous Moss"),
-        .price = 4000,
+        .price = 500,
         .holdEffect = HOLD_EFFECT_LUMINOUS_MOSS,
         .holdEffectParam = 0,
         .description = sLuminousMossDesc,
@@ -5598,7 +5598,7 @@ const struct Item gItems[] =
     [ITEM_SNOWBALL] =
     {
         .name = _("Snowball"),
-        .price = 4000,
+        .price = 500,
         .holdEffect = HOLD_EFFECT_SNOWBALL,
         .holdEffectParam = 0,
         .description = sSnowballDesc,
@@ -5687,7 +5687,7 @@ const struct Item gItems[] =
     [ITEM_KINGS_ROCK] =
     {
         .name = _("King's Rock"),
-        .price = 5000,
+        .price = 4000,
         .holdEffect = HOLD_EFFECT_FLINCH,
         .holdEffectParam = 10,
         .description = sKingsRockDesc,
@@ -6136,7 +6136,7 @@ const struct Item gItems[] =
     [ITEM_EJECT_BUTTON] =
     {
         .name = _("Eject Button"),
-        .price = 4000,
+        .price = 1500,
         .holdEffect = HOLD_EFFECT_EJECT_BUTTON,
         .holdEffectParam = 0,
         .description = sEjectButtonDesc,
@@ -6235,7 +6235,7 @@ const struct Item gItems[] =
     [ITEM_EJECT_PACK] =
     {
         .name = _("Eject Pack"),
-        .price = 4000,
+        .price = 1500,
         .holdEffect = HOLD_EFFECT_EJECT_PACK,
         .description = sEjectPackDesc,
         .pocket = POCKET_BATTLE_ITEMS,
@@ -9209,7 +9209,7 @@ const struct Item gItems[] =
     [ITEM_ABILITY_SHIELD] =
     {
         .name = _("AbilityShield"),
-        .price = 20000,
+        .price = 3000,
         .holdEffect = HOLD_EFFECT_ABILITY_SHIELD,
         .description = sAbilityShieldDesc,
         .pocket = POCKET_ITEMS,
@@ -9221,7 +9221,7 @@ const struct Item gItems[] =
     [ITEM_CLEAR_AMULET] =
     {
         .name = _("Clear Amulet"),
-        .price = 30000,
+        .price = 3000,
         .holdEffect = HOLD_EFFECT_CLEAR_AMULET,
         .description = sClearAmuletDesc,
         .pocket = POCKET_ITEMS,
@@ -9233,7 +9233,7 @@ const struct Item gItems[] =
     [ITEM_PUNCHING_GLOVE] =
     {
         .name = _("PunchingGlove"),
-        .price = 15000,
+        .price = 3000,
         .holdEffect = HOLD_EFFECT_PUNCHING_GLOVE,
         .description = sPunchingGloveDesc,
         .pocket = POCKET_ITEMS,
@@ -9245,7 +9245,7 @@ const struct Item gItems[] =
     [ITEM_COVERT_CLOAK] =
     {
         .name = _("Covert Cloak"),
-        .price = 20000,
+        .price = 3000,
         .holdEffect = HOLD_EFFECT_COVERT_CLOAK,
         .description = sCovertCloakDesc,
         .pocket = POCKET_ITEMS,
@@ -9257,7 +9257,7 @@ const struct Item gItems[] =
     [ITEM_LOADED_DICE] =
     {
         .name = _("Loaded Dice"),
-        .price = 20000,
+        .price = 3000,
         .holdEffect = HOLD_EFFECT_LOADED_DICE,
         .description = sLoadedDiceDesc,
         .pocket = POCKET_ITEMS,

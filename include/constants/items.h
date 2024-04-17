@@ -384,47 +384,47 @@
 #define ITEM_VENUSAURITE 292
 #define ITEM_CHARIZARDITE_X 293
 #define ITEM_CHARIZARDITE_Y 294
-#define ITEM_BLASTOISINITE 295
+#define ITEM_BLASTOISINITE 295 //hidden in berry route
 #define ITEM_BEEDRILLITE 296
 #define ITEM_PIDGEOTITE 297 //Glass house
 #define ITEM_ALAKAZITE 298
-#define ITEM_SLOWBRONITE 299
-#define ITEM_GENGARITE 300
-#define ITEM_KANGASKHANITE 301
+#define ITEM_SLOWBRONITE 299 //Route125 
+#define ITEM_GENGARITE 300 //Mt Pyre Summit
+#define ITEM_KANGASKHANITE 301 //hidden in Victory Road
 #define ITEM_PINSIRITE 302 //Trick house
-#define ITEM_GYARADOSITE 303
+#define ITEM_GYARADOSITE 303 //Juan
 #define ITEM_AERODACTYLITE 304
 #define ITEM_MEWTWONITE_X 305
 #define ITEM_MEWTWONITE_Y 306
 #define ITEM_AMPHAROSITE 307 //Wattson past New Mauville
 #define ITEM_STEELIXITE 308 //Glass house
-#define ITEM_SCIZORITE 309
+#define ITEM_SCIZORITE 309 //game corner
 #define ITEM_HERACRONITE 310
 #define ITEM_HOUNDOOMINITE 311 //Flannery
 #define ITEM_TYRANITARITE 312
-#define ITEM_SCEPTILITE 313
-#define ITEM_BLAZIKENITE 314
-#define ITEM_SWAMPERTITE 315
+#define ITEM_SCEPTILITE 313 //by Mom, after defeating Norman
+#define ITEM_BLAZIKENITE 314 //by Mom, after defeating Norman
+#define ITEM_SWAMPERTITE 315 //by Mom, after defeating Norman
 #define ITEM_GARDEVOIRITE 316
-#define ITEM_SABLENITE 317
+#define ITEM_SABLENITE 317 // Mt Pyre lv2
 #define ITEM_MAWILITE 318
 #define ITEM_AGGRONITE 319
 #define ITEM_MEDICHAMITE 320 //Tate & Liza
-#define ITEM_MANECTITE 321
+#define ITEM_MANECTITE 321 //Wattson
 #define ITEM_SHARPEDONITE 322 //Glass house
 #define ITEM_CAMERUPTITE 323
 #define ITEM_ALTARIANITE 324 //Winnona 
 #define ITEM_BANETTITE 325 //Glass house
 #define ITEM_ABSOLITE 326
 #define ITEM_GLALITITE 327
-#define ITEM_SALAMENCITE 328
-#define ITEM_METAGROSSITE 329
+#define ITEM_SALAMENCITE 328 //Artisan Cave
+#define ITEM_METAGROSSITE 329 //Artisan Cave
 #define ITEM_LATIASITE 330
 #define ITEM_LATIOSITE 331
-#define ITEM_LOPUNNITE 332
+#define ITEM_LOPUNNITE 332 //game corner
 #define ITEM_GARCHOMPITE 333 //Glass house
 #define ITEM_LUCARIONITE 334 //Brawly
-#define ITEM_ABOMASITE 335
+#define ITEM_ABOMASITE 335 //game corner
 #define ITEM_GALLADITE 336
 #define ITEM_AUDINITE 337 //Glass house
 #define ITEM_DIANCITE 338

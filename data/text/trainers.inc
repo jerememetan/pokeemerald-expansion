@@ -3430,6 +3430,15 @@ Route123_Text_JackiPostRematch:
 	.string "Your power with POKéMON…\n"
 	.string "That could be a psychic power, too.$"
 
+Route123_Text_RedIntro:
+	.string "Red: ...!$"
+
+Route123_Text_RedDefeat:
+	.string "....$"
+
+Route123_Text_RedPostBattle:
+	.string "...$"
+
 Route123_Text_MiuIntro:
 	.string "MIU: Hello, TRAINER. I hope your\n"
 	.string "POKéMON won't cry when they lose.$"

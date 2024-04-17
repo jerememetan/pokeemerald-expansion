@@ -4430,6 +4430,16 @@
       "secondary_tileset": "gTileset_Petalburg",
       "border_filepath": "data/layouts/Littleroot_Extension/border.bin",
       "blockdata_filepath": "data/layouts/Littleroot_Extension/map.bin"
+    },
+    {
+      "id": "LAYOUT_PETALBURG_WOODGROVE",
+      "name": "PetalburgWoodgrove_Layout",
+      "width": 25,
+      "height": 30,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Petalburg",
+      "border_filepath": "data/layouts/PetalburgWoodgrove/border.bin",
+      "blockdata_filepath": "data/layouts/PetalburgWoodgrove/map.bin"
     }
   ]
 }

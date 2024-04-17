@@ -614,11 +614,11 @@ static void Cmd_callnative(void);
 const u16 sLevelCapFlags[NUM_SOFT_CAPS] =
 {
     FLAG_BADGE01_GET, FLAG_BADGE02_GET, FLAG_BADGE03_GET, FLAG_BADGE04_GET,
-    FLAG_BADGE05_GET, FLAG_BADGE06_GET, FLAG_BADGE07_GET, FLAG_BADGE08_GET, FLAG_IS_CHAMPION,
+    FLAG_BADGE05_GET, FLAG_BADGE06_GET, FLAG_HIDE_LILYCOVE_CITY_RIVAL, FLAG_BADGE07_GET, FLAG_BADGE08_GET, FLAG_IS_CHAMPION,
 };
 
-const u16 sLevelCaps[NUM_SOFT_CAPS] = { 15, 19, 25, 35, 39, 49, 60, 69, 81};
-const double sLevelCapReduction[7] = { .05, .001, .001, .001, .001, .001, .001 };
+const u16 sLevelCaps[NUM_SOFT_CAPS] = { 15, 19, 25, 35, 39, 49, 53, 60, 69, 81};
+const double sLevelCapReduction[7] = { .3, .001, .001, .001, .001, .001, .001 };
 const double sRelativePartyScaling[27] =
 {
     3.00, 2.75, 2.50, 2.33, 2.25,

@@ -15,13 +15,13 @@ Route113_GlassWorkshop_MapScripts::
 # 8 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.set CAMERUPTITE_PRICE,  500
 # 9 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	.set BANETTITE_PRICE,  1500
+	.set BANETTITE_PRICE,    500
 # 10 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	.set SHARPEDONITE_PRICE,  1500
+	.set SHARPEDONITE_PRICE, 700
 # 11 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	.set STEELIXITE_PRICE, 2000
+	.set STEELIXITE_PRICE,   700
 # 12 "data/maps/Route113_GlassWorkshop/scripts.pory"
-	.set GARCHOMPITE_PPRICE,  5000
+	.set GARCHOMPITE_PPRICE,  1500
 # 13 "data/maps/Route113_GlassWorkshop/scripts.pory"
 	.set LOWEST_ASH_PRICE,   PIDGEOTITE_PRICE
 # 14 "data/maps/Route113_GlassWorkshop/scripts.pory"

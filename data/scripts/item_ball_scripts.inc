@@ -255,7 +255,7 @@ Route124_EventScript_ItemYellowShard::
 	end
 
 Route125_EventScript_ItemBigPearl::
-	finditem ITEM_BIG_PEARL
+	finditem ITEM_SLOWBRONITE
 	end
 
 Route126_EventScript_ItemGreenShard::
@@ -483,7 +483,7 @@ SafariZone_Southeast_EventScript_ItemBigPearl::
 	end
 
 MtPyre_2F_EventScript_ItemUltraBall::
-	finditem ITEM_ULTRA_BALL
+	finditem ITEM_SABLENITE
 	end
 
 MtPyre_3F_EventScript_ItemSuperRepel::
@@ -623,11 +623,11 @@ VictoryRoad_B2F_EventScript_ItemFullHeal::
 	end
 
 ArtisanCave_B1F_EventScript_ItemHPUp::
-	finditem ITEM_NUGGET
+	finditem ITEM_METAGROSSITE
 	end
 
 ArtisanCave_1F_EventScript_ItemCarbos::
-	finditem ITEM_SUPER_POTION
+	finditem ITEM_SALAMENCITE
 	end
 
 MagmaHideout_1F_EventScript_ItemRareCandy::

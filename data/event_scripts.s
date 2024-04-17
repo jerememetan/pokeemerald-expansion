@@ -1071,3 +1071,5 @@ EventScript_VsSeekerChargingDone::
 	.include "data/maps/Verdanturf_Extension/scripts.inc"
 
 	.include "data/maps/Littleroot_Extension/scripts.inc"
+
+	.include "data/maps/PetalburgWoodgrove/scripts.inc"
