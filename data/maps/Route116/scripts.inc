@@ -117,7 +117,7 @@ Route116_EventScript_GiveRepeatBall::
 # 59 "data/maps/Route116/scripts.pory"
 	setflag FLAG_MET_DEVON_EMPLOYEE
 # 60 "data/maps/Route116/scripts.pory"
-	giveitem ITEM_REPEAT_BALL
+	giveitem ITEM_REPEAT_BALL, 10
 # 61 "data/maps/Route116/scripts.pory"
 	goto_if_eq VAR_RESULT, FALSE, Route116_EventScript_NoRoomForRepeatBall
 # 62 "data/maps/Route116/scripts.pory"

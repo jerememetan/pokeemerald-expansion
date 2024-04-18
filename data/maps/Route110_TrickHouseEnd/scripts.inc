@@ -247,7 +247,7 @@ Route110_TrickHouseEnd_EventScript_CompletedPuzzle6::
 # 124 "data/maps/Route110_TrickHouseEnd/scripts.pory"
 	setvar VAR_TRICK_HOUSE_PRIZE_PICKUP, 0
 # 125 "data/maps/Route110_TrickHouseEnd/scripts.pory"
-	giveitem ITEM_EXP_ALL
+	giveitem ITEM_BEEDRILLITE
 # 126 "data/maps/Route110_TrickHouseEnd/scripts.pory"
 	call_if_eq VAR_RESULT, FALSE, Route110_TrickHouseEnd_EventScript_BagFull
 # 127 "data/maps/Route110_TrickHouseEnd/scripts.pory"

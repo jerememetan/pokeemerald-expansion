@@ -181,7 +181,7 @@ Route104_PrettyPetalFlowerShop_EventScript_RandomBerryGirl::
 # 91 "data/maps/Route104_PrettyPetalFlowerShop/scripts.pory"
 	addvar VAR_RESULT, FIRST_BERRY_INDEX
 # 92 "data/maps/Route104_PrettyPetalFlowerShop/scripts.pory"
-	giveitem VAR_RESULT
+	giveitem VAR_RESULT, 15
 # 93 "data/maps/Route104_PrettyPetalFlowerShop/scripts.pory"
 	goto_if_eq VAR_RESULT, 0, Common_EventScript_ShowBagIsFull
 # 94 "data/maps/Route104_PrettyPetalFlowerShop/scripts.pory"

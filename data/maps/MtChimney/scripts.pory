@@ -107,12 +107,12 @@ MtChimney_EventScript_LavaCookieLady::
 	showmoneybox 0, 0
 	msgbox MtChimney_Text_LavaCookiesJust200, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, MtChimney_EventScript_DeclineLavaCookie
-	checkmoney 200
+	checkmoney 3000
 	goto_if_eq VAR_RESULT, FALSE, MtChimney_EventScript_NotEnoughMoney
 	msgbox MtChimney_Text_ThankYouDear, MSGBOX_DEFAULT
-	checkitemspace ITEM_LAVA_COOKIE
+	checkitemspace ITEM_LUCKY_EGG
 	call_if_eq VAR_RESULT, TRUE, MtChimney_EventScript_RemoveMoney
-	giveitem ITEM_LAVA_COOKIE
+	giveitem ITEM_LUCKY_EGG
 	goto_if_eq VAR_RESULT, FALSE, MtChimney_EventScript_BagIsFull
 	hidemoneybox
 	release
@@ -706,9 +706,9 @@ MtChimney_Text_Bushaa:
 	.string "Bushaa!$"
 
 MtChimney_Text_LavaCookiesJust200:
-	.string "LAVA COOKIES are MT. CHIMNEY's local\n"
+	.string "Lucky Eggs are MT. CHIMNEY's local\n"
 	.string "specialty.\p"
-	.string "Try one. It's just ¥200.$"
+	.string "Get one. It's just ¥3000.$"
 
 MtChimney_Text_ThankYouDear:
 	.string "Thank you, dear!$"

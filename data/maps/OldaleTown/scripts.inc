@@ -155,7 +155,7 @@ OldaleTown_EventScript_ExplainPokemonMart::
 # 78 "data/maps/OldaleTown/scripts.pory"
 	msgbox OldaleTown_Text_ThisIsAPokemonMart, MSGBOX_DEFAULT
 # 79 "data/maps/OldaleTown/scripts.pory"
-	giveitem ITEM_POTION
+	giveitem ITEM_POTION, 5
 # 80 "data/maps/OldaleTown/scripts.pory"
 	goto_if_eq VAR_RESULT, FALSE, OldaleTown_EventScript_BagIsFull
 # 81 "data/maps/OldaleTown/scripts.pory"

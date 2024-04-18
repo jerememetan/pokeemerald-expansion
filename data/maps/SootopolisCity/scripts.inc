@@ -1493,7 +1493,7 @@ SootopolisCity_EventScript_KiriGiveBerry::
 # 747 "data/maps/SootopolisCity/scripts.pory"
 SootopolisCity_EventScript_GiveFigyBerry::
 # 748 "data/maps/SootopolisCity/scripts.pory"
-	giveitem ITEM_FIGY_BERRY
+	giveitem ITEM_FIGY_BERRY, 5
 # 749 "data/maps/SootopolisCity/scripts.pory"
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
 # 750 "data/maps/SootopolisCity/scripts.pory"
@@ -1507,7 +1507,7 @@ SootopolisCity_EventScript_GiveFigyBerry::
 # 754 "data/maps/SootopolisCity/scripts.pory"
 SootopolisCity_EventScript_GiveIapapaBerry::
 # 755 "data/maps/SootopolisCity/scripts.pory"
-	giveitem ITEM_IAPAPA_BERRY
+	giveitem ITEM_IAPAPA_BERRY, 5
 # 756 "data/maps/SootopolisCity/scripts.pory"
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
 # 757 "data/maps/SootopolisCity/scripts.pory"

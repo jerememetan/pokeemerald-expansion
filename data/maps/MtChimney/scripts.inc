@@ -217,17 +217,17 @@ MtChimney_EventScript_LavaCookieLady::
 # 109 "data/maps/MtChimney/scripts.pory"
 	goto_if_eq VAR_RESULT, NO, MtChimney_EventScript_DeclineLavaCookie
 # 110 "data/maps/MtChimney/scripts.pory"
-	checkmoney 200
+	checkmoney 3000
 # 111 "data/maps/MtChimney/scripts.pory"
 	goto_if_eq VAR_RESULT, FALSE, MtChimney_EventScript_NotEnoughMoney
 # 112 "data/maps/MtChimney/scripts.pory"
 	msgbox MtChimney_Text_ThankYouDear, MSGBOX_DEFAULT
 # 113 "data/maps/MtChimney/scripts.pory"
-	checkitemspace ITEM_LAVA_COOKIE
+	checkitemspace ITEM_LUCKY_EGG
 # 114 "data/maps/MtChimney/scripts.pory"
 	call_if_eq VAR_RESULT, TRUE, MtChimney_EventScript_RemoveMoney
 # 115 "data/maps/MtChimney/scripts.pory"
-	giveitem ITEM_LAVA_COOKIE
+	giveitem ITEM_LUCKY_EGG
 # 116 "data/maps/MtChimney/scripts.pory"
 	goto_if_eq VAR_RESULT, FALSE, MtChimney_EventScript_BagIsFull
 # 117 "data/maps/MtChimney/scripts.pory"
@@ -1415,11 +1415,11 @@ MtChimney_Text_Bushaa:
 # 708 "data/maps/MtChimney/scripts.pory"
 MtChimney_Text_LavaCookiesJust200:
 # 709 "data/maps/MtChimney/scripts.pory"
-	.string "LAVA COOKIES are MT. CHIMNEY's local\n"
+	.string "Lucky Eggs are MT. CHIMNEY's local\n"
 # 710 "data/maps/MtChimney/scripts.pory"
 	.string "specialty.\p"
 # 711 "data/maps/MtChimney/scripts.pory"
-	.string "Try one. It's just ¥200.$"
+	.string "Get one. It's just ¥3000.$"
 # 712 "data/maps/MtChimney/scripts.pory"
 
 # 713 "data/maps/MtChimney/scripts.pory"

@@ -323,7 +323,7 @@ Route111_EventScript_Girl::
 # 162 "data/maps/Route111/scripts.pory"
 	msgbox Route111_Text_WateredPlantsEveryDayTakeBerry, MSGBOX_DEFAULT
 # 163 "data/maps/Route111/scripts.pory"
-	giveitem ITEM_RAZZ_BERRY
+	giveitem ITEM_RAZZ_BERRY, 5
 # 164 "data/maps/Route111/scripts.pory"
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
 # 165 "data/maps/Route111/scripts.pory"

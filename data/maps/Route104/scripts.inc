@@ -529,7 +529,7 @@ Route104_EventScript_ExpertF::
 # 265 "data/maps/Route104/scripts.pory"
 	msgbox Route104_Text_PlantBerriesInSoilTakeThis, MSGBOX_DEFAULT
 # 266 "data/maps/Route104/scripts.pory"
-	giveitem ITEM_CHESTO_BERRY
+	giveitem ITEM_CHESTO_BERRY, 5
 # 267 "data/maps/Route104/scripts.pory"
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
 # 268 "data/maps/Route104/scripts.pory"
@@ -563,7 +563,7 @@ Route104_EventScript_WhiteHerbFlorist::
 # 282 "data/maps/Route104/scripts.pory"
 	msgbox Route104_Text_DontNeedThisTakeIt, MSGBOX_DEFAULT
 # 283 "data/maps/Route104/scripts.pory"
-	giveitem ITEM_WHITE_HERB
+	giveitem ITEM_WHITE_HERB, 5
 # 284 "data/maps/Route104/scripts.pory"
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
 # 285 "data/maps/Route104/scripts.pory"

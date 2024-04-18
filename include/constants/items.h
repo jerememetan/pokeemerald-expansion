@@ -385,7 +385,7 @@
 #define ITEM_CHARIZARDITE_X 293
 #define ITEM_CHARIZARDITE_Y 294
 #define ITEM_BLASTOISINITE 295 //hidden in berry route
-#define ITEM_BEEDRILLITE 296
+#define ITEM_BEEDRILLITE 296 //trick house
 #define ITEM_PIDGEOTITE 297 //Glass house
 #define ITEM_ALAKAZITE 298
 #define ITEM_SLOWBRONITE 299 //Route125 

@@ -761,7 +761,7 @@ Route110_TrickHouseEntrance_EventScript_GivePuzzle5Reward::
 # 381 "data/maps/Route110_TrickHouseEntrance/scripts.pory"
 Route110_TrickHouseEntrance_EventScript_GivePuzzle6Reward::
 # 382 "data/maps/Route110_TrickHouseEntrance/scripts.pory"
-	giveitem ITEM_EXP_ALL
+	giveitem ITEM_BEEDRILLITE
 # 383 "data/maps/Route110_TrickHouseEntrance/scripts.pory"
 	goto_if_eq VAR_RESULT, TRUE, Route110_TrickHouseEntrance_EventScript_GotReward
 # 384 "data/maps/Route110_TrickHouseEntrance/scripts.pory"

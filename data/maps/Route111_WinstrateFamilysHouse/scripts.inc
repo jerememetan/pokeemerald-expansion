@@ -45,7 +45,7 @@ Route111_WinstrateFamilysHouse_EventScript_Victoria::
 # 23 "data/maps/Route111_WinstrateFamilysHouse/scripts.pory"
 	msgbox Route111_WinstrateFamilysHouse_Text_LikeYouToHaveMachoBrace, MSGBOX_DEFAULT
 # 24 "data/maps/Route111_WinstrateFamilysHouse/scripts.pory"
-	giveitem ITEM_MACHO_BRACE
+	giveitem ITEM_MACHO_BRACE, 6
 # 25 "data/maps/Route111_WinstrateFamilysHouse/scripts.pory"
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
 # 26 "data/maps/Route111_WinstrateFamilysHouse/scripts.pory"

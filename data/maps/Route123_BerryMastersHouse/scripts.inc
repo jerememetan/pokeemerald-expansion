@@ -49,7 +49,7 @@ Route123_BerryMastersHouse_EventScript_BerryMaster::
 # 25 "data/maps/Route123_BerryMastersHouse/scripts.pory"
 	addvar VAR_RESULT, FIRST_BERRY_INDEX
 # 26 "data/maps/Route123_BerryMastersHouse/scripts.pory"
-	giveitem VAR_RESULT
+	giveitem VAR_RESULT, 10
 # 27 "data/maps/Route123_BerryMastersHouse/scripts.pory"
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
 # 28 "data/maps/Route123_BerryMastersHouse/scripts.pory"
@@ -137,7 +137,7 @@ Route123_BerryMastersHouse_EventScript_GiveNormalBerry::
 # 69 "data/maps/Route123_BerryMastersHouse/scripts.pory"
 	addvar VAR_RESULT, FIRST_BERRY_INDEX
 # 70 "data/maps/Route123_BerryMastersHouse/scripts.pory"
-	giveitem VAR_RESULT
+	giveitem VAR_RESULT, 10
 # 71 "data/maps/Route123_BerryMastersHouse/scripts.pory"
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
 # 72 "data/maps/Route123_BerryMastersHouse/scripts.pory"
@@ -155,7 +155,7 @@ Route123_BerryMastersHouse_EventScript_GiveSpelonBerry::
 # 78 "data/maps/Route123_BerryMastersHouse/scripts.pory"
 	msgbox Route123_BerryMastersHouse_Text_InspirationalTakeThis, MSGBOX_DEFAULT
 # 79 "data/maps/Route123_BerryMastersHouse/scripts.pory"
-	giveitem ITEM_SPELON_BERRY
+	giveitem ITEM_SPELON_BERRY, 10
 # 80 "data/maps/Route123_BerryMastersHouse/scripts.pory"
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
 # 81 "data/maps/Route123_BerryMastersHouse/scripts.pory"
@@ -173,7 +173,7 @@ Route123_BerryMastersHouse_EventScript_GivePamtreBerry::
 # 87 "data/maps/Route123_BerryMastersHouse/scripts.pory"
 	msgbox Route123_BerryMastersHouse_Text_InspirationalTakeThis, MSGBOX_DEFAULT
 # 88 "data/maps/Route123_BerryMastersHouse/scripts.pory"
-	giveitem ITEM_PAMTRE_BERRY
+	giveitem ITEM_PAMTRE_BERRY, 10
 # 89 "data/maps/Route123_BerryMastersHouse/scripts.pory"
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
 # 90 "data/maps/Route123_BerryMastersHouse/scripts.pory"
@@ -191,7 +191,7 @@ Route123_BerryMastersHouse_EventScript_GiveWatmelBerry::
 # 96 "data/maps/Route123_BerryMastersHouse/scripts.pory"
 	msgbox Route123_BerryMastersHouse_Text_InspirationalTakeThis, MSGBOX_DEFAULT
 # 97 "data/maps/Route123_BerryMastersHouse/scripts.pory"
-	giveitem ITEM_WATMEL_BERRY
+	giveitem ITEM_WATMEL_BERRY, 10
 # 98 "data/maps/Route123_BerryMastersHouse/scripts.pory"
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
 # 99 "data/maps/Route123_BerryMastersHouse/scripts.pory"
@@ -209,7 +209,7 @@ Route123_BerryMastersHouse_EventScript_GiveDurinBerry::
 # 105 "data/maps/Route123_BerryMastersHouse/scripts.pory"
 	msgbox Route123_BerryMastersHouse_Text_InspirationalTakeThis, MSGBOX_DEFAULT
 # 106 "data/maps/Route123_BerryMastersHouse/scripts.pory"
-	giveitem ITEM_DURIN_BERRY
+	giveitem ITEM_DURIN_BERRY, 10
 # 107 "data/maps/Route123_BerryMastersHouse/scripts.pory"
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
 # 108 "data/maps/Route123_BerryMastersHouse/scripts.pory"
@@ -227,7 +227,7 @@ Route123_BerryMastersHouse_EventScript_GiveBelueBerry::
 # 114 "data/maps/Route123_BerryMastersHouse/scripts.pory"
 	msgbox Route123_BerryMastersHouse_Text_InspirationalTakeThis, MSGBOX_DEFAULT
 # 115 "data/maps/Route123_BerryMastersHouse/scripts.pory"
-	giveitem ITEM_BELUE_BERRY
+	giveitem ITEM_BELUE_BERRY, 10
 # 116 "data/maps/Route123_BerryMastersHouse/scripts.pory"
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
 # 117 "data/maps/Route123_BerryMastersHouse/scripts.pory"
