@@ -3087,7 +3087,7 @@ static const u8 sAxeKickDescription[] = _(
 
 static const u8 sLastRespectsDescription[] = _(
     "This move deals more damage\n"
-    "for each defeated ally.");
+    "if ally fainted last turn.");
 
 static const u8 sLuminaCrashDescription[] = _(
     "A mind-affecting light\n"

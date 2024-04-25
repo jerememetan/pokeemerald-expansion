@@ -1364,6 +1364,7 @@ SootopolisCity_EventScript_Maxie::
 SootopolisCity_EventScript_MaxieRayquaza::
 	msgbox SootopolisCity_Text_AfterAllOurScheming, MSGBOX_DEFAULT
 	setflag FLAG_MET_MAXIE_SOOTOPOLIS
+	goto_if_unset FLAG_RECIEVED_CAMERUPTITE, SootopolisCity_EventScript_GiveCameruptite
 	goto_if_set FLAG_MET_ARCHIE_SOOTOPOLIS, SootopolisCity_EventScript_MaxieArchieLeave
 	releaseall
 	end
@@ -1394,6 +1395,13 @@ SootopolisCity_EventScript_MaxieArchieLeave::
 	waitstate
 	releaseall
 	end
+
+SootopolisCity_EventScript_GiveCameruptite::
+   msgbox SootopolisCity_Text_TakeThisMegaStone, MSGBOX_DEFAULT
+   giveitem ITEM_CAMERUPTITE
+   goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
+   setflag FLAG_RECIEVED_CAMERUPTITE
+   return
 
 @ Unused
 SootopolisCity_Movement_Levitate::
@@ -1725,4 +1733,11 @@ SootopolisCity_Text_DazzledByMentor:
 	.string "WALLACE: I'm sure that you will be\n"
 	.string "dazzled by my mentor's breathtakingly\l"
 	.string "elegant battle style.$"
+
+
+SootopolisCity_Text_TakeThisMegaStone:
+    .string "As an apology, take this since.\n"
+	.string "I won't be needing this anymore.\l"
+	.string "Fuhaha.....$"
+
 `

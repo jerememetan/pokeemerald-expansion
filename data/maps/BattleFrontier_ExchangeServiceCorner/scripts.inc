@@ -109,7 +109,7 @@ BattleFrontier_ExchangeServiceCorner_EventScript_TryGiveItem::
 # 55 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
 	special TakeFrontierBattlePoints
 # 56 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
-	additem VAR_0x8009
+	additem VAR_0x8009, 5
 # 57 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
 	special UpdateBattlePointsWindow
 # 58 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
@@ -201,7 +201,7 @@ BattleFrontier_ExchangeServiceCorner_EventScript_KissPoster::
 # 101 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
 	goto_if_eq VAR_RESULT, NO, BattleFrontier_ExchangeServiceCorner_EventScript_ChooseDecor1
 # 102 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
-	setvar VAR_0x8008, 16
+	setvar VAR_0x8008, 2
 # 103 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
 	setvar VAR_0x8009, DECOR_KISS_POSTER
 # 104 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
@@ -217,7 +217,7 @@ BattleFrontier_ExchangeServiceCorner_EventScript_KissCushion::
 # 109 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
 	goto_if_eq VAR_RESULT, NO, BattleFrontier_ExchangeServiceCorner_EventScript_ChooseDecor1
 # 110 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
-	setvar VAR_0x8008, 32
+	setvar VAR_0x8008, 2
 # 111 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
 	setvar VAR_0x8009, DECOR_KISS_CUSHION
 # 112 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
@@ -233,7 +233,7 @@ BattleFrontier_ExchangeServiceCorner_EventScript_SmoochumDoll::
 # 117 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
 	goto_if_eq VAR_RESULT, NO, BattleFrontier_ExchangeServiceCorner_EventScript_ChooseDecor1
 # 118 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
-	setvar VAR_0x8008, 32
+	setvar VAR_0x8008, 2
 # 119 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
 	setvar VAR_0x8009, DECOR_SMOOCHUM_DOLL
 # 120 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
@@ -249,7 +249,7 @@ BattleFrontier_ExchangeServiceCorner_EventScript_TogepiDoll::
 # 125 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
 	goto_if_eq VAR_RESULT, NO, BattleFrontier_ExchangeServiceCorner_EventScript_ChooseDecor1
 # 126 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
-	setvar VAR_0x8008, 48
+	setvar VAR_0x8008, 2
 # 127 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
 	setvar VAR_0x8009, DECOR_TOGEPI_DOLL
 # 128 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
@@ -265,7 +265,7 @@ BattleFrontier_ExchangeServiceCorner_EventScript_MeowthDoll::
 # 133 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
 	goto_if_eq VAR_RESULT, NO, BattleFrontier_ExchangeServiceCorner_EventScript_ChooseDecor1
 # 134 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
-	setvar VAR_0x8008, 48
+	setvar VAR_0x8008, 2
 # 135 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
 	setvar VAR_0x8009, DECOR_MEOWTH_DOLL
 # 136 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
@@ -281,7 +281,7 @@ BattleFrontier_ExchangeServiceCorner_EventScript_ClefairyDoll::
 # 141 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
 	goto_if_eq VAR_RESULT, NO, BattleFrontier_ExchangeServiceCorner_EventScript_ChooseDecor1
 # 142 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
-	setvar VAR_0x8008, 48
+	setvar VAR_0x8008, 2
 # 143 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
 	setvar VAR_0x8009, DECOR_CLEFAIRY_DOLL
 # 144 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
@@ -297,7 +297,7 @@ BattleFrontier_ExchangeServiceCorner_EventScript_DittoDoll::
 # 149 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
 	goto_if_eq VAR_RESULT, NO, BattleFrontier_ExchangeServiceCorner_EventScript_ChooseDecor1
 # 150 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
-	setvar VAR_0x8008, 48
+	setvar VAR_0x8008, 4
 # 151 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
 	setvar VAR_0x8009, DECOR_DITTO_DOLL
 # 152 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
@@ -313,7 +313,7 @@ BattleFrontier_ExchangeServiceCorner_EventScript_CyndaquilDoll::
 # 157 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
 	goto_if_eq VAR_RESULT, NO, BattleFrontier_ExchangeServiceCorner_EventScript_ChooseDecor1
 # 158 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
-	setvar VAR_0x8008, 80
+	setvar VAR_0x8008, 8
 # 159 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
 	setvar VAR_0x8009, DECOR_CYNDAQUIL_DOLL
 # 160 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
@@ -329,7 +329,7 @@ BattleFrontier_ExchangeServiceCorner_EventScript_ChikoritaDoll::
 # 165 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
 	goto_if_eq VAR_RESULT, NO, BattleFrontier_ExchangeServiceCorner_EventScript_ChooseDecor1
 # 166 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
-	setvar VAR_0x8008, 80
+	setvar VAR_0x8008, 8
 # 167 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
 	setvar VAR_0x8009, DECOR_CHIKORITA_DOLL
 # 168 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
@@ -345,7 +345,7 @@ BattleFrontier_ExchangeServiceCorner_EventScript_TotodileDoll::
 # 173 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
 	goto_if_eq VAR_RESULT, NO, BattleFrontier_ExchangeServiceCorner_EventScript_ChooseDecor1
 # 174 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
-	setvar VAR_0x8008, 80
+	setvar VAR_0x8008, 8
 # 175 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
 	setvar VAR_0x8009, DECOR_TOTODILE_DOLL
 # 176 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
@@ -409,7 +409,7 @@ BattleFrontier_ExchangeServiceCorner_EventScript_LaprasDoll::
 # 205 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
 	goto_if_eq VAR_RESULT, NO, BattleFrontier_ExchangeServiceCorner_EventScript_ChooseDecor2
 # 206 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
-	setvar VAR_0x8008, 128
+	setvar VAR_0x8008, 20
 # 207 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
 	setvar VAR_0x8009, DECOR_LAPRAS_DOLL
 # 208 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
@@ -425,7 +425,7 @@ BattleFrontier_ExchangeServiceCorner_EventScript_SnorlaxDoll::
 # 213 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
 	goto_if_eq VAR_RESULT, NO, BattleFrontier_ExchangeServiceCorner_EventScript_ChooseDecor2
 # 214 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
-	setvar VAR_0x8008, 128
+	setvar VAR_0x8008, 20
 # 215 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
 	setvar VAR_0x8009, DECOR_SNORLAX_DOLL
 # 216 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
@@ -441,7 +441,7 @@ BattleFrontier_ExchangeServiceCorner_EventScript_VenusaurDoll::
 # 221 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
 	goto_if_eq VAR_RESULT, NO, BattleFrontier_ExchangeServiceCorner_EventScript_ChooseDecor2
 # 222 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
-	setvar VAR_0x8008, 256
+	setvar VAR_0x8008, 28
 # 223 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
 	setvar VAR_0x8009, DECOR_VENUSAUR_DOLL
 # 224 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
@@ -457,7 +457,7 @@ BattleFrontier_ExchangeServiceCorner_EventScript_CharizardDoll::
 # 229 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
 	goto_if_eq VAR_RESULT, NO, BattleFrontier_ExchangeServiceCorner_EventScript_ChooseDecor2
 # 230 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
-	setvar VAR_0x8008, 256
+	setvar VAR_0x8008, 28
 # 231 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
 	setvar VAR_0x8009, DECOR_CHARIZARD_DOLL
 # 232 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
@@ -473,7 +473,7 @@ BattleFrontier_ExchangeServiceCorner_EventScript_BlastoiseDoll::
 # 237 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
 	goto_if_eq VAR_RESULT, NO, BattleFrontier_ExchangeServiceCorner_EventScript_ChooseDecor2
 # 238 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
-	setvar VAR_0x8008, 256
+	setvar VAR_0x8008, 28
 # 239 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"
 	setvar VAR_0x8009, DECOR_BLASTOISE_DOLL
 # 240 "data/maps/BattleFrontier_ExchangeServiceCorner/scripts.pory"

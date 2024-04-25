@@ -7682,12 +7682,12 @@ static const struct TrainerMon sParty_Dwayne[] = {
 
 static const struct TrainerMon sParty_Phillip[] = {
     {
-    .lvl = 44,
+    .lvl = 74,
     .species = SPECIES_TENTACRUEL,
     },
     {
-    .lvl = 44,
-    .species = SPECIES_MACHOKE,
+    .lvl = 74,
+    .species = SPECIES_MACHAMP,
     }
 };
 

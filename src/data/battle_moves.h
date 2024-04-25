@@ -13606,8 +13606,8 @@ const struct BattleMove gBattleMoves[MOVES_COUNT_DYNAMAX] =
 
     [MOVE_LAST_RESPECTS] =
     {
-        .effect = EFFECT_PLACEHOLDER, // EFFECT_LAST_RESPECTS
-        .power = 50,
+        .effect = EFFECT_RETALIATE, // EFFECT_LAST_RESPECTS
+        .power = 80,
         .type = TYPE_GHOST,
         .accuracy = 100,
         .pp = 10,
@@ -13616,6 +13616,7 @@ const struct BattleMove gBattleMoves[MOVES_COUNT_DYNAMAX] =
         .priority = 0,
         .split = SPLIT_PHYSICAL,
         .zMoveEffect = Z_EFFECT_NONE,
+        .makesContact = TRUE,
         .metronomeBanned = TRUE, // Only since it isn't implemented yet
     },
 
@@ -13838,7 +13839,7 @@ const struct BattleMove gBattleMoves[MOVES_COUNT_DYNAMAX] =
 
     [MOVE_FILLET_AWAY] =
     {
-        .effect = EFFECT_PLACEHOLDER, // EFFECT_FILLET_AWAY
+        .effect = EFFECT_SHELL_SMASH, // EFFECT_FILLET_AWAY
         .power = 0,
         .type = TYPE_NORMAL,
         .accuracy = 0,

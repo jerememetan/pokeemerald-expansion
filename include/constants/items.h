@@ -412,7 +412,7 @@
 #define ITEM_MEDICHAMITE 320 //Tate & Liza
 #define ITEM_MANECTITE 321 //Wattson
 #define ITEM_SHARPEDONITE 322 //Glass house
-#define ITEM_CAMERUPTITE 323
+#define ITEM_CAMERUPTITE 323 //by Maxie after Raquaza scene
 #define ITEM_ALTARIANITE 324 //Winnona 
 #define ITEM_BANETTITE 325 //Glass house
 #define ITEM_ABSOLITE 326
