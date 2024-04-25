@@ -17044,9 +17044,6 @@ Move_ICE_SPINNER::
     loadspritegfx ANIM_TAG_IMPACT
 	loadspritegfx ANIM_TAG_RAPID_SPIN
 	loadspritegfx ANIM_TAG_ICE_CRYSTALS
-	loopsewithpan SE_M_BUBBLE_BEAM2, SOUND_PAN_ATTACKER, 28, 2
-	createvisualtask AnimTask_MetallicShine, 5, 1, 1, RGB(14, 182, 199)
-	waitforvisualfinish
 	monbg ANIM_ATTACKER
 	createsprite gRapidSpinSpriteTemplate, ANIM_ATTACKER, 2, 0, 0, 32, -32, 40, -2
 	createvisualtask AnimTask_RapinSpinMonElevation, 2, 0, 2, 0
@@ -17060,15 +17057,15 @@ Move_ICE_SPINNER::
 	waitplaysewithpan SE_M_HAIL, SOUND_PAN_TARGET, 17
 	waitforvisualfinish
 	call IceCrystalEffectShort
-	delay 5
+	waitforvisualfinish
 	createvisualtask AnimTask_ShakeTargetBasedOnMovePowerOrDmg, 2, FALSE, 1, 10, 1, 0
 	playsewithpan SE_M_HAIL, SOUND_PAN_TARGET
 	waitforvisualfinish
 	createvisualtask AnimTask_SetGrayscaleOrOriginalPal, 5, ANIM_ATTACKER, TRUE
 	waitforvisualfinish
+	clearmonbg ANIM_TARGET
 	clearmonbg ANIM_ATTACKER
 	blendoff
-	waitforvisualfinish
 	end
 
 Move_GLAIVE_RUSH::
