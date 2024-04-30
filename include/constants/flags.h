@@ -654,7 +654,7 @@
 
 #define FLAG_DISABLE_BAG  0x264 // Unused Flag
 #define FLAG_RECIEVED_CAMERUPTITE  0x265 // Unused Flag
-#define FLAG_CLOCK_MODE_TOGGLE  0x266 // Unused Flag
+#define FLAG_UNUSED_0x266  0x266 // Unused Flag
 #define FLAG_UNUSED_0x267  0x267 // Unused Flag
 #define FLAG_UNUSED_0x268  0x268 // Unused Flag
 #define FLAG_UNUSED_0x269  0x269 // Unused Flag
