@@ -3180,15 +3180,44 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, u16 item, u8 partyIndex, u8 mov
         // Handle ITEM3 effects (Guard Spec, Rare Candy, cure status)
         case 3:
             // Rare Candy / EXP Candy
-            if ((itemEffect[i] & ITEM3_LEVEL_UP)
-             && GetMonData(mon, MON_DATA_LEVEL, NULL) != MAX_LEVEL)
+            u8 cap;
+            if ((itemEffect[i] & ITEM3_LEVEL_UP) && GetMonData(mon, MON_DATA_LEVEL, NULL) != MAX_LEVEL)
             {
+
                 u8 param = ItemId_GetHoldEffectParam(item);
                 dataUnsigned = 0;
 
                 if (param == 0) // Rare Candy
                 {
-                    dataUnsigned = gExperienceTables[gSpeciesInfo[GetMonData(mon, MON_DATA_SPECIES, NULL)].growthRate][GetMonData(mon, MON_DATA_LEVEL, NULL) + 1];
+                    
+                    for (i = 0; i < NUM_SOFT_CAPS; i++)
+                    {
+                        cap = sLevelCaps[i];
+                        u8 val = i + 1;
+                        if (val == (NUM_SOFT_CAPS - 1))
+                        {
+                            cap = MAX_LEVEL;
+                        }
+                        else 
+                        {
+                            cap = sLevelCaps[val];
+                        }
+                        // if flag is not obtained
+                        // first time did not clear the flag, but mon level is lower than cap, allow it
+                        if (FlagGet(sLevelCapFlags[i]) &&  GetMonData(mon, MON_DATA_LEVEL, NULL) < cap) 
+                        {
+                            dataUnsigned = gExperienceTables[gSpeciesInfo[GetMonData(mon, MON_DATA_SPECIES, NULL)].growthRate][GetMonData(mon, MON_DATA_LEVEL, NULL) + 1];
+                            
+                        }
+                        else if (GetMonData(mon, MON_DATA_LEVEL, NULL) < sLevelCaps[0])
+                        {
+                            dataUnsigned = gExperienceTables[gSpeciesInfo[GetMonData(mon, MON_DATA_SPECIES, NULL)].growthRate][GetMonData(mon, MON_DATA_LEVEL, NULL) + 1];
+                        }
+                       
+                    
+                    }
+
+                 
                 }
                 else if (param - 1 < ARRAY_COUNT(sExpCandyExperienceTable)) // EXP Candies
                 {

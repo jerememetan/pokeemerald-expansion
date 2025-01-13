@@ -1018,7 +1018,7 @@ static const struct InGameTrade sIngameTrades[] =
     },
     [INGAME_TRADE_HORSEA] =
     {
-        .nickname = _("SEASOR"),
+        .nickname = _("CHOMPS"),
         .species = SPECIES_GIBLE,
         .ivs = {25, 24, 24, 24, 25, 24},
         .abilityNum = 0,
@@ -1027,26 +1027,26 @@ static const struct InGameTrade sIngameTrades[] =
         .personality = 0x7F,
         .heldItem = ITEM_ROCKY_HELMET,
         .mailNum = -1,
-        .otName = _("SKYLAR"),
+        .otName = _("SKYLER"),
         .otGender = MALE,
         .sheen = 10,
         .requestedSpecies = SPECIES_BAGON
     },
     [INGAME_TRADE_MEOWTH] =
     {
-        .nickname = _("MEOWOW"),
-        .species = SPECIES_MEOWTH,
-        .ivs = {4, 5, 4, 5, 4, 4},
+        .nickname = _("Fluff"),
+        .species = SPECIES_EEVEE,
+        .ivs = {24, 25, 24, 25, 24, 24},
         .abilityNum = 0,
         .otId = 91481,
         .conditions = {5, 5, 5, 30, 5},
         .personality = 0x8B,
-        .heldItem = ITEM_RETRO_MAIL,
-        .mailNum = 2,
-        .otName = _("ISIS"),
+        .heldItem = ITEM_LIFE_ORB,
+        .mailNum = -1,
+        .otName = _("PRISM"),
         .otGender = FEMALE,
         .sheen = 10,
-        .requestedSpecies = SPECIES_SKITTY
+        .requestedSpecies = SPECIES_KECLEON
     }
 };
 

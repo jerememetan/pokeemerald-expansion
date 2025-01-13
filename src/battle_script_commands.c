@@ -611,15 +611,15 @@ static void Cmd_unused(void);
 static void Cmd_tryworryseed(void);
 static void Cmd_callnative(void);
 
-const u16 sLevelCapFlags[NUM_SOFT_CAPS] =
+const u16 sLevelCapFlags[NUM_SOFT_CAPS] =  // flags for the Level caps to check
 {
     FLAG_BADGE01_GET, FLAG_BADGE02_GET, FLAG_BADGE03_GET, FLAG_BADGE04_GET,
     FLAG_BADGE05_GET, FLAG_BADGE06_GET, FLAG_HIDE_LILYCOVE_CITY_RIVAL, FLAG_BADGE07_GET, FLAG_BADGE08_GET, FLAG_IS_CHAMPION,
 };
 
-const u16 sLevelCaps[NUM_SOFT_CAPS] = { 15, 19, 25, 35, 39, 49, 53, 60, 69, 81};
-const double sLevelCapReduction[7] = { .3, .001, .001, .001, .001, .001, .001 };
-const double sRelativePartyScaling[27] =
+const u16 sLevelCaps[NUM_SOFT_CAPS] = { 15, 20, 26, 35, 39, 49, 53, 60, 69, 81};   // level caps itself
+const double sLevelCapReduction[7] = { .3, .0001, .0001, .0001, .0001, .0001, .0001 };   // scale of experience gain in reference to the current cap
+const double sRelativePartyScaling[27] =  // scaling of experience based on average level of the team to the current pokemon
 {
     3.00, 2.75, 2.50, 2.33, 2.25,
     2.00, 1.80, 1.70, 1.60, 1.50,
@@ -4086,7 +4086,7 @@ static u32 GetMonHoldEffect(struct Pokemon *mon)
     return holdEffect;
 }
 
-u8 GetTeamLevel(void)
+u8 GetTeamLevel(void)  // calculates the party level (to calculate exp mulitplier)
 {
     u8 i;
     u16 partyLevel = 0;
@@ -4119,7 +4119,7 @@ u8 GetTeamLevel(void)
     return partyLevel;
 }
 
-double GetPkmnExpMultiplier(u8 level)
+double GetPkmnExpMultiplier(u8 level) // gets exp mulitpler, based on level cap
 {
     u8 i;
     double lvlCapMultiplier = 1.0;
@@ -4294,17 +4294,17 @@ static void Cmd_getexp(void)
                 }
 
                 if (IsValidForBattle(&gPlayerParty[*expMonId]));
-                double expMultiplier = GetPkmnExpMultiplier(gPlayerParty[*expMonId].level);
+                double expMultiplier = GetPkmnExpMultiplier(gPlayerParty[*expMonId].level); // add this
                 {
                     if (wasSentOut)
-                        gBattleMoveDamage = gBattleStruct->expValue * expMultiplier;
+                        gBattleMoveDamage = gBattleStruct->expValue * expMultiplier; //edit this
                     else
                         gBattleMoveDamage = 0;
 
                     if ((holdEffect == HOLD_EFFECT_EXP_SHARE || IsGen6ExpShareEnabled())
                         && (B_SPLIT_EXP < GEN_6 || gBattleMoveDamage == 0)) // only give exp share bonus in later gens if the mon wasn't sent out
                     {
-                        gBattleMoveDamage += gBattleStruct->expShareExpValue * expMultiplier;
+                        gBattleMoveDamage += gBattleStruct->expShareExpValue * expMultiplier; // edit this
                     }
 
                     ApplyExperienceMultipliers(&gBattleMoveDamage, *expMonId, gBattlerFainted);

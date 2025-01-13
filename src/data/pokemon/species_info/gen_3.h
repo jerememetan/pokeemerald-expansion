@@ -27,6 +27,7 @@ const struct SpeciesInfo gSpeciesInfoGen3[] =
         .cryId = CRY_TREECKO,
         .natDexNum = NATIONAL_DEX_TREECKO,
         .categoryName = _("Wood Gecko"),
+        .isLegendary = TRUE,
         .height = 5,
         .weight = 50,
         .description = COMPOUND_STRING(
@@ -50,6 +51,7 @@ const struct SpeciesInfo gSpeciesInfoGen3[] =
         .footprint = gMonFootprint_Treecko,
         LEARNSETS(Treecko),
         .evolutions = EVOLUTION({EVO_LEVEL, 16, SPECIES_GROVYLE}),
+        
     },
 
     [SPECIES_GROVYLE] =
@@ -217,6 +219,7 @@ const struct SpeciesInfo gSpeciesInfoGen3[] =
         .categoryName = _("Chick"),
         .height = 4,
         .weight = 25,
+        .isLegendary = TRUE,
         .description = COMPOUND_STRING(
             "If attacked, it strikes back by spitting\n"
             "balls of fire it forms in its stomach.\n"
@@ -404,6 +407,7 @@ const struct SpeciesInfo gSpeciesInfoGen3[] =
         .categoryName = _("Mud Fish"),
         .height = 4,
         .weight = 76,
+        .isLegendary = TRUE,
         .description = COMPOUND_STRING(
             "On land, it can powerfully lift large\n"
             "boulders by planting its four feet and\n"

@@ -125,7 +125,7 @@ MtChimney_EventScript_BagIsFull::
 	end
 
 MtChimney_EventScript_RemoveMoney::
-	removemoney 200
+	removemoney 3000
 	updatemoneybox
 	return
 

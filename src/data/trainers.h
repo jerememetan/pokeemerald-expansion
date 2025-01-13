@@ -10259,4 +10259,27 @@ const struct Trainer gTrainers[] = {
         .aiFlags = 0,
         .party = TRAINER_PARTY(sParty_MayLinkPlaceholder),
     },
+
+    [TRAINER_STEVEN_GRANITE_CAVE] =
+    {
+        .trainerClass = TRAINER_CLASS_RIVAL,
+        .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_MALE,
+        .trainerPic = TRAINER_PIC_STEVEN,
+        .trainerName = _("STEVEN"),
+        .items = {},
+        .doubleBattle = FALSE,
+        .aiFlags = AI_FLAG_CHECK_BAD_MOVE | AI_FLAG_TRY_TO_FAINT | AI_FLAG_CHECK_VIABILITY | AI_FLAG_SMART_SWITCHING | AI_FLAG_SMART_MON_CHOICES,
+        .party = TRAINER_PARTY(sParty_StevenGraniteCave),
+    },
+    [TRAINER_RED_ALTERING_CAVE] =
+    {
+        .trainerClass = TRAINER_CLASS_RIVAL,
+        .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_MALE,
+        .trainerPic = TRAINER_PIC_RED,
+        .trainerName = _("RED"),
+        .items = {},
+        .doubleBattle = FALSE,
+        .aiFlags = AI_FLAG_CHECK_BAD_MOVE | AI_FLAG_TRY_TO_FAINT | AI_FLAG_CHECK_VIABILITY | AI_FLAG_SMART_SWITCHING | AI_FLAG_SMART_MON_CHOICES,
+        .party = TRAINER_PARTY(sParty_RedAlteringCave),
+    }
 };

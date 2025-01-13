@@ -27,14 +27,14 @@
   "object_events": [
     {
       "graphics_id": "OBJ_EVENT_GFX_SWIMMER_M",
-      "x": 40,
-      "y": 13,
+      "x": 36,
+      "y": 12,
       "elevation": 1,
       "movement_type": "MOVEMENT_TYPE_WALK_SEQUENCE_UP_LEFT_DOWN_RIGHT",
       "movement_range_x": 3,
       "movement_range_y": 3,
       "trainer_type": "TRAINER_TYPE_NORMAL",
-      "trainer_sight_or_berry_tree_id": "5",
+      "trainer_sight_or_berry_tree_id": "6",
       "script": "Route108_EventScript_Jerome",
       "flag": "0"
     },

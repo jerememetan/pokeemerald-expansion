@@ -253,7 +253,7 @@ MtChimney_EventScript_BagIsFull::
 # 127 "data/maps/MtChimney/scripts.pory"
 MtChimney_EventScript_RemoveMoney::
 # 128 "data/maps/MtChimney/scripts.pory"
-	removemoney 200
+	removemoney 3000
 # 129 "data/maps/MtChimney/scripts.pory"
 	updatemoneybox
 # 130 "data/maps/MtChimney/scripts.pory"

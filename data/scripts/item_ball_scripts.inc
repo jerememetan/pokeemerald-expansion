@@ -311,11 +311,11 @@ PetalburgCity_EventScript_ItemEther::
 	end
 
 MauvilleCity_EventScript_ItemXSpeed::
-	finditem ITEM_X_SPEED
+	finditem ITEM_SUPER_POTION
 	end
 
 RustboroCity_EventScript_ItemXDefend::
-	finditem ITEM_X_DEFENSE
+	finditem ITEM_POTION
 	end
 
 LilycoveCity_EventScript_ItemMaxRepel::
@@ -327,7 +327,7 @@ MossdeepCity_EventScript_ItemNetBall::
 	end
 
 PetalburgWoods_EventScript_ItemXAttack::
-	finditem ITEM_X_ATTACK
+	finditem ITEM_SUPER_POTION
 	end
 
 PetalburgWoods_EventScript_ItemGreatBall::

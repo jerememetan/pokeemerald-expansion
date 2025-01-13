@@ -19,103 +19,103 @@ GraniteCave_StevensRoom_EventScript_Steven::
 # 10 "data/maps/GraniteCave_StevensRoom/scripts.pory"
 	msgbox GraniteCave_StevensRoom_Text_ImStevenLetterForMe, MSGBOX_DEFAULT
 # 11 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	setvar VAR_0x8004, ITEM_LETTER
+	trainerbattle_no_intro TRAINER_STEVEN_GRANITE_CAVE, GraniteCave_StevensRoom_Steven_Defeat
 # 12 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	call Common_EventScript_PlayerHandedOverTheItem
+	setvar VAR_0x8004, ITEM_LETTER
 # 13 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	setflag FLAG_DELIVERED_STEVEN_LETTER
+	call Common_EventScript_PlayerHandedOverTheItem
 # 14 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	msgbox GraniteCave_StevensRoom_Text_ThankYouTakeThis, MSGBOX_DEFAULT
+	setflag FLAG_DELIVERED_STEVEN_LETTER
 # 15 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	giveitem ITEM_TM_STEEL_WING
+	msgbox GraniteCave_StevensRoom_Text_ThankYouTakeThis, MSGBOX_DEFAULT
 # 16 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	call_if_eq VAR_RESULT, FALSE, GraniteCave_StevensRoom_EventScript_BagFull
+	giveitem ITEM_TM_STEEL_WING
 # 17 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	msgbox GraniteCave_StevensRoom_Text_CouldBecomeChampionLetsRegister, MSGBOX_DEFAULT
+	call_if_eq VAR_RESULT, FALSE, GraniteCave_StevensRoom_EventScript_BagFull
 # 18 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	closemessage
+	msgbox GraniteCave_StevensRoom_Text_CouldBecomeChampionLetsRegister, MSGBOX_DEFAULT
 # 19 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	delay 30
+	closemessage
 # 20 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	playfanfare MUS_REGISTER_MATCH_CALL
-# 21 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	msgbox GraniteCave_StevensRoom_Text_RegisteredSteven, MSGBOX_DEFAULT
-# 22 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	waitfanfare
-# 23 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	closemessage
-# 24 "data/maps/GraniteCave_StevensRoom/scripts.pory"
 	delay 30
-# 25 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	setflag FLAG_REGISTERED_STEVEN_POKENAV
-# 26 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	msgbox GraniteCave_StevensRoom_Text_IveGotToHurryAlong, MSGBOX_DEFAULT
-# 27 "data/maps/GraniteCave_StevensRoom/scripts.pory"
+# 21 "data/maps/GraniteCave_StevensRoom/scripts.pory"
+	playfanfare MUS_REGISTER_MATCH_CALL
+# 22 "data/maps/GraniteCave_StevensRoom/scripts.pory"
+	msgbox GraniteCave_StevensRoom_Text_RegisteredSteven, MSGBOX_DEFAULT
+# 23 "data/maps/GraniteCave_StevensRoom/scripts.pory"
+	waitfanfare
+# 24 "data/maps/GraniteCave_StevensRoom/scripts.pory"
 	closemessage
+# 25 "data/maps/GraniteCave_StevensRoom/scripts.pory"
+	delay 30
+# 26 "data/maps/GraniteCave_StevensRoom/scripts.pory"
+	setflag FLAG_REGISTERED_STEVEN_POKENAV
+# 27 "data/maps/GraniteCave_StevensRoom/scripts.pory"
+	msgbox GraniteCave_StevensRoom_Text_IveGotToHurryAlong, MSGBOX_DEFAULT
 # 28 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	call_if_eq VAR_FACING, DIR_NORTH, GraniteCave_StevensRoom_EventScript_StevenExitNorth
+	closemessage
 # 29 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	call_if_eq VAR_FACING, DIR_SOUTH, GraniteCave_StevensRoom_EventScript_StevenExitSouth
+	call_if_eq VAR_FACING, DIR_NORTH, GraniteCave_StevensRoom_EventScript_StevenExitNorth
 # 30 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	call_if_eq VAR_FACING, DIR_WEST, GraniteCave_StevensRoom_EventScript_StevenExitWestEast
+	call_if_eq VAR_FACING, DIR_SOUTH, GraniteCave_StevensRoom_EventScript_StevenExitSouth
 # 31 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	call_if_eq VAR_FACING, DIR_EAST, GraniteCave_StevensRoom_EventScript_StevenExitWestEast
+	call_if_eq VAR_FACING, DIR_WEST, GraniteCave_StevensRoom_EventScript_StevenExitWestEast
 # 32 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	playse SE_EXIT
+	call_if_eq VAR_FACING, DIR_EAST, GraniteCave_StevensRoom_EventScript_StevenExitWestEast
 # 33 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	removeobject LOCALID_STEVEN
+	playse SE_EXIT
 # 34 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	release
+	removeobject LOCALID_STEVEN
 # 35 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	end
+	release
 # 36 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-
+	end
 # 37 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-GraniteCave_StevensRoom_EventScript_StevenExitNorth::
+
 # 38 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	applymovement LOCALID_STEVEN, GraniteCave_StevensRoom_Movement_StevenExit
+GraniteCave_StevensRoom_EventScript_StevenExitNorth::
 # 39 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	waitmovement 0
-# 40 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	return
-# 41 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-
-# 42 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-GraniteCave_StevensRoom_EventScript_StevenExitWestEast::
-# 43 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	applymovement OBJ_EVENT_ID_PLAYER, GraniteCave_StevensRoom_Movement_PlayerTurnTowardExit
-# 44 "data/maps/GraniteCave_StevensRoom/scripts.pory"
 	applymovement LOCALID_STEVEN, GraniteCave_StevensRoom_Movement_StevenExit
-# 45 "data/maps/GraniteCave_StevensRoom/scripts.pory"
+# 40 "data/maps/GraniteCave_StevensRoom/scripts.pory"
 	waitmovement 0
-# 46 "data/maps/GraniteCave_StevensRoom/scripts.pory"
+# 41 "data/maps/GraniteCave_StevensRoom/scripts.pory"
 	return
-# 47 "data/maps/GraniteCave_StevensRoom/scripts.pory"
+# 42 "data/maps/GraniteCave_StevensRoom/scripts.pory"
 
-# 48 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-GraniteCave_StevensRoom_EventScript_StevenExitSouth::
-# 49 "data/maps/GraniteCave_StevensRoom/scripts.pory"
+# 43 "data/maps/GraniteCave_StevensRoom/scripts.pory"
+GraniteCave_StevensRoom_EventScript_StevenExitWestEast::
+# 44 "data/maps/GraniteCave_StevensRoom/scripts.pory"
 	applymovement OBJ_EVENT_ID_PLAYER, GraniteCave_StevensRoom_Movement_PlayerTurnTowardExit
-# 50 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	applymovement LOCALID_STEVEN, GraniteCave_StevensRoom_Movement_StevenExitSouth
-# 51 "data/maps/GraniteCave_StevensRoom/scripts.pory"
+# 45 "data/maps/GraniteCave_StevensRoom/scripts.pory"
+	applymovement LOCALID_STEVEN, GraniteCave_StevensRoom_Movement_StevenExit
+# 46 "data/maps/GraniteCave_StevensRoom/scripts.pory"
 	waitmovement 0
+# 47 "data/maps/GraniteCave_StevensRoom/scripts.pory"
+	return
+# 48 "data/maps/GraniteCave_StevensRoom/scripts.pory"
+
+# 49 "data/maps/GraniteCave_StevensRoom/scripts.pory"
+GraniteCave_StevensRoom_EventScript_StevenExitSouth::
+# 50 "data/maps/GraniteCave_StevensRoom/scripts.pory"
+	applymovement OBJ_EVENT_ID_PLAYER, GraniteCave_StevensRoom_Movement_PlayerTurnTowardExit
+# 51 "data/maps/GraniteCave_StevensRoom/scripts.pory"
+	applymovement LOCALID_STEVEN, GraniteCave_StevensRoom_Movement_StevenExitSouth
 # 52 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	return
+	waitmovement 0
 # 53 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-
-# 54 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-GraniteCave_StevensRoom_EventScript_BagFull::
-# 55 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	msgbox GraniteCave_StevensRoom_Text_OhBagIsFull, MSGBOX_DEFAULT
-# 56 "data/maps/GraniteCave_StevensRoom/scripts.pory"
 	return
-# 57 "data/maps/GraniteCave_StevensRoom/scripts.pory"
+# 54 "data/maps/GraniteCave_StevensRoom/scripts.pory"
 
+# 55 "data/maps/GraniteCave_StevensRoom/scripts.pory"
+GraniteCave_StevensRoom_EventScript_BagFull::
+# 56 "data/maps/GraniteCave_StevensRoom/scripts.pory"
+	msgbox GraniteCave_StevensRoom_Text_OhBagIsFull, MSGBOX_DEFAULT
+# 57 "data/maps/GraniteCave_StevensRoom/scripts.pory"
+	return
 # 58 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-GraniteCave_StevensRoom_Movement_StevenExit:
+
 # 59 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	walk_up
+GraniteCave_StevensRoom_Movement_StevenExit:
 # 60 "data/maps/GraniteCave_StevensRoom/scripts.pory"
 	walk_up
 # 61 "data/maps/GraniteCave_StevensRoom/scripts.pory"
@@ -125,61 +125,61 @@ GraniteCave_StevensRoom_Movement_StevenExit:
 # 63 "data/maps/GraniteCave_StevensRoom/scripts.pory"
 	walk_up
 # 64 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	delay_8
+	walk_up
 # 65 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	step_end
+	delay_8
 # 66 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-
+	step_end
 # 67 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-GraniteCave_StevensRoom_Movement_PlayerTurnTowardExit:
+
 # 68 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	delay_16
+GraniteCave_StevensRoom_Movement_PlayerTurnTowardExit:
 # 69 "data/maps/GraniteCave_StevensRoom/scripts.pory"
 	delay_16
 # 70 "data/maps/GraniteCave_StevensRoom/scripts.pory"
 	delay_16
 # 71 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	walk_in_place_faster_up
+	delay_16
 # 72 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	step_end
+	walk_in_place_faster_up
 # 73 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-
+	step_end
 # 74 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-GraniteCave_StevensRoom_Movement_StevenExitSouth:
+
 # 75 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	walk_left
+GraniteCave_StevensRoom_Movement_StevenExitSouth:
 # 76 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	walk_up
+	walk_left
 # 77 "data/maps/GraniteCave_StevensRoom/scripts.pory"
 	walk_up
 # 78 "data/maps/GraniteCave_StevensRoom/scripts.pory"
 	walk_up
 # 79 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	walk_right
-# 80 "data/maps/GraniteCave_StevensRoom/scripts.pory"
 	walk_up
+# 80 "data/maps/GraniteCave_StevensRoom/scripts.pory"
+	walk_right
 # 81 "data/maps/GraniteCave_StevensRoom/scripts.pory"
 	walk_up
 # 82 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	delay_8
+	walk_up
 # 83 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	step_end
+	delay_8
 # 84 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-
+	step_end
 # 85 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-GraniteCave_StevensRoom_Text_ImStevenLetterForMe:
-# 86 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	.string "My name is STEVEN.\p"
-# 87 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	.string "I'm interested in rare stones,\n"
-# 88 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	.string "so I travel here and there.\p"
-# 89 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	.string "Oh?\n"
-# 90 "data/maps/GraniteCave_StevensRoom/scripts.pory"
-	.string "A LETTER for me?$"
-# 91 "data/maps/GraniteCave_StevensRoom/scripts.pory"
 
+# 86 "data/maps/GraniteCave_StevensRoom/scripts.pory"
+GraniteCave_StevensRoom_Text_ImStevenLetterForMe:
+# 87 "data/maps/GraniteCave_StevensRoom/scripts.pory"
+	.string "My name is STEVEN.\p"
+# 88 "data/maps/GraniteCave_StevensRoom/scripts.pory"
+	.string "I'm interested in rare stones.\p"
+# 89 "data/maps/GraniteCave_StevensRoom/scripts.pory"
+	.string "Hey, you look strong.\p"
+# 90 "data/maps/GraniteCave_StevensRoom/scripts.pory"
+	.string "Why don't we battle?$"
+# 91 "data/maps/GraniteCave_StevensRoom/scripts.pory"
+	
 # 92 "data/maps/GraniteCave_StevensRoom/scripts.pory"
 GraniteCave_StevensRoom_Text_ThankYouTakeThis:
 # 93 "data/maps/GraniteCave_StevensRoom/scripts.pory"
@@ -240,3 +240,13 @@ GraniteCave_StevensRoom_Text_OhBagIsFull:
 	.string "Oh, your BAG is full…\n"
 # 121 "data/maps/GraniteCave_StevensRoom/scripts.pory"
 	.string "That's too bad, then.$"
+# 122 "data/maps/GraniteCave_StevensRoom/scripts.pory"
+
+# 123 "data/maps/GraniteCave_StevensRoom/scripts.pory"
+GraniteCave_StevensRoom_Steven_Defeat:
+# 124 "data/maps/GraniteCave_StevensRoom/scripts.pory"
+	.string "That was fun! \n"
+# 125 "data/maps/GraniteCave_StevensRoom/scripts.pory"
+	.string "Oh? \p"
+# 126 "data/maps/GraniteCave_StevensRoom/scripts.pory"
+	.string "Is that a letter for me?$"

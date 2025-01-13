@@ -4820,3 +4820,9 @@ VerdanturfExtension_LeafPostBattle:
 	.string "came too HEONN too.\p"
 	.string "He's name is....\n"
 	.string "...Red$"
+
+AlteringCave_Red_Speech:
+	.string ".....$"
+	
+AlteringCave_Red_Speech_Defeat:
+	.string "....!$"
