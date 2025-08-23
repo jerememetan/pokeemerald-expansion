@@ -5351,6 +5351,8 @@ Move_LOW_SWEEP:
 	createsprite gSlideMonToOriginalPosSpriteTemplate, ANIM_ATTACKER, 2, 0, 1, 4
 	end
 
+
+
 Move_ACID_SPRAY:
 	loadspritegfx ANIM_TAG_POISON_BUBBLE
 	monbg ANIM_TARGET
@@ -17166,6 +17168,7 @@ Move_TORCH_SONG::
 	waitbgfadein
 	waitforvisualfinish
 	end
+
 Move_AQUA_STEP::
     loadspritegfx ANIM_TAG_WATER_IMPACT
 	loadspritegfx ANIM_TAG_SMALL_BUBBLES
