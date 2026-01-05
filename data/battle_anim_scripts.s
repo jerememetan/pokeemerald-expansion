@@ -17267,16 +17267,160 @@ Move_COMEUPPANCE::
   end
 Move_AQUA_CUTTER::
   end
+
 Move_BLAZING_TORQUE::
-  end
+	loadspritegfx ANIM_TAG_IMPACT
+	loadspritegfx ANIM_TAG_RAPID_SPIN
+	loadspritegfx ANIM_TAG_FIRE_PLUME
+	loadspritegfx ANIM_TAG_SMALL_EMBER
+	monbg ANIM_ATTACKER
+	loopsewithpan SE_M_HARDEN, SOUND_PAN_ATTACKER, 28, 2
+	createvisualtask AnimTask_MetallicShine, 5, 1, 1, RGB(31, 10, 0)
+	waitforvisualfinish
+	createsprite gRapidSpinSpriteTemplate, ANIM_ATTACKER, 2, 0, 0, 32, -32, 40, -2
+	createvisualtask AnimTask_RapinSpinMonElevation, 2, 0, 2, 0
+	loopsewithpan SE_M_RAZOR_WIND2, SOUND_PAN_ATTACKER, 8, 4
+	delay 16
+	monbg ANIM_TARGET
+	setalpha 12, 8
+	createvisualtask AnimTask_ShakeTargetBasedOnMovePowerOrDmg, 2, FALSE, 1, 10, 1, 0
+	playsewithpan SE_M_DOUBLE_SLAP, SOUND_PAN_TARGET
+	createsprite gBasicHitSplatSpriteTemplate, ANIM_TARGET, 2, 0, 0, ANIM_TARGET, 2
+	delay 4
+	createsprite gSmallEmberSpriteTemplate, ANIM_TARGET, 3, 0, 12, 12, 5, 1, 8
+	delay 2
+	createsprite gSmallEmberSpriteTemplate, ANIM_TARGET, 3, 0, -12, 12, 5, 1, 8
+	delay 2
+	createsprite gSmallEmberSpriteTemplate, ANIM_TARGET, 3, 0, 12, -12, 5, 1, 8
+	delay 2
+	createsprite gSmallEmberSpriteTemplate, ANIM_TARGET, 3, 0, -12, -12, 5, 1, 8
+	waitforvisualfinish
+	clearmonbg ANIM_ATTACKER
+	clearmonbg ANIM_TARGET
+	blendoff
+	end
+
 Move_WICKED_TORQUE::
-  end
+	loadspritegfx ANIM_TAG_IMPACT
+	loadspritegfx ANIM_TAG_RAPID_SPIN
+	loadspritegfx ANIM_TAG_PURPLE_FLAME
+	loadspritegfx ANIM_TAG_PURPLE_SMOKE
+	fadetobg BG_GHOST
+	waitbgfadein
+	monbg ANIM_ATTACKER
+	loopsewithpan SE_M_HARDEN, SOUND_PAN_ATTACKER, 28, 2
+	createvisualtask AnimTask_MetallicShine, 5, 1, 1, RGB(15, 0, 20)
+	waitforvisualfinish
+	createsprite gRapidSpinSpriteTemplate, ANIM_ATTACKER, 2, 0, 0, 32, -32, 40, -2
+	createvisualtask AnimTask_RapinSpinMonElevation, 2, 0, 2, 0
+	loopsewithpan SE_M_RAZOR_WIND2, SOUND_PAN_ATTACKER, 8, 4
+	createvisualtask AnimTask_SetGrayscaleOrOriginalPal, 5, ANIM_ATTACKER, TRUE
+	delay 16
+	monbg ANIM_TARGET
+	setalpha 12, 8
+	createvisualtask AnimTask_ShakeTargetBasedOnMovePowerOrDmg, 2, FALSE, 1, 10, 1, 0
+	playsewithpan SE_M_DOUBLE_SLAP, SOUND_PAN_TARGET
+	createsprite gBasicHitSplatSpriteTemplate, ANIM_TARGET, 2, 0, 0, ANIM_TARGET, 2
+	delay 4
+	createsprite gPurpleFlamesSpriteTemplate, ANIM_TARGET, 2, 16, 0, 24
+	delay 3
+	createsprite gPurpleFlamesSpriteTemplate, ANIM_TARGET, 2, -16, 0, 24
+	delay 3
+	createsprite gPurpleFlamesSpriteTemplate, ANIM_TARGET, 2, 0, 16, 24
+	createvisualtask AnimTask_SetGrayscaleOrOriginalPal, 5, ANIM_ATTACKER, TRUE
+	waitforvisualfinish
+	clearmonbg ANIM_ATTACKER
+	clearmonbg ANIM_TARGET
+	blendoff
+	restorebg
+	waitbgfadein
+	end
+
 Move_NOXIOUS_TORQUE::
-  end
+	loadspritegfx ANIM_TAG_IMPACT
+	loadspritegfx ANIM_TAG_RAPID_SPIN
+	loadspritegfx ANIM_TAG_POISON_BUBBLE
+	monbg ANIM_ATTACKER
+	loopsewithpan SE_M_HARDEN, SOUND_PAN_ATTACKER, 28, 2
+	createvisualtask AnimTask_MetallicShine, 5, 1, 1, RGB(20, 0, 20)
+	waitforvisualfinish
+	createsprite gRapidSpinSpriteTemplate, ANIM_ATTACKER, 2, 0, 0, 32, -32, 40, -2
+	createvisualtask AnimTask_RapinSpinMonElevation, 2, 0, 2, 0
+	loopsewithpan SE_M_RAZOR_WIND2, SOUND_PAN_ATTACKER, 8, 4
+	createvisualtask AnimTask_SetGrayscaleOrOriginalPal, 5, ANIM_ATTACKER, TRUE
+	delay 16
+	monbg ANIM_TARGET
+	setalpha 12, 8
+	createvisualtask AnimTask_ShakeTargetBasedOnMovePowerOrDmg, 2, FALSE, 1, 10, 1, 0
+	playsewithpan SE_M_DOUBLE_SLAP, SOUND_PAN_TARGET
+	createsprite gBasicHitSplatSpriteTemplate, ANIM_TARGET, 2, 0, 0, ANIM_TARGET, 2
+	createvisualtask AnimTask_SetGrayscaleOrOriginalPal, 5, ANIM_ATTACKER, TRUE
+	call PoisonBubblesEffect
+	waitforvisualfinish
+	clearmonbg ANIM_ATTACKER
+	clearmonbg ANIM_TARGET
+	blendoff
+	end
+
 Move_COMBAT_TORQUE::
-  end
+	loadspritegfx ANIM_TAG_IMPACT
+	loadspritegfx ANIM_TAG_RAPID_SPIN
+	loadspritegfx ANIM_TAG_SPARK
+	loadspritegfx ANIM_TAG_SPARK_2
+	monbg ANIM_ATTACKER
+	loopsewithpan SE_M_HARDEN, SOUND_PAN_ATTACKER, 28, 2
+	createvisualtask AnimTask_MetallicShine, 5, 1, 1, RGB(31, 20, 0)
+	waitforvisualfinish
+	createsprite gRapidSpinSpriteTemplate, ANIM_ATTACKER, 2, 0, 0, 32, -32, 40, -2
+	createvisualtask AnimTask_RapinSpinMonElevation, 2, 0, 2, 0
+	loopsewithpan SE_M_RAZOR_WIND2, SOUND_PAN_ATTACKER, 8, 4
+	createvisualtask AnimTask_SetGrayscaleOrOriginalPal, 5, ANIM_ATTACKER, TRUE
+	delay 16
+	monbg ANIM_TARGET
+	setalpha 12, 8
+	createvisualtask AnimTask_ShakeTargetBasedOnMovePowerOrDmg, 2, FALSE, 1, 10, 1, 0
+	playsewithpan SE_M_DOUBLE_SLAP, SOUND_PAN_TARGET
+	createsprite gBasicHitSplatSpriteTemplate, ANIM_TARGET, 2, 0, 0, ANIM_TARGET, 2
+	createvisualtask AnimTask_SetGrayscaleOrOriginalPal, 5, ANIM_ATTACKER, TRUE
+	call ElectricityEffect
+	waitforvisualfinish
+	clearmonbg ANIM_ATTACKER
+	clearmonbg ANIM_TARGET
+	blendoff
+	end
+
 Move_MAGICAL_TORQUE::
-  end
+	loadspritegfx ANIM_TAG_IMPACT
+	loadspritegfx ANIM_TAG_RAPID_SPIN
+	loadspritegfx ANIM_TAG_SPARKLE_4
+	loadspritegfx ANIM_TAG_CONFETTI
+	monbg ANIM_ATTACKER
+	loopsewithpan SE_M_HARDEN, SOUND_PAN_ATTACKER, 28, 2
+	createvisualtask AnimTask_MetallicShine, 5, 1, 1, RGB(31, 15, 31)
+	waitforvisualfinish
+	createsprite gRapidSpinSpriteTemplate, ANIM_ATTACKER, 2, 0, 0, 32, -32, 40, -2
+	createvisualtask AnimTask_RapinSpinMonElevation, 2, 0, 2, 0
+	loopsewithpan SE_M_RAZOR_WIND2, SOUND_PAN_ATTACKER, 8, 4
+	createvisualtask AnimTask_SetGrayscaleOrOriginalPal, 5, ANIM_ATTACKER, TRUE
+	delay 16
+	monbg ANIM_TARGET
+	setalpha 12, 8
+	createvisualtask AnimTask_ShakeTargetBasedOnMovePowerOrDmg, 2, FALSE, 1, 10, 1, 0
+	playsewithpan SE_M_DOUBLE_SLAP, SOUND_PAN_TARGET
+	createsprite gBasicHitSplatSpriteTemplate, ANIM_TARGET, 2, 0, 0, ANIM_TARGET, 2
+	delay 4
+	createsprite gFallingBagSpriteTemplate, ANIM_TARGET, 2, 20, 0, 0, 30, 7
+	delay 3
+	createsprite gFallingBagSpriteTemplate, ANIM_TARGET, 2, -20, 0, 0, 30, 7
+	delay 3
+	createsprite gFallingBagSpriteTemplate, ANIM_TARGET, 2, 0, 20, 0, 30, 7
+	createvisualtask AnimTask_SetGrayscaleOrOriginalPal, 5, ANIM_ATTACKER, TRUE
+	waitforvisualfinish
+	clearmonbg ANIM_ATTACKER
+	clearmonbg ANIM_TARGET
+	blendoff
+	end
+
 Move_PSYBLADE::
   end
 Move_HYDRO_STEAM::

@@ -3246,19 +3246,24 @@ static const u8 sAquaCutterDescription[] = _(
     "high critical-hit ratio.");
 
 static const u8 sBlazingTorqueDescription[] = _(
-    "---");
+    "A searing engine attack that\n"
+    "may inflict a burn.");
 
 static const u8 sWickedTorqueDescription[] = _(
-    "---");
+    "A dark engine attack that\n"
+    "may cause sleep.");
 
 static const u8 sNoxiousTorqueDescription[] = _(
-    "---");
+    "A toxic engine attack that\n"
+    "may poison the foe.");
 
 static const u8 sCombatTorqueDescription[] = _(
-    "---");
+    "A fighting engine attack\n"
+    "that may cause paralysis.");
 
 static const u8 sMagicalTorqueDescription[] = _(
-    "---");
+    "A magical engine attack that\n"
+    "may cause confusion.");
 
 static const u8 sPsybladeDescription[] = _(
     "This move's power increases\n"
