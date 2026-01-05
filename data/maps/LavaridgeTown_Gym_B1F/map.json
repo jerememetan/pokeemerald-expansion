@@ -76,8 +76,8 @@
       "dest_warp_id": "2"
     },
     {
-      "x": 13,
-      "y": 14,
+      "x": 0,
+      "y": 17,
       "elevation": 3,
       "dest_map": "MAP_LAVARIDGE_TOWN_GYM_1F",
       "dest_warp_id": "6"

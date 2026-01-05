@@ -3309,8 +3309,8 @@ static const u8 sDragonCheerDescription[] = _(
     "ration, especially if Dragons.");
 
 static const u8 sAlluringVoiceDescription[] = _(
-    "Confuses the target if their\n"
-    "stats were boosted this turn.");
+    "An alluring voice that may\n"
+    "cause confusion.");
 
 static const u8 sTemperFlareDescription[] = _(
     "A desperation attack. Power\n"
