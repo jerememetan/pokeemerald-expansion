@@ -7312,8 +7312,14 @@ BattleScript_ToxicDebrisActivates::
 	call BattleScript_AbilityPopUp
 	pause B_WAIT_TIME_SHORT
 	settoxicspikes BattleScript_ToxicDebrisRet
+	copyhword gChosenMove, gCurrentMove
+	sethword gCurrentMove, MOVE_TOXIC_SPIKES
+	attackanimation
+	waitanimation
+	copyhword gCurrentMove, gChosenMove
 	printstring STRINGID_POISONSPIKESSCATTERED
 	waitmessage B_WAIT_TIME_LONG
+
 BattleScript_ToxicDebrisRet:
 	copybyte sBATTLER, gBattlerTarget
 	copybyte gBattlerTarget, gBattlerAttacker

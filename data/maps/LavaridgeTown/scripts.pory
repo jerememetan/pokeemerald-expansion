@@ -246,9 +246,39 @@ LavaridgeTown_EventScript_EggWoman::
 	playfanfare MUS_OBTAIN_ITEM
 	message LavaridgeTown_Text_ReceivedTheEgg
 	waitfanfare
-	giveegg SPECIES_WYNAUT
+	call LavaridgeTown_EventScript_GiveRandomEgg
 	release
 	end
+
+LavaridgeTown_EventScript_GiveRandomEgg::
+	random 5  @ Generate random number from 0-4
+	switch VAR_RESULT
+	case 0, LavaridgeTown_EventScript_GiveEgg1
+	case 1, LavaridgeTown_EventScript_GiveEgg2
+	case 2, LavaridgeTown_EventScript_GiveEgg3
+	case 3, LavaridgeTown_EventScript_GiveEgg4
+	case 4, LavaridgeTown_EventScript_GiveEgg5
+	return
+
+LavaridgeTown_EventScript_GiveEgg1::
+	giveegg SPECIES_WYNAUT
+	return
+
+LavaridgeTown_EventScript_GiveEgg2::
+	giveegg SPECIES_TOGEPI
+	return
+
+LavaridgeTown_EventScript_GiveEgg3::
+	giveegg SPECIES_CHIMCHAR
+	return
+
+LavaridgeTown_EventScript_GiveEgg4::
+	giveegg SPECIES_PIPLUP
+	return
+
+LavaridgeTown_EventScript_GiveEgg5::
+	giveegg SPECIES_TURTWIG
+	return
 
 LavaridgeTown_EventScript_ReceivedEgg::
 	msgbox LavaridgeTown_Text_EverySoOftenEggFoundAtDayCare, MSGBOX_DEFAULT

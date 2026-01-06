@@ -17287,13 +17287,11 @@ Move_BLAZING_TORQUE::
 	playsewithpan SE_M_DOUBLE_SLAP, SOUND_PAN_TARGET
 	createsprite gBasicHitSplatSpriteTemplate, ANIM_TARGET, 2, 0, 0, ANIM_TARGET, 2
 	delay 4
-	createsprite gSmallEmberSpriteTemplate, ANIM_TARGET, 3, 0, 12, 12, 5, 1, 8
+	createsprite gFireSpinSpriteTemplate, ANIM_TARGET, 2, 0, 28, 528, 30, 13, 50, ANIM_TARGET
 	delay 2
-	createsprite gSmallEmberSpriteTemplate, ANIM_TARGET, 3, 0, -12, 12, 5, 1, 8
+	createsprite gFireSpinSpriteTemplate, ANIM_TARGET, 2, 0, 32, 480, 20, 16, -46, ANIM_TARGET
 	delay 2
-	createsprite gSmallEmberSpriteTemplate, ANIM_TARGET, 3, 0, 12, -12, 5, 1, 8
-	delay 2
-	createsprite gSmallEmberSpriteTemplate, ANIM_TARGET, 3, 0, -12, -12, 5, 1, 8
+	createsprite gFireSpinSpriteTemplate, ANIM_TARGET, 2, 0, 33, 576, 20, 8, 42, ANIM_TARGET
 	waitforvisualfinish
 	clearmonbg ANIM_ATTACKER
 	clearmonbg ANIM_TARGET
@@ -17304,7 +17302,6 @@ Move_WICKED_TORQUE::
 	loadspritegfx ANIM_TAG_IMPACT
 	loadspritegfx ANIM_TAG_RAPID_SPIN
 	loadspritegfx ANIM_TAG_PURPLE_FLAME
-	loadspritegfx ANIM_TAG_PURPLE_SMOKE
 	fadetobg BG_GHOST
 	waitbgfadein
 	monbg ANIM_ATTACKER
@@ -17322,11 +17319,7 @@ Move_WICKED_TORQUE::
 	playsewithpan SE_M_DOUBLE_SLAP, SOUND_PAN_TARGET
 	createsprite gBasicHitSplatSpriteTemplate, ANIM_TARGET, 2, 0, 0, ANIM_TARGET, 2
 	delay 4
-	createsprite gPurpleFlamesSpriteTemplate, ANIM_TARGET, 2, 16, 0, 24
-	delay 3
-	createsprite gPurpleFlamesSpriteTemplate, ANIM_TARGET, 2, -16, 0, 24
-	delay 3
-	createsprite gPurpleFlamesSpriteTemplate, ANIM_TARGET, 2, 0, 16, 24
+	createvisualtask AnimTask_BlendColorCycle, 2, F_PAL_TARGET, 2, 2, 0, 12, RGB(20, 0, 31)
 	createvisualtask AnimTask_SetGrayscaleOrOriginalPal, 5, ANIM_ATTACKER, TRUE
 	waitforvisualfinish
 	clearmonbg ANIM_ATTACKER
@@ -17393,7 +17386,6 @@ Move_MAGICAL_TORQUE::
 	loadspritegfx ANIM_TAG_IMPACT
 	loadspritegfx ANIM_TAG_RAPID_SPIN
 	loadspritegfx ANIM_TAG_SPARKLE_4
-	loadspritegfx ANIM_TAG_CONFETTI
 	monbg ANIM_ATTACKER
 	loopsewithpan SE_M_HARDEN, SOUND_PAN_ATTACKER, 28, 2
 	createvisualtask AnimTask_MetallicShine, 5, 1, 1, RGB(31, 15, 31)
@@ -17409,11 +17401,12 @@ Move_MAGICAL_TORQUE::
 	playsewithpan SE_M_DOUBLE_SLAP, SOUND_PAN_TARGET
 	createsprite gBasicHitSplatSpriteTemplate, ANIM_TARGET, 2, 0, 0, ANIM_TARGET, 2
 	delay 4
-	createsprite gFallingBagSpriteTemplate, ANIM_TARGET, 2, 20, 0, 0, 30, 7
+	createvisualtask AnimTask_BlendColorCycle, 2, F_PAL_TARGET, 2, 2, 0, 12, RGB(31, 20, 31)
+	createsprite gReversalOrbSpriteTemplate, ANIM_TARGET, 2, 20, 0
 	delay 3
-	createsprite gFallingBagSpriteTemplate, ANIM_TARGET, 2, -20, 0, 0, 30, 7
+	createsprite gReversalOrbSpriteTemplate, ANIM_TARGET, 2, 20, 84
 	delay 3
-	createsprite gFallingBagSpriteTemplate, ANIM_TARGET, 2, 0, 20, 0, 30, 7
+	createsprite gReversalOrbSpriteTemplate, ANIM_TARGET, 2, 20, 168
 	createvisualtask AnimTask_SetGrayscaleOrOriginalPal, 5, ANIM_ATTACKER, TRUE
 	waitforvisualfinish
 	clearmonbg ANIM_ATTACKER
