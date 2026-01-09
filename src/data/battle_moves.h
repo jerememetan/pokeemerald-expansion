@@ -14671,7 +14671,7 @@ const struct BattleMove gBattleMoves[MOVES_COUNT_DYNAMAX] =
 
     [MOVE_PSYCHIC_NOISE] =
     {
-        .effect = EFFECT_PLACEHOLDER, //EFFECT_PSYCHIC_NOISE
+        .effect = EFFECT_HEAL_BLOCK, //EFFECT_PSYCHIC_NOISE
         .power = 75,
         .type = TYPE_PSYCHIC,
         .accuracy = 100,
