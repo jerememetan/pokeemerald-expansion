@@ -17614,8 +17614,48 @@ Move_MAGICAL_TORQUE::
 
 Move_PSYBLADE::
   end
+  
 Move_HYDRO_STEAM::
-  end
+	loadspritegfx ANIM_TAG_WATER_ORB
+	loadspritegfx ANIM_TAG_WATER_IMPACT
+	loadspritegfx ANIM_TAG_STEAM_ERUPTION @Steam Eruption Particle
+	createvisualtask AnimTask_BlendBattleAnimPal, 0xa, F_PAL_BG, 0x1, 0x0, 0x7, 0x043D
+	delay 0x20
+	monbg ANIM_DEF_PARTNER
+	splitbgprio ANIM_TARGET
+	panse SE_M_HYDRO_PUMP, SOUND_PAN_ATTACKER, SOUND_PAN_TARGET, 0x2, 0x0
+	call SteamEruptionBreath
+	call SteamEruptionBreath
+	createvisualtask AnimTask_BlendBattleAnimPal, 0xa, F_PAL_TARGET, 0x1, 0x0, 0x9, 0x1f
+	call SteamEruptionBreath
+	delay 0x2
+	createvisualtask AnimTask_ShakeMon2, 2, ANIM_TARGET, 2, 0, 21, 1
+	call SteamEruptionBreath
+	call SteamEruptionBreath
+	call SteamEruptionBreath
+	call SteamEruptionBreath
+	call SteamEruptionBreath
+	call SteamEruptionBreath
+	call SteamEruptionBreath
+	call SteamEruptionBreath
+	call SteamEruptionBreath
+	call SteamEruptionBreath
+	call SteamEruptionBreath
+	call ScaldHitSplats
+	call SteamEruptionBreath
+	call SteamEruptionBreath
+	call ScaldHitSplats
+	call SteamEruptionBreath
+	call ScaldHitSplats
+	call SteamEruptionBreath
+	call SteamEruptionBreath
+	call ScaldHitSplats
+	createvisualtask AnimTask_BlendBattleAnimPal, 0xa, F_PAL_TARGET, 0x1, 0x9, 0x0, 0x1f
+	waitforvisualfinish
+	clearmonbg ANIM_DEF_PARTNER
+	createvisualtask AnimTask_BlendBattleAnimPal, 0xa, F_PAL_BG, 0x1, 0x7, 0x0, 0x043D
+	waitforvisualfinish
+	end
 
 Move_BLOOD_MOON::
 loadspritegfx ANIM_TAG_MOON
