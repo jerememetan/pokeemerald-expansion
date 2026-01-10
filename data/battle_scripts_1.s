@@ -9349,10 +9349,10 @@ BattleScript_BanefulBunkerEffect::
 	return
 
 BattleScript_BurningBulwarkEffect::
-	orword gHitMarker, HITMARKER_IGNORE_SUBSTITUTE | HITMARKER_STATUS_ABILITY_EFFECT | HITMARKER_PASSIVE_DAMAGE
+	orword gHitMarker, HITMARKER_IGNORE_SUBSTITUTE | HITMARKER_PASSIVE_DAMAGE
 	bichalfword gMoveResultFlags, MOVE_RESULT_NO_EFFECT
 	seteffectsecondary
-	setmoveeffect 0
+	setmoveeffect 0	
 	orhalfword gMoveResultFlags, MOVE_RESULT_MISSED
 	return
 

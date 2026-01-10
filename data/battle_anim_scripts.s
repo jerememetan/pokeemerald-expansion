@@ -17614,7 +17614,7 @@ Move_MAGICAL_TORQUE::
 
 Move_PSYBLADE::
   end
-  
+
 Move_HYDRO_STEAM::
 	loadspritegfx ANIM_TAG_WATER_ORB
 	loadspritegfx ANIM_TAG_WATER_IMPACT
@@ -17724,8 +17724,33 @@ Move_TERA_STARSTORM::
   end
 Move_FICKLE_BEAM::
   end
+
 Move_BURNING_BULWARK::
- end
+	loadspritegfx ANIM_TAG_THIN_RING @ring
+	loadspritegfx ANIM_TAG_SMALL_RED_EYE @red color
+	loadspritegfx ANIM_TAG_PINK_CLOUD @yawn
+	loadspritegfx ANIM_TAG_SMALL_EMBER @fire
+	loadspritegfx ANIM_TAG_PROTECT  @protect
+	monbg ANIM_ATTACKER
+	call BurningJealousyFireBuffEffect
+	createvisualtask AnimTask_BlendBattleAnimPal, 0xa, F_PAL_ATTACKER, 0x1, 0x0, 0xd, 0x1c
+	createvisualtask AnimTask_ShakeMon, 5, ANIM_ATTACKER, 2, 0, 15, 1
+	waitforvisualfinish
+	delay 0x1E
+	createsprite gUproarRingSpriteTemplate, ANIM_ATTACKER, 3, 0x0, 0x0, 0x0, 0x0, 0x1f, 0x8
+	waitforvisualfinish
+	playsewithpan SE_M_FLAME_WHEEL, SOUND_PAN_ATTACKER
+	createvisualtask AnimTask_CopyPalFadedToUnfaded, 0x5, 0x1
+	delay 0x1
+	createvisualtask AnimTask_BlendBattleAnimPal, 0xa, F_PAL_ATTACKER, 0x0, 0x0, 0xd, 0x4a52
+	waitforvisualfinish
+	createvisualtask AnimTask_BlendBattleAnimPal, 0xa, F_PAL_ATTACKER, 0x0, 0xd, 0x0, 0x4a52
+	delay 0x1
+	clearmonbg ANIM_ATTACKER
+	blendoff
+	createvisualtask AnimTask_BlendParticle, 5, ANIM_TAG_PROTECT, 0x0, 0xC, 0xC, 0x318C   @Gray
+	goto Move_PROTECT
+	end
 
 
 Move_THUNDERCLAP::
