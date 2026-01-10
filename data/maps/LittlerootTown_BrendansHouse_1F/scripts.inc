@@ -721,7 +721,7 @@ PlayersHouse_1F_Text_SecretFightForMegaStones:
 # 361 "data/maps/LittlerootTown_BrendansHouse_1F/scripts.pory"
 	.string "MOM: You know, I was also a \n"
 # 362 "data/maps/LittlerootTown_BrendansHouse_1F/scripts.pory"
-	.string "myself. I have a surprise gift \n"
+	.string "myself. I have a surprise gift \p"
 # 363 "data/maps/LittlerootTown_BrendansHouse_1F/scripts.pory"
 	.string "for you, but you got to work for it.\n"
 # 364 "data/maps/LittlerootTown_BrendansHouse_1F/scripts.pory"

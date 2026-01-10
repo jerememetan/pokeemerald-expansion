@@ -359,7 +359,7 @@ PlayersHouse_1F_Text_MomDefeat:
 	
 PlayersHouse_1F_Text_SecretFightForMegaStones:
 	.string "MOM: You know, I was also a \n"
-	.string "myself. I have a surprise gift \n"
+	.string "myself. I have a surprise gift \p"
 	.string "for you, but you got to work for it.\n"
 	.string "Are you up for the challenge?$"
 

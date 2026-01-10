@@ -4839,7 +4839,7 @@ NewMauville_Inside_Text_Leaf2Defeated:
 	.string "have you seen RED around?$"
 
 NewMauville_Inside_Text_Leaf2PostBattle:
-	.string "Don't mind me, I'll just\n"
-	.string "be here training to be\n"
-	.string "stronger. See Ya!$"
+	.string "Red... I wonder where \n"
+	.string "he is. Are you stronger \p"
+	.string "than him as well?$"
 

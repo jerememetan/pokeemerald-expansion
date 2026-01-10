@@ -23,9 +23,9 @@ Route122_EventScript_AquaGrunt::
 
 Route122_Text_ScramKidGoShopping:
 	.string "Scram Kid, this isn't a place\n"
-	.string "for a kid like you. This is \n"
+	.string "for a kid like you. This is \p"
 	.string "for grown ups only. Go do \n"
-	.string "something else like shopping\n"
+	.string "something else like shopping\p"
 	.string "at the Lilycove department store\n"
 	.string "... or whatever kids do nowadays.$"
 

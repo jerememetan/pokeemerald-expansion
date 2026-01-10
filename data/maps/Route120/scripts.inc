@@ -919,11 +919,11 @@ Route120_Text_NotEnoughBadges:
 # 460 "data/maps/Route120/scripts.pory"
     .string "Past this route there is a tough \n"
 # 461 "data/maps/Route120/scripts.pory"
-	.string "guanlet of trainers.\p"
+	.string "guantlet of trainers.\p"
 # 462 "data/maps/Route120/scripts.pory"
 	.string "If you can defeat a strong trainer\n"
 # 463 "data/maps/Route120/scripts.pory"
-	.string "like WINONA and I will let you pass.$"
+	.string "like WINONA, I will let you pass.$"
 # 464 "data/maps/Route120/scripts.pory"
 
 # 465 "data/maps/Route120/scripts.pory"

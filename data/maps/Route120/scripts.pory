@@ -458,9 +458,9 @@ Route120_Text_RouteSign121:
 	.string "{LEFT_ARROW} ROUTE 120$"
 Route120_Text_NotEnoughBadges:
     .string "Past this route there is a tough \n"
-	.string "guanlet of trainers.\p"
+	.string "guantlet of trainers.\p"
 	.string "If you can defeat a strong trainer\n"
-	.string "like WINONA and I will let you pass.$"
+	.string "like WINONA, I will let you pass.$"
 
 Route120_Text_SixBadgesGoodLuck:
     .string "Is that...\n"

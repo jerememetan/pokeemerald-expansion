@@ -17733,7 +17733,6 @@ Move_BURNING_BULWARK::
 	loadspritegfx ANIM_TAG_PROTECT  @protect
 	monbg ANIM_ATTACKER
 	call BurningJealousyFireBuffEffect
-	createvisualtask AnimTask_BlendBattleAnimPal, 0xa, F_PAL_ATTACKER, 0x1, 0x0, 0xd, 0x1c
 	createvisualtask AnimTask_ShakeMon, 5, ANIM_ATTACKER, 2, 0, 15, 1
 	waitforvisualfinish
 	delay 0x1E
@@ -17742,15 +17741,14 @@ Move_BURNING_BULWARK::
 	playsewithpan SE_M_FLAME_WHEEL, SOUND_PAN_ATTACKER
 	createvisualtask AnimTask_CopyPalFadedToUnfaded, 0x5, 0x1
 	delay 0x1
-	createvisualtask AnimTask_BlendBattleAnimPal, 0xa, F_PAL_ATTACKER, 0x0, 0x0, 0xd, 0x4a52
 	waitforvisualfinish
-	createvisualtask AnimTask_BlendBattleAnimPal, 0xa, F_PAL_ATTACKER, 0x0, 0xd, 0x0, 0x4a52
 	delay 0x1
+	delay 0x1
+	waitforvisualfinish
 	clearmonbg ANIM_ATTACKER
 	blendoff
-	createvisualtask AnimTask_BlendParticle, 5, ANIM_TAG_PROTECT, 0x0, 0xC, 0xC, 0x318C   @Gray
+	createvisualtask AnimTask_BlendParticle, 5, ANIM_TAG_PROTECT, 0x0, 0xC, 0xC, 0x0015   @red
 	goto Move_PROTECT
-	end
 
 
 Move_THUNDERCLAP::
