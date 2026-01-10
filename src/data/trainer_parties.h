@@ -14976,6 +14976,39 @@ static const struct TrainerMon sParty_Leaf[] = {
 
 };
 
+static const struct TrainerMon sParty_Leaf_2[] = {
+    {
+    .lvl = 39,
+    .species = SPECIES_MR_RIME,
+    .moves = {MOVE_FREEZE_DRY, MOVE_PSYBEAM, MOVE_CHARGE_BEAM, MOVE_HYPNOSIS},
+    },
+    {
+    .lvl = 40,
+    .species = SPECIES_VENUSAUR,
+    .ability = ABILITY_OVERGROW,
+    .heldItem = ITEM_VENUSAURITE,
+    .moves = {MOVE_GIGA_DRAIN, MOVE_LEECH_SEED, MOVE_SLUDGE_BOMB, MOVE_SLEEP_POWDER},
+    },
+    {
+    .lvl = 42,
+    .species = SPECIES_ARCANINE_HISUIAN,
+    .ability = ABILITY_ROCK_HEAD,
+    .moves = {MOVE_HEAD_SMASH, MOVE_FLARE_BLITZ, MOVE_EXTREMESPEED, MOVE_WILL_O_WISP},
+    },
+    {
+    .lvl = 41,
+    .species = SPECIES_GYARADOS,
+    .ability = ABILITY_INTIMIDATE,
+    .moves = {MOVE_CRUNCH, MOVE_DRAGON_DANCE, MOVE_ICE_FANG, MOVE_THRASH},
+    },
+    {
+    .lvl = 42,
+    .species = SPECIES_KLAWF,
+    .moves = {MOVE_CRABHAMMER, MOVE_ROCK_TOMB, MOVE_KNOCK_OFF, MOVE_DIG},
+    }
+
+};
+
 static const struct TrainerMon sParty_MOM[] = {
     {
     .iv = TRAINER_PARTY_IVS(30, 30, 30, 30, 30, 30),

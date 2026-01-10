@@ -4826,3 +4826,20 @@ AlteringCave_Red_Speech:
 	
 AlteringCave_Red_Speech_Defeat:
 	.string "....!$"
+
+NewMauville_Inside_Text_Leaf2Intro:
+	.string "Hi there! {PLAYER} right?\p"
+	.string "This place is utterly... \n"
+	.string "ELECTRIFYING!!\n"
+	.string "Anyways, lets fight {PLAYER}!$"
+
+NewMauville_Inside_Text_Leaf2Defeated:
+	.string "That was a shockingly\p"
+	.string "terrifying loss. Also, \n"
+	.string "have you seen RED around?$"
+
+NewMauville_Inside_Text_Leaf2PostBattle:
+	.string "Don't mind me, I'll just\n"
+	.string "be here training to be\n"
+	.string "stronger. See Ya!$"
+

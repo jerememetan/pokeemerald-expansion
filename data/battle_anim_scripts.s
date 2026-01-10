@@ -17114,6 +17114,8 @@ Move_MORTAL_SPIN::
 	loopsewithpan SE_M_RAZOR_WIND2, SOUND_PAN_ATTACKER, 8, 4
 	createvisualtask AnimTask_SetGrayscaleOrOriginalPal, 5, ANIM_ATTACKER, TRUE
 	waitforvisualfinish
+	clearmonbg ANIM_ATTACKER
+	delay 0x1
 	monbg ANIM_TARGET
 	setalpha 12, 8
 	createvisualtask AnimTask_ShakeTargetBasedOnMovePowerOrDmg, 2, FALSE, 1, 10, 1, 0
@@ -17123,7 +17125,6 @@ Move_MORTAL_SPIN::
 	createvisualtask AnimTask_SetGrayscaleOrOriginalPal, 5, ANIM_ATTACKER, TRUE
 	call PoisonBubblesEffect
 	waitforvisualfinish
-	clearmonbg ANIM_ATTACKER
 	clearmonbg ANIM_TARGET
 	blendoff
 	waitforvisualfinish

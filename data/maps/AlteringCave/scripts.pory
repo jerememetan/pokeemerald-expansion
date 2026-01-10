@@ -10,6 +10,7 @@ AlteringCave_MapScripts::
 AlteringCave_OnTransition:
 	setflag FLAG_LANDMARK_ALTERING_CAVE
 	end
+
 AlteringCave_Check_Red_Defeated:
 	call_if_set FLAG_ALTERINGCAVE_RED_DEFEATED, AlteringCave_RemoveRed
 	return
@@ -22,6 +23,7 @@ AlteringCave_Red_Fight::
 	trainerbattle_single TRAINER_RED_ALTERING_CAVE,AlteringCave_Red_Speech, AlteringCave_Red_Speech_Defeat, AlteringCave_EventScript_Red_Disappear
 	release
 	end
+	
 AlteringCave_EventScript_Red_Disappear::
 	fadescreen FADE_TO_BLACK
 	removeobject LOCALID_RED

@@ -1,5 +1,32 @@
 raw `
+.set LOCALID_GRUNT, 1
+
 Route122_MapScripts::
+	map_script MAP_SCRIPT_ON_LOAD, Route122_OnLoad
 	.byte 0
+
+Route122_OnLoad:
+	call_if_set FLAG_HIDE_LILYCOVE_CITY_RIVAL, Route122_EventScript_RemoveAquaGrunt
+	end
+
+Route122_EventScript_RemoveAquaGrunt::
+	setflag FLAG_HIDE_MT_PYRE_BLOCKER
+	return
+
+
+Route122_EventScript_AquaGrunt::
+	lock
+	faceplayer
+	msgbox Route122_Text_ScramKidGoShopping, MSGBOX_DEFAULT
+	release
+	end
+
+Route122_Text_ScramKidGoShopping:
+	.string "Scram Kid, this isn't a place\n"
+	.string "for a kid like you. This is \n"
+	.string "for grown ups only. Go do \n"
+	.string "something else like shopping\n"
+	.string "at the Lilycove department store\n"
+	.string "... or whatever kids do nowadays.$"
 
 `
