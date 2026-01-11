@@ -17102,9 +17102,8 @@ Move_POPULATION_BOMB::
 	monbg ANIM_TARGET
 	setalpha 12, 8
 	playsewithpan SE_M_CUT, SOUND_PAN_TARGET
-	createvisualtask AnimTask_RandomBool, 2
-	jumpretfalse PopulationBombSliceRight
-	jumprettrue PopulationBombSliceLeft
+	call PopulationBombSliceRight
+	call PopulationBombSliceLeft
 
 PopulationBombSliceRight:
 	createsprite gCuttingSliceSpriteTemplate, ANIM_ATTACKER, 2, 40, -32, 0
@@ -17168,7 +17167,6 @@ Move_GLAIVE_RUSH::
 	createvisualtask AnimTask_AttackerFadeToInvisible, 5, 0
 	waitforvisualfinish
 	createvisualtask SoundTask_PlaySE2WithPanning, 5, 238, SOUND_PAN_ATTACKER
-	createsprite gGlaiveRushSpriteTemplate, ANIM_TARGET, 2
 	delay 14
 	playsewithpan SE_M_MEGA_KICK2, SOUND_PAN_TARGET
 	createsprite gBasicHitSplatSpriteTemplate, ANIM_TARGET, 4, -10, 0, 1, 0
@@ -17669,19 +17667,8 @@ Move_TIDY_UP::
 	end
 Move_POUNCE::
 	loadspritegfx ANIM_TAG_IMPACT
-	monbg ANIM_TARGET
-	setalpha 12, 8
-	createvisualtask AnimTask_DuckDownHop, 5, ANIM_ATTACKER, 28, -8, 10, 14, 10, 18
-	waitforvisualfinish
-	createsprite gBasicHitSplatSpriteTemplate, ANIM_ATTACKER, 2, 0, 0, ANIM_TARGET, 2
-	createvisualtask AnimTask_ShakeMon, 2, ANIM_TARGET, 3, 0, 6, 1
-	playsewithpan SE_M_COMET_PUNCH, SOUND_PAN_TARGET
-	waitforvisualfinish
-	delay 20
-	createsprite gSlideMonToOriginalPosSpriteTemplate, ANIM_ATTACKER, 2, 0, 0, 7
-	waitforvisualfinish
-	clearmonbg ANIM_TARGET
-	blendoff
+	loadspritegfx ANIM_TAG_ROUND_SHADOW
+	goto BounceUnleash
 	end
 
 Move_TRAILBLAZE::
