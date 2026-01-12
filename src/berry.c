@@ -258,7 +258,7 @@ const struct Berry gBerries[] =
         .firmness = BERRY_FIRMNESS_VERY_HARD,
         .size = 28,
         .maxYield = 16,
-        .minYield = 8,
+        .minYield = 4,
         .description1 = sBerryDescriptionPart1_Leppa,
         .description2 = sBerryDescriptionPart2_Leppa,
         .stageDuration = 4,
@@ -330,7 +330,7 @@ const struct Berry gBerries[] =
         .firmness = BERRY_FIRMNESS_VERY_HARD,
         .size = 95,
         .maxYield = 16,
-        .minYield = 8,
+        .minYield = 4,
         .description1 = sBerryDescriptionPart1_Sitrus,
         .description2 = sBerryDescriptionPart2_Sitrus,
         .stageDuration = 6,
@@ -348,7 +348,7 @@ const struct Berry gBerries[] =
         .firmness = BERRY_FIRMNESS_SOFT,
         .size = 100,
         .maxYield = 16,
-        .minYield = 8,
+        .minYield = 4,
         .description1 = sBerryDescriptionPart1_Figy,
         .description2 = sBerryDescriptionPart2_Figy,
         .stageDuration = 6,
@@ -527,8 +527,8 @@ const struct Berry gBerries[] =
         .name = _("Pomeg"),
         .firmness = BERRY_FIRMNESS_VERY_HARD,
         .size = 135,
-        .maxYield = 16,
-        .minYield = 8,
+        .maxYield = 32,
+        .minYield = 12,
         .description1 = sBerryDescriptionPart1_Pomeg,
         .description2 = sBerryDescriptionPart2_Pomeg,
         .stageDuration = 3,
@@ -545,8 +545,8 @@ const struct Berry gBerries[] =
         .name = _("Kelpsy"),
         .firmness = BERRY_FIRMNESS_HARD,
         .size = 150,
-        .maxYield = 16,
-        .minYield = 8,
+        .maxYield = 32,
+        .minYield = 12,
         .description1 = sBerryDescriptionPart1_Kelpsy,
         .description2 = sBerryDescriptionPart2_Kelpsy,
         .stageDuration = 3,
@@ -563,8 +563,8 @@ const struct Berry gBerries[] =
         .name = _("Qualot"),
         .firmness = BERRY_FIRMNESS_HARD,
         .size = 110,
-        .maxYield = 16,
-        .minYield = 8,
+        .maxYield = 32,
+        .minYield = 12,
         .description1 = sBerryDescriptionPart1_Qualot,
         .description2 = sBerryDescriptionPart2_Qualot,
         .stageDuration = 3,
@@ -581,8 +581,8 @@ const struct Berry gBerries[] =
         .name = _("Hondew"),
         .firmness = BERRY_FIRMNESS_HARD,
         .size = 162,
-        .maxYield = 16,
-        .minYield = 8,
+        .maxYield = 32,
+        .minYield = 12,
         .description1 = sBerryDescriptionPart1_Hondew,
         .description2 = sBerryDescriptionPart2_Hondew,
         .stageDuration = 3,
@@ -599,8 +599,8 @@ const struct Berry gBerries[] =
         .name = _("Grepa"),
         .firmness = BERRY_FIRMNESS_SOFT,
         .size = 149,
-        .maxYield = 16,
-        .minYield = 8,
+        .maxYield = 32,
+        .minYield = 12,
         .description1 = sBerryDescriptionPart1_Grepa,
         .description2 = sBerryDescriptionPart2_Grepa,
         .stageDuration = 3,
@@ -1626,7 +1626,7 @@ void PlantBerryTree(u8 id, u8 berry, u8 stage, bool8 allowGrowth)
     // Stop growth, to keep tree at this stage until the player has seen it
     // allowGrowth is always true for berry trees the player has planted
     if (!allowGrowth)
-        tree->stopGrowth = TRUE;
+        tree->stopGrowth = TRUE; 
 }
 
 void RemoveBerryTree(u8 id)
@@ -1716,8 +1716,8 @@ static u8 CalcBerryYieldInternal(u16 max, u16 min, u8 water)
     u32 rand;
     u32 extraYield;
 
-    if (water == 0)
-        return min;
+    if (water == 0) // if not watered its always min
+        return Random() % (4) + min; // random addition of 0 to 2 + min
     else
     {
         randMin = (max - min) * (water);

@@ -2178,7 +2178,7 @@ const struct BattleMove gBattleMoves[MOVES_COUNT_DYNAMAX] =
         #endif
         .effect = EFFECT_POISON_HIT,
         .type = TYPE_POISON,
-        .accuracy = 90,
+        .accuracy = 100,
         .pp = 20,
         .secondaryEffectChance = 40,
         .target = MOVE_TARGET_SELECTED,
@@ -3339,7 +3339,7 @@ const struct BattleMove gBattleMoves[MOVES_COUNT_DYNAMAX] =
         #endif
         .effect = EFFECT_CONFUSE,
         .power = 0,
-        .accuracy = 75,
+        .accuracy = 85,
         .pp = 10,
         .secondaryEffectChance = 0,
         .target = MOVE_TARGET_SELECTED,
@@ -4261,7 +4261,7 @@ const struct BattleMove gBattleMoves[MOVES_COUNT_DYNAMAX] =
     [MOVE_CROSS_CHOP] =
     {
         .effect = EFFECT_HIT,
-        .power = 100,
+        .power = 110,
         .type = TYPE_FIGHTING,
         .accuracy = 80,
         .pp = 5,
@@ -7137,7 +7137,7 @@ const struct BattleMove gBattleMoves[MOVES_COUNT_DYNAMAX] =
         .effect = EFFECT_HIT,
         .power = 90,
         .type = TYPE_WATER,
-        .accuracy = 90,
+        .accuracy = 95,
         .pp = 10,
         .secondaryEffectChance = 0,
         .target = MOVE_TARGET_SELECTED,
@@ -7237,7 +7237,7 @@ const struct BattleMove gBattleMoves[MOVES_COUNT_DYNAMAX] =
     [MOVE_DRAGON_RUSH] =
     {
         .effect = EFFECT_FLINCH_HIT,
-        .power = 100,
+        .power = 120,
         .type = TYPE_DRAGON,
         .accuracy = 75,
         .pp = 10,
@@ -8184,7 +8184,7 @@ const struct BattleMove gBattleMoves[MOVES_COUNT_DYNAMAX] =
     [MOVE_DARK_VOID] =
     {
         #if B_UPDATED_MOVE_DATA >= GEN_7
-            .accuracy = 50,
+            .accuracy = 70,
         #else
             .accuracy = 80,
         #endif
@@ -9768,7 +9768,7 @@ const struct BattleMove gBattleMoves[MOVES_COUNT_DYNAMAX] =
     [MOVE_FUSION_FLARE] =
     {
         .effect = EFFECT_FUSION_COMBO,
-        .power = 100,
+        .power = 110,
         .type = TYPE_FIRE,
         .accuracy = 100,
         .pp = 5,
@@ -9783,7 +9783,7 @@ const struct BattleMove gBattleMoves[MOVES_COUNT_DYNAMAX] =
     [MOVE_FUSION_BOLT] =
     {
         .effect = EFFECT_FUSION_COMBO,
-        .power = 100,
+        .power = 110,
         .type = TYPE_ELECTRIC,
         .accuracy = 100,
         .pp = 5,
@@ -13278,7 +13278,7 @@ const struct BattleMove gBattleMoves[MOVES_COUNT_DYNAMAX] =
         .effect = EFFECT_FLINCH_HIT,
         .power = 100,
         .type = TYPE_ICE,
-        .accuracy = 85,
+        .accuracy = 90,
         .pp = 5,
         .secondaryEffectChance = 30,
         .target = MOVE_TARGET_SELECTED,
