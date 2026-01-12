@@ -2906,7 +2906,7 @@ const struct FacilityMon gFallarborBattleTentMons[NUM_FALLARBOR_TENT_MONS] =
     },
     [FALLARBOR_TENT_MON_WAILMER] = {
         .species = SPECIES_WAILMER,
-        .moves = {MOVE_WATER_PULSE, MOVE_RAIN_DANCE, MOVE_SPLASH, MOVE_CURSE},
+        .moves = {MOVE_WATER_PULSE, MOVE_RAIN_DANCE, MOVE_ICE_BEAM, MOVE_CURSE},
         .itemTableId = BATTLE_FRONTIER_ITEM_KINGS_ROCK,
         .evSpread = F_EV_SPREAD_SP_ATTACK | F_EV_SPREAD_ATTACK,
         .nature = NATURE_QUIET
