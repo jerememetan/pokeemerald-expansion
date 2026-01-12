@@ -15,7 +15,7 @@ Route104_EventScript_ItemPPUp::
 	end
 
 Route104_EventScript_ItemPokeBall::
-	finditem ITEM_POKE_BALL
+	finditem ITEM_SUPER_POTION
 	end
 
 Route104_EventScript_ItemXAccuracy::
@@ -83,7 +83,7 @@ Route113_EventScript_ItemMaxEther::
 	end
 
 Route113_EventScript_ItemSuperRepel::
-	finditem ITEM_SUPER_REPEL
+	finditem ITEM_SUPER_POTION
 	end
 
 Route113_EventScript_ItemHyperPotion::
@@ -115,7 +115,7 @@ Route115_EventScript_ItemIron::
 	end
 
 Route115_EventScript_ItemGreatBall::
-	finditem ITEM_GREAT_BALL
+	finditem ITEM_SUPER_POTION
 	end
 
 Route115_EventScript_ItemHealPowder::
@@ -135,7 +135,7 @@ Route116_EventScript_ItemEther::
 	end
 
 Route116_EventScript_ItemRepel::
-	finditem ITEM_REPEL
+	finditem ITEM_HYPER_POTION
 	end
 
 Route116_EventScript_ItemHPUp::
@@ -147,7 +147,7 @@ Route116_EventScript_ItemPotion::
 	end
 
 Route117_EventScript_ItemGreatBall::
-	finditem ITEM_GREAT_BALL
+	finditem ITEM_GREAT_BALL, 5
 	end
 
 Route117_EventScript_ItemRevive::
@@ -159,7 +159,7 @@ Route118_EventScript_ItemHyperPotion::
 	end
 
 Route119_EventScript_ItemSuperRepel::
-	finditem ITEM_SUPER_REPEL
+	finditem ITEM_HEART_SCALE
 	end
 
 Route119_EventScript_ItemZinc::
@@ -203,7 +203,7 @@ Route120_EventScript_ItemHyperPotion::
 	end
 
 Route120_EventScript_ItemNestBall::
-	finditem ITEM_NEST_BALL
+	finditem ITEM_MAX_POTION
 	end
 
 Route120_EventScript_ItemRevive::
@@ -227,7 +227,7 @@ Route123_EventScript_ItemCalcium::
 	end
 
 Route123_EventScript_ItemUltraBall::
-	finditem ITEM_ULTRA_BALL
+	finditem ITEM_HYPER_POTION
 	end
 
 Route123_EventScript_ItemElixir::
@@ -243,15 +243,15 @@ Route123_EventScript_ItemRevivalHerb::
 	end
 
 Route124_EventScript_ItemRedShard::
-	finditem ITEM_RED_SHARD
+	finditem ITEM_RED_SHARD, 5
 	end
 
 Route124_EventScript_ItemBlueShard::
-	finditem ITEM_BLUE_SHARD
+	finditem ITEM_BLUE_SHARD, 5
 	end
 
 Route124_EventScript_ItemYellowShard::
-	finditem ITEM_YELLOW_SHARD
+	finditem ITEM_YELLOW_SHARD, 5
 	end
 
 Route125_EventScript_ItemBigPearl::
@@ -259,7 +259,7 @@ Route125_EventScript_ItemBigPearl::
 	end
 
 Route126_EventScript_ItemGreenShard::
-	finditem ITEM_GREEN_SHARD
+	finditem ITEM_GREEN_SHARD, 5
 	end
 
 Route127_EventScript_ItemZinc::
@@ -323,7 +323,7 @@ LilycoveCity_EventScript_ItemMaxRepel::
 	end
 
 MossdeepCity_EventScript_ItemNetBall::
-	finditem ITEM_NET_BALL
+	finditem ITEM_NET_BALL, 5
 	end
 
 PetalburgWoods_EventScript_ItemXAttack::
@@ -331,7 +331,7 @@ PetalburgWoods_EventScript_ItemXAttack::
 	end
 
 PetalburgWoods_EventScript_ItemGreatBall::
-	finditem ITEM_GREAT_BALL
+	finditem ITEM_GREAT_BALL, 5
 	end
 
 PetalburgWoods_EventScript_ItemEther::
@@ -343,7 +343,7 @@ PetalburgWoods_EventScript_ItemParalyzeHeal::
 	end
 
 RusturfTunnel_EventScript_ItemPokeBall::
-	finditem ITEM_POKE_BALL
+	finditem ITEM_POKE_BALL, 5
 	end
 
 RusturfTunnel_EventScript_ItemMaxEther::
@@ -355,7 +355,7 @@ GraniteCave_1F_EventScript_ItemEscapeRope::
 	end
 
 GraniteCave_B1F_EventScript_ItemPokeBall::
-	finditem ITEM_POKE_BALL
+	finditem ITEM_POKE_BALL, 3
 	end
 
 GraniteCave_B2F_EventScript_ItemRepel::
@@ -399,7 +399,7 @@ MeteorFalls_B1F_2R_EventScript_ItemTMDragonClaw::
 	end
 
 NewMauville_Inside_EventScript_ItemUltraBall::
-	finditem ITEM_ULTRA_BALL
+	finditem ITEM_ULTRA_BALL, 3
 	end
 
 NewMauville_Inside_EventScript_ItemEscapeRope::
@@ -427,7 +427,7 @@ AbandonedShip_Rooms_B1F_EventScript_ItemEscapeRope::
 	end
 
 AbandonedShip_Rooms2_B1F_EventScript_ItemDiveBall::
-	finditem ITEM_DIVE_BALL
+	finditem ITEM_DIVE_BALL, 5
 	end
 
 AbandonedShip_Room_B1F_EventScript_ItemTMIceBeam::
@@ -443,7 +443,7 @@ AbandonedShip_CaptainsOffice_EventScript_ItemStorageKey::
 	end
 
 AbandonedShip_HiddenFloorRooms_EventScript_ItemLuxuryBall::
-	finditem ITEM_LUXURY_BALL
+	finditem ITEM_LUXURY_BALL, 5
 	end
 
 AbandonedShip_HiddenFloorRooms_EventScript_ItemScanner::
@@ -523,7 +523,7 @@ AquaHideout_B1F_EventScript_ItemMaxElixir::
 	end
 
 AquaHideout_B2F_EventScript_ItemNestBall::
-	finditem ITEM_NEST_BALL
+	finditem ITEM_NEST_BALL, 3
 	end
 
 AquaHideout_B2F_EventScript_ItemMasterBall::
@@ -539,7 +539,7 @@ Route119_EventScript_ItemMaxElixir::
 	end
 
 Route119_EventScript_ItemNestBall::
-	finditem ITEM_NEST_BALL
+	finditem ITEM_NEST_BALL, 5
 	end
 
 ShoalCave_LowTideEntranceRoom_EventScript_ItemBigPearl::
@@ -599,7 +599,7 @@ Route110_TrickHousePuzzle7_EventScript_ItemTropicMail::
 	end
 
 Route110_TrickHousePuzzle8_EventScript_ItemBeadMail::
-	finditem ITEM_BEAD_MAIL
+	finditem ITEM_LEFTOVERS
 	end
 
 VictoryRoad_1F_EventScript_ItemMaxElixir::
