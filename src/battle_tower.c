@@ -154,7 +154,9 @@ const u16 gBattleFrontierHeldItems[] =
     [BATTLE_FRONTIER_ITEM_FOCUS_SASH]     = ITEM_FOCUS_SASH,
     [BATTLE_FRONTIER_ITEM_ROCKY_HELMET]   = ITEM_ROCKY_HELMET,
     [BATTLE_FRONTIER_ITEM_LIFE_ORB]       = ITEM_LIFE_ORB, 
-
+    [BATTLE_FRONTIER_ITEM_FLAME_ORB]       = ITEM_FLAME_ORB, 
+    [BATTLE_FRONTIER_ITEM_TOXIC_ORB]       = ITEM_TOXIC_ORB, 
+    [BATTLE_FRONTIER_ITEM_FLYING_GEM]       = ITEM_FLYING_GEM, 
 };
 
 #include "data/battle_frontier/battle_frontier_trainer_mons.h"
