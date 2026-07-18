@@ -64,9 +64,9 @@ Document the current battle-AI call graph, the existing test/build commands, tra
 
 ### Phase 1: ROM-only external mode
 
-Add an opt-in trainer flag/mode that changes nothing by itself. Add a ROM-only test seam that can supply a legal mock action. Confirm ordinary trainers and the new mode with no response retain existing AI behavior.
+Add a generic `Trainer.externalAi` opt-in that is separate from vanilla `aiFlags`. Enable it only for Route 102's `TRAINER_CALVIN_1`, then add a ROM-only, test-only mock-response seam that can supply a legal opponent-targeting move slot. Confirm ordinary trainers, unsupported battle types, absent mock responses, and rejected mock responses retain existing AI behavior.
 
-**Exit criterion:** The ROM builds, existing battle tests pass, and a special trainer can use a deterministic legal mock move without changing any other trainer.
+**Exit criterion:** The ROM builds, existing battle tests pass, and Calvin can use a deterministic legal test mock move without changing any other trainer or a vanilla switch/item action.
 
 ### Phase 2: Legal-action snapshot
 
@@ -135,3 +135,5 @@ Later phase specifications will select exact mailbox field widths, Python depend
 - [Protocol version 1](protocol.md)
 - [Integration plan](integration-plan.md)
 - [Phase 0 task plan](plans/2026-07-18-phase-0-discovery-and-contract-baseline.md)
+- [Phase 1 specification](specs/2026-07-18-phase-1-trainer-opt-in-and-rom-mock.md)
+- [Phase 1 flow review](reviews/2026-07-18-phase-1-trainer-opt-in-and-rom-mock-flow-review.md)

@@ -60,9 +60,9 @@ No critical gaps remain after the specification amendments. The two initially bl
 
 ### Minor
 
-1. **The first external trainer needs a stable demo identity.** The repository's trainer data is in `src/data/trainers.h`, but the user has not selected a trainer ID.
+1. **The first external trainer needs a stable demo identity.** The repository's trainer data is in `src/data/trainers.h`, and the user selected the first Route 102 trainer.
 
-   **Default:** Phase 1 adds the opt-in bit to a purpose-built test/demo trainer introduced by that phase; it does not modify an existing story trainer.
+   **Resolution:** Phase 1 sets `TRAINER_CALVIN_1.externalAi = TRUE` and leaves Calvin's rematch IDs and every other trainer disabled.
 
 2. **The 600-frame wait needs player-facing copy.** The initial ROM-only mock has no need to display a wait message.
 
