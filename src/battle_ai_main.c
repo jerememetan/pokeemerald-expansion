@@ -52,6 +52,25 @@ static s32 AI_Safari(u32 battlerAtk, u32 battlerDef, u32 move, s32 score);
 static s32 AI_FirstBattle(u32 battlerAtk, u32 battlerDef, u32 move, s32 score);
 static s32 AI_DoubleBattle(u32 battlerAtk, u32 battlerDef, u32 move, s32 score);
 
+#if TESTING
+static EWRAM_DATA s8 sTestExternalAiMockMoveSlot = -1;
+
+void BattleAI_TestSetExternalAiMockMoveSlot(s8 moveSlot)
+{
+    sTestExternalAiMockMoveSlot = moveSlot;
+}
+
+void BattleAI_TestResetExternalAiMockResponse(void)
+{
+    sTestExternalAiMockMoveSlot = -1;
+}
+
+static s8 GetExternalAiMockMoveSlot(void)
+{
+    return sTestExternalAiMockMoveSlot;
+}
+#endif
+
 static s32 (*const sBattleAiFuncTable[])(u32, u32, u32, s32) =
 {
     [0] = AI_CheckBadMove,           // AI_FLAG_CHECK_BAD_MOVE
@@ -89,6 +108,55 @@ static s32 (*const sBattleAiFuncTable[])(u32, u32, u32, s32) =
 };
 
 // Functions
+bool32 BattleAI_TryApplyExternalAiMockMove(u32 battler)
+{
+#if TESTING
+    s8 moveSlot = GetExternalAiMockMoveSlot();
+#endif
+
+    if (!BattlerHasAi(battler)
+     || GetBattlerSide(battler) != B_SIDE_OPPONENT
+     || !(gBattleTypeFlags & BATTLE_TYPE_TRAINER)
+     || (gBattleTypeFlags & (BATTLE_TYPE_DOUBLE | BATTLE_TYPE_MULTI | BATTLE_TYPE_LINK
+                           | BATTLE_TYPE_SAFARI | BATTLE_TYPE_PALACE
+                           | BATTLE_TYPE_FRONTIER | BATTLE_TYPE_EREADER_TRAINER
+                           | BATTLE_TYPE_TRAINER_HILL | BATTLE_TYPE_SECRET_BASE
+                           | BATTLE_TYPE_TWO_OPPONENTS))
+     || !gTrainers[gTrainerBattleOpponent_A].externalAi)
+        return FALSE;
+
+    if (gBattleStruct->aiMoveOrAction[battler] >= MAX_MON_MOVES)
+        return FALSE;
+
+#if !TESTING
+    if (gBattleTypeFlags & BATTLE_TYPE_RECORDED)
+        return FALSE;
+
+    return FALSE;
+#else
+    // Battle tests use recorded-battle setup; only an active test with a pending mock may bypass that one exclusion.
+    if ((gBattleTypeFlags & BATTLE_TYPE_RECORDED)
+     && (!gTestRunnerEnabled || moveSlot < 0))
+        return FALSE;
+
+    u8 moveLimitations;
+
+    if (moveSlot < 0 || moveSlot >= MAX_MON_MOVES)
+        return FALSE;
+
+    moveLimitations = CheckMoveLimitations(battler, 0, MOVE_LIMITATIONS_ALL);
+    if (gBattleMons[battler].moves[moveSlot] == MOVE_NONE
+     || (moveLimitations & gBitTable[moveSlot])
+     || gBattleMoves[gBattleMons[battler].moves[moveSlot]].target != MOVE_TARGET_SELECTED
+     || gBattleStruct->aiChosenTarget[battler] >= MAX_BATTLERS_COUNT
+     || GetBattlerSide(gBattleStruct->aiChosenTarget[battler]) != B_SIDE_PLAYER)
+        return FALSE;
+
+    gBattleStruct->aiMoveOrAction[battler] = moveSlot;
+    return TRUE;
+#endif
+}
+
 void BattleAI_SetupItems(void)
 {
     s32 i;

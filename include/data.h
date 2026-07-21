@@ -64,7 +64,8 @@ struct Trainer
     /*0x12*/ u8 trainerPic;
     /*0x13*/ u8 trainerName[TRAINER_NAME_LENGTH + 1];
     /*0x1E*/ bool8 doubleBattle:1;
-             u8 padding:7;
+             bool8 externalAi:1;
+             u8 padding:6;
     /*0x1F*/ u8 partySize;
 };
 

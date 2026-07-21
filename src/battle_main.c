@@ -4040,6 +4040,7 @@ static void HandleTurnActionSelectionState(void)
             {
                 AI_DATA->mostSuitableMonId[battler] = GetMostSuitableMonToSwitchInto(battler, FALSE);
                 gBattleStruct->aiMoveOrAction[battler] = ComputeBattleAiScores(battler);
+                BattleAI_TryApplyExternalAiMockMove(battler);
             }
             // fallthrough
         case STATE_BEFORE_ACTION_CHOSEN: // Choose an action.
