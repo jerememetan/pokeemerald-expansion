@@ -1,6 +1,6 @@
 # mGBA AI Trainer Design
 
-**Status:** Proposed and approved for planning
+**Status:** Phase 1 implemented; later phases remain planned
 
 **Goal:** Add a local, external AI decision layer to `pokeemerald-expansion` that can control selected trainer battle actions in a playable ROM, while the ROM remains the sole authority on battle rules and always falls back to the existing trainer AI.
 
@@ -137,3 +137,5 @@ Later phase specifications will select exact mailbox field widths, Python depend
 - [Phase 0 task plan](plans/2026-07-18-phase-0-discovery-and-contract-baseline.md)
 - [Phase 1 specification](specs/2026-07-18-phase-1-trainer-opt-in-and-rom-mock.md)
 - [Phase 1 flow review](reviews/2026-07-18-phase-1-trainer-opt-in-and-rom-mock-flow-review.md)
+- [Phase 1 implementation plan](plans/2026-07-18-phase-1-trainer-opt-in-and-rom-mock.md)
+- [Phase 1 build and test evidence](reviews/2026-07-18-phase-1-build-and-test-evidence.md)

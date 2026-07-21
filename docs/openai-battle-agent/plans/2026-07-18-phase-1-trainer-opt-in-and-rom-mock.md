@@ -4,7 +4,7 @@
 
 **Goal:** Add a generic `Trainer.externalAi` bit, opt in only Route 102's `TRAINER_CALVIN_1`, and prove a test-only ROM mock can replace a flagged single trainer's legal move while all no-response and invalid-response paths retain vanilla AI.
 
-**Architecture:** `src/battle_main.c` continues to compute the ordinary action and target first. A focused helper in `src/battle_ai_main.c` then consults trainer data, battle-type eligibility, and a test-only move-slot response; it accepts only a currently usable opponent-targeting move and otherwise leaves the existing values untouched. The battle test runner selects real immutable trainer IDs and supplies the mock response before battle initialization.
+**Architecture:** `src/battle_main.c` continues to compute the ordinary action and target first. A focused helper in `src/battle_ai_main.c` then consults trainer data, battle-type eligibility, and a test-only move-slot response; it accepts only a currently usable `MOVE_TARGET_SELECTED` move whose existing engine target is a player-side battler, and otherwise leaves the existing values untouched. `AI_SINGLE_BATTLE_TEST` necessarily uses `BATTLE_TYPE_RECORDED`; only under `#if TESTING`, with `gTestRunnerEnabled` and a pending mock slot, the hook permits that one harness flag. The battle test runner selects real immutable trainer IDs and supplies the mock response before battle initialization.
 
 **Tech Stack:** `pokeemerald-expansion` C17 ROM build, existing battle-test DSL, WSL Ubuntu `make`, and the project ARM toolchain.
 
@@ -50,77 +50,115 @@
   void ExternalAiMockReset_(u32 sourceLine);
   ```
 
-  The names must be usable only inside `GIVEN`, except `RESET_EXTERNAL_AI_MOCK`, which is called in `FINALLY`.
+The names must be usable only inside `GIVEN`. `RESET_EXTERNAL_AI_MOCK` must be the first statement in each test's `GIVEN` block.
 
 - [ ] **Step 2: Add the focused test cases to the end of `test/battle/ai.c`.**
 
-  Use two opponent-targeting moves: slot `0` is `MOVE_GROWL`; slot `1` is `MOVE_TACKLE`. Use `AI_FLAG_PREFER_STRONGEST_MOVE` so the known vanilla fallback is Tackle whenever Tackle has PP. Each test must have `PLAYER(SPECIES_MAGIKARP) { Moves(MOVE_SPLASH); }`, an opponent Lillipup, and one turn whose `EXPECT_MOVE` checks the visible result.
+  Use `MOVE_LEER` in slot `0` and `MOVE_TACKLE` in slot `1` for accepted and ordinary fallback cases. Use `AI_FLAG_CHECK_BAD_MOVE` with `PLAYER(SPECIES_GASTLY) { Moves(MOVE_MEAN_LOOK); }` so vanilla AI rejects ineffective Normal-type Tackle against Ghost and deterministically selects Leer. The target-rejection case uses `MOVE_REST` in slot `1`, which is otherwise legal but self-targeting; every test has an opponent Lillipup and one turn whose `EXPECT_MOVE` checks the visible result.
 
-  Add these four tests, resetting the mock in every `FINALLY` block:
+Add these seven tests, resetting the mock as the first statement in every `GIVEN` block:
 
   ```c
   AI_SINGLE_BATTLE_TEST("External AI mock accepts Calvin's legal move slot")
-  {
-      GIVEN {
-          AI_FLAGS(AI_FLAG_PREFER_STRONGEST_MOVE);
-          TRAINER_OPPONENT(TRAINER_CALVIN_1);
-          EXTERNAL_AI_MOCK_MOVE(0);
-          PLAYER(SPECIES_MAGIKARP) { Moves(MOVE_SPLASH); }
-          OPPONENT(SPECIES_LILLIPUP) { Moves(MOVE_GROWL, MOVE_TACKLE); }
-      } WHEN {
-          TURN { MOVE(player, MOVE_SPLASH); EXPECT_MOVE(opponent, MOVE_GROWL); }
-      } FINALLY {
-          RESET_EXTERNAL_AI_MOCK();
-      }
-  }
-
-  AI_SINGLE_BATTLE_TEST("External AI Calvin without a response keeps vanilla move")
-  {
-      GIVEN {
-          AI_FLAGS(AI_FLAG_PREFER_STRONGEST_MOVE);
-          TRAINER_OPPONENT(TRAINER_CALVIN_1);
-          PLAYER(SPECIES_MAGIKARP) { Moves(MOVE_SPLASH); }
-          OPPONENT(SPECIES_LILLIPUP) { Moves(MOVE_GROWL, MOVE_TACKLE); }
-      } WHEN {
-          TURN { MOVE(player, MOVE_SPLASH); EXPECT_MOVE(opponent, MOVE_TACKLE); }
-      } FINALLY {
-          RESET_EXTERNAL_AI_MOCK();
-      }
-  }
-
-  AI_SINGLE_BATTLE_TEST("External AI Calvin rejects a zero-PP mock move")
-  {
-      GIVEN {
-          AI_FLAGS(AI_FLAG_PREFER_STRONGEST_MOVE);
+{
+    GIVEN {
+        RESET_EXTERNAL_AI_MOCK();
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE);
           TRAINER_OPPONENT(TRAINER_CALVIN_1);
           EXTERNAL_AI_MOCK_MOVE(1);
-          PLAYER(SPECIES_MAGIKARP) { Moves(MOVE_SPLASH); }
+          PLAYER(SPECIES_GASTLY) { Moves(MOVE_MEAN_LOOK); }
+          OPPONENT(SPECIES_LILLIPUP) { Moves(MOVE_LEER, MOVE_TACKLE); }
+    } WHEN {
+        TURN { MOVE(player, MOVE_MEAN_LOOK); EXPECT_MOVE(opponent, MOVE_TACKLE); }
+    }
+}
+
+  AI_SINGLE_BATTLE_TEST("External AI Calvin without a response keeps vanilla move")
+{
+    GIVEN {
+        RESET_EXTERNAL_AI_MOCK();
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE);
+          TRAINER_OPPONENT(TRAINER_CALVIN_1);
+          PLAYER(SPECIES_GASTLY) { Moves(MOVE_MEAN_LOOK); }
+          OPPONENT(SPECIES_LILLIPUP) { Moves(MOVE_LEER, MOVE_TACKLE); }
+    } WHEN {
+        TURN { MOVE(player, MOVE_MEAN_LOOK); EXPECT_MOVE(opponent, MOVE_LEER); }
+    }
+}
+
+AI_SINGLE_BATTLE_TEST("External AI Calvin rejects a zero-PP mock move")
+{
+    GIVEN {
+        RESET_EXTERNAL_AI_MOCK();
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE);
+          TRAINER_OPPONENT(TRAINER_CALVIN_1);
+          EXTERNAL_AI_MOCK_MOVE(1);
+          PLAYER(SPECIES_GASTLY) { Moves(MOVE_MEAN_LOOK); }
           OPPONENT(SPECIES_LILLIPUP) {
               MovesWithPP(
-                  ((struct moveWithPP){ .moveId = MOVE_GROWL, .pp = 40 }),
+                  ((struct moveWithPP){ .moveId = MOVE_LEER, .pp = 40 }),
                   ((struct moveWithPP){ .moveId = MOVE_TACKLE, .pp = 0 }));
           }
-      } WHEN {
-          TURN { MOVE(player, MOVE_SPLASH); EXPECT_MOVE(opponent, MOVE_GROWL); }
-      } FINALLY {
-          RESET_EXTERNAL_AI_MOCK();
-      }
-  }
+    } WHEN {
+        TURN { MOVE(player, MOVE_MEAN_LOOK); EXPECT_MOVE(opponent, MOVE_LEER); }
+    }
+}
+
+  AI_SINGLE_BATTLE_TEST("External AI Calvin rejects an out-of-range mock move")
+{
+    GIVEN {
+        RESET_EXTERNAL_AI_MOCK();
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE);
+          TRAINER_OPPONENT(TRAINER_CALVIN_1);
+          EXTERNAL_AI_MOCK_MOVE(MAX_MON_MOVES);
+          PLAYER(SPECIES_GASTLY) { Moves(MOVE_MEAN_LOOK); }
+          OPPONENT(SPECIES_LILLIPUP) { Moves(MOVE_LEER, MOVE_TACKLE); }
+    } WHEN {
+        TURN { MOVE(player, MOVE_MEAN_LOOK); EXPECT_MOVE(opponent, MOVE_LEER); }
+    }
+}
+
+  AI_SINGLE_BATTLE_TEST("External AI Calvin rejects an empty mock move")
+{
+    GIVEN {
+        RESET_EXTERNAL_AI_MOCK();
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE);
+          TRAINER_OPPONENT(TRAINER_CALVIN_1);
+          EXTERNAL_AI_MOCK_MOVE(2);
+          PLAYER(SPECIES_GASTLY) { Moves(MOVE_MEAN_LOOK); }
+          OPPONENT(SPECIES_LILLIPUP) { Moves(MOVE_LEER, MOVE_TACKLE, MOVE_NONE); }
+    } WHEN {
+        TURN { MOVE(player, MOVE_MEAN_LOOK); EXPECT_MOVE(opponent, MOVE_LEER); }
+    }
+}
+
+AI_SINGLE_BATTLE_TEST("External AI Calvin rejects a self-targeting mock move")
+{
+    GIVEN {
+        RESET_EXTERNAL_AI_MOCK();
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE);
+        TRAINER_OPPONENT(TRAINER_CALVIN_1);
+        EXTERNAL_AI_MOCK_MOVE(1);
+        PLAYER(SPECIES_GASTLY) { Moves(MOVE_MEAN_LOOK); }
+        OPPONENT(SPECIES_LILLIPUP) { Moves(MOVE_LEER, MOVE_REST); }
+    } WHEN {
+        TURN { MOVE(player, MOVE_MEAN_LOOK); EXPECT_MOVE(opponent, MOVE_LEER); }
+    }
+}
 
   AI_SINGLE_BATTLE_TEST("External AI mock does not affect an unflagged trainer")
-  {
-      GIVEN {
-          AI_FLAGS(AI_FLAG_PREFER_STRONGEST_MOVE);
+{
+    GIVEN {
+        RESET_EXTERNAL_AI_MOCK();
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE);
           TRAINER_OPPONENT(TRAINER_BILLY);
-          EXTERNAL_AI_MOCK_MOVE(0);
-          PLAYER(SPECIES_MAGIKARP) { Moves(MOVE_SPLASH); }
-          OPPONENT(SPECIES_LILLIPUP) { Moves(MOVE_GROWL, MOVE_TACKLE); }
-      } WHEN {
-          TURN { MOVE(player, MOVE_SPLASH); EXPECT_MOVE(opponent, MOVE_TACKLE); }
-      } FINALLY {
-          RESET_EXTERNAL_AI_MOCK();
-      }
-  }
+          EXTERNAL_AI_MOCK_MOVE(1);
+          PLAYER(SPECIES_GASTLY) { Moves(MOVE_MEAN_LOOK); }
+          OPPONENT(SPECIES_LILLIPUP) { Moves(MOVE_LEER, MOVE_TACKLE); }
+    } WHEN {
+        TURN { MOVE(player, MOVE_MEAN_LOOK); EXPECT_MOVE(opponent, MOVE_LEER); }
+    }
+}
   ```
 
 - [ ] **Step 3: Run the focused test to prove it fails for the missing DSL.**
@@ -168,6 +206,8 @@
 
   `TRAINER_OPPONENT` changes only the recorded trainer ID before `SetVariablesForRecordedBattle`; it does not edit `gTrainers` or alter the synthetic Pokémon configured by `OPPONENT(...)`.
 
+  Reset the mock at the start of each `BattleTest_Run`, before invoking the test function. Keep `RESET_EXTERNAL_AI_MOCK()` as the first statement in each `GIVEN` block: the runner-level reset isolates battles, while the directive reset isolates parameterized invocations within a battle.
+
 - [ ] **Step 2: Add test-only mock declarations in `include/battle_ai_main.h`.**
 
   Append these declarations before the closing include guard:
@@ -183,7 +223,7 @@
 
 - [ ] **Step 3: Implement the isolated mock state in `src/battle_ai_main.c`.**
 
-  Add a private signed slot initialized to `-1` inside `#if TESTING`, plus the two declared setters. The reset function must restore `-1`. In non-test builds, the lookup helper must return `-1` without allocating an externally writable ROM state:
+  Add a private signed slot initialized to `-1` inside `#if TESTING`, plus the two declared setters. The reset function must restore `-1`. `BattleTest_Run` resets this state at each battle boundary, and every `GIVEN` block resets it again before configuration to protect parameterized invocations. Defer the private lookup to Task 3, where it is compiled only under `TESTING` together with its caller; this keeps Task 2's interim build free of an unused static helper:
 
   ```c
   #if TESTING
@@ -199,15 +239,6 @@
       sTestExternalAiMockMoveSlot = -1;
   }
   #endif
-
-  static s8 GetExternalAiMockMoveSlot(void)
-  {
-  #if TESTING
-      return sTestExternalAiMockMoveSlot;
-  #else
-      return -1;
-  #endif
-  }
   ```
 
 - [ ] **Step 4: Re-run the focused test.**
@@ -248,18 +279,20 @@
 
 - [ ] **Step 2: Add the production eligibility and validation helpers in `src/battle_ai_main.c`.**
 
-  Implement `BattleAI_TryApplyExternalAiMockMove` with this exact decision order:
+  Define `GetExternalAiMockMoveSlot` only inside `#if TESTING`, next to the mock state, and use it only from the `#if TESTING` branch of `BattleAI_TryApplyExternalAiMockMove`. The normal-build branch returns `FALSE` before any test-only mock lookup, so it allocates no mock state and preserves vanilla AI. Implement the helper with this exact decision order:
 
   ```c
   bool32 BattleAI_TryApplyExternalAiMockMove(u32 battler)
   {
-      u8 moveLimitations;
-      s8 moveSlot;
+  #if TESTING
+      s8 moveSlot = GetExternalAiMockMoveSlot();
+  #endif
 
       if (!BattlerHasAi(battler)
+       || GetBattlerSide(battler) != B_SIDE_OPPONENT
        || !(gBattleTypeFlags & BATTLE_TYPE_TRAINER)
        || (gBattleTypeFlags & (BATTLE_TYPE_DOUBLE | BATTLE_TYPE_MULTI | BATTLE_TYPE_LINK
-                             | BATTLE_TYPE_RECORDED | BATTLE_TYPE_SAFARI | BATTLE_TYPE_PALACE
+                             | BATTLE_TYPE_SAFARI | BATTLE_TYPE_PALACE
                              | BATTLE_TYPE_FRONTIER | BATTLE_TYPE_EREADER_TRAINER
                              | BATTLE_TYPE_TRAINER_HILL | BATTLE_TYPE_SECRET_BASE
                              | BATTLE_TYPE_TWO_OPPONENTS))
@@ -269,17 +302,32 @@
       if (gBattleStruct->aiMoveOrAction[battler] >= MAX_MON_MOVES)
           return FALSE;
 
-      moveSlot = GetExternalAiMockMoveSlot();
+  #if !TESTING
+      if (gBattleTypeFlags & BATTLE_TYPE_RECORDED)
+          return FALSE;
+
+      return FALSE;
+  #else
+      if ((gBattleTypeFlags & BATTLE_TYPE_RECORDED)
+       && (!gTestRunnerEnabled || moveSlot < 0))
+          return FALSE;
+
+      u8 moveLimitations;
+
       if (moveSlot < 0 || moveSlot >= MAX_MON_MOVES)
           return FALSE;
 
       moveLimitations = CheckMoveLimitations(battler, 0, MOVE_LIMITATIONS_ALL);
       if (gBattleMons[battler].moves[moveSlot] == MOVE_NONE
-       || (moveLimitations & gBitTable[moveSlot]))
+       || (moveLimitations & gBitTable[moveSlot])
+       || gBattleMoves[gBattleMons[battler].moves[moveSlot]].target != MOVE_TARGET_SELECTED
+       || gBattleStruct->aiChosenTarget[battler] >= MAX_BATTLERS_COUNT
+       || GetBattlerSide(gBattleStruct->aiChosenTarget[battler]) != B_SIDE_PLAYER)
           return FALSE;
 
       gBattleStruct->aiMoveOrAction[battler] = moveSlot;
       return TRUE;
+  #endif
   }
   ```
 
@@ -302,7 +350,7 @@
   make check TESTS='External AI'
   ```
 
-  Expected: all four external-AI tests pass. The accepted Calvin mock emits Growl; the absent and unflagged cases emit Tackle; the zero-PP Tackle request emits Growl.
+Expected: all seven external-AI tests pass. The accepted Calvin mock emits Tackle; the absent, out-of-range, empty-slot, self-targeting, and unflagged cases emit Leer; the zero-PP Tackle request emits Leer.
 
 ## Task 4: Verify scope, regression safety, and the playable fallback
 
@@ -313,7 +361,7 @@
 - Create: `docs/openai-battle-agent/reviews/2026-07-18-phase-1-build-and-test-evidence.md`
 - Read: `AGENTS.md`, the Phase 1 specification and flow review
 
-- [ ] **Step 1: Check the trainer-data diff and source scope.**
+- [x] **Step 1: Check the trainer-data diff and source scope.**
 
   Run:
 
@@ -324,40 +372,42 @@
 
   Expected: the trainer layout has one new named bit, only Calvin's first trainer entry is opted in, and no switch/item controller, trainer party, map script, or battle mechanic file is changed.
 
-- [ ] **Step 2: Run the complete automated verification.**
+- [x] **Step 2: Run the complete automated verification.**
 
   Run in WSL from the repository root:
 
   ```bash
-  make -j2
-  make check TESTS='External AI'
-  make check
+  make -j"$(nproc)"
+  make -j"$(nproc)" check TESTS='External AI'
+  make -j"$(nproc)" check
   ```
 
-  Expected: every command exits `0`; `make -j2` writes `pokeemerald.gba`; the focused group reports all four tests passing; the full suite has no new failures.
+Observed on 2026-07-22: the normal build produced the playable ROM, and all seven focused tests passed. The full suite reported 1,122 passed, 24 known-failing, 98 to-do, 34 failed assumptions, and 44 failures. The project owner classified those 44 as accepted existing failures. The Phase 1 source-scope review and focused tests found no Phase 1 regression; the exact result is recorded in the evidence review.
 
-- [ ] **Step 3: Perform the Route 102 production-ROM smoke test.**
+- [x] **Step 3: Perform the Route 102 production-ROM smoke test.**
 
   Launch the newly built `pokeemerald.gba` in the agreed mGBA emulator without a Lua script or service. Start the Route 102 battle against Youngster Calvin, complete at least one turn, and finish or safely exit the battle.
 
   Expected: Calvin's battle starts and proceeds with ordinary AI; there is no wait, crash, new UI, or need for an external process. This confirms the no-response fallback in a real playable ROM.
 
-- [ ] **Step 4: Record evidence and finish documentation links.**
+- [x] **Step 4: Record evidence and finish documentation links.**
 
   Create `docs/openai-battle-agent/reviews/2026-07-18-phase-1-build-and-test-evidence.md` with these headings and the observed date/commands/results: `Build`, `Focused tests`, `Full tests`, `Route 102 smoke test`, `Fallback result`, and `Known limitations`. State that the mock exists only under `TESTING`, no bridge exists, target choice remains engine-owned, and switches/items/doubles are deferred.
 
   Add the Phase 1 plan and evidence-review links to the parent design and add the evidence-review link to the Phase 1 specification.
 
-- [ ] **Step 5: Create the scoped commit only after all evidence passes.**
+- [ ] **Step 5: Create small scoped commits after the recorded verification evidence and final review.**
 
   Stage only the Phase 1 files, never the user's unrelated map scripts or prior build fixes:
 
   ```bash
   git add include/data.h src/data/trainers.h include/battle_ai_main.h src/battle_ai_main.c src/battle_main.c include/test/battle.h test/test_runner_battle.c test/battle/ai.c docs/openai-battle-agent/2026-07-18-mgba-ai-trainer-design.md docs/openai-battle-agent/specs/2026-07-18-phase-1-trainer-opt-in-and-rom-mock.md docs/openai-battle-agent/reviews/2026-07-18-phase-1-trainer-opt-in-and-rom-mock-flow-review.md docs/openai-battle-agent/reviews/2026-07-18-phase-1-build-and-test-evidence.md docs/openai-battle-agent/plans/2026-07-18-phase-1-trainer-opt-in-and-rom-mock.md
-  git commit -m "feat: add external AI trainer opt-in"
+  git commit -m "feat(battle): add trainer external AI opt-in mock seam"
+  git commit -m "test(battle): cover external AI mock fallback"
+  git commit -m "docs(ai): record phase 1 verification"
   ```
 
-  Expected: the commit contains only Phase 1 trainer, AI, test, and documentation files. If unrelated paths appear in `git diff --cached --name-only`, unstage them with `git restore --staged <path>` before committing.
+  Expected: each commit contains only one of the Phase 1 trainer/AI seam, its test-harness coverage, or its documentation/evidence. If unrelated paths appear in `git diff --cached --name-only`, unstage them with `git restore --staged <path>` before committing.
 
 ## Plan self-review
 
