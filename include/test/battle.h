@@ -817,6 +817,9 @@ struct moveWithPP {
 #define RNGSeed(seed) RNGSeed_(__LINE__, seed)
 #define AI_FLAGS(flags) AIFlags_(__LINE__, flags)
 #define AI_LOG AILogScores(__LINE__)
+#define TRAINER_OPPONENT(trainerId) TrainerOpponent_(__LINE__, trainerId)
+#define EXTERNAL_AI_MOCK_MOVE(moveSlot) ExternalAiMockMove_(__LINE__, moveSlot)
+#define RESET_EXTERNAL_AI_MOCK() ExternalAiMockReset_(__LINE__)
 
 #define PLAYER(species) for (OpenPokemon(__LINE__, B_SIDE_PLAYER, species); gBattleTestRunnerState->data.currentMon; ClosePokemon(__LINE__))
 #define OPPONENT(species) for (OpenPokemon(__LINE__, B_SIDE_OPPONENT, species); gBattleTestRunnerState->data.currentMon; ClosePokemon(__LINE__))
@@ -845,6 +848,9 @@ void ClosePokemon(u32 sourceLine);
 void RNGSeed_(u32 sourceLine, u32 seed);
 void AIFlags_(u32 sourceLine, u32 flags);
 void AILogScores(u32 sourceLine);
+void TrainerOpponent_(u32 sourceLine, u16 trainerId);
+void ExternalAiMockMove_(u32 sourceLine, s8 moveSlot);
+void ExternalAiMockReset_(u32 sourceLine);
 void Gender_(u32 sourceLine, u32 gender);
 void Nature_(u32 sourceLine, u32 nature);
 void Ability_(u32 sourceLine, u32 ability);

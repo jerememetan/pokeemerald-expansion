@@ -688,3 +688,104 @@ AI_DOUBLE_BATTLE_TEST("AI will not try to switch for the same pokemon for 2 spot
         }
     }
 }
+
+AI_SINGLE_BATTLE_TEST("External AI mock accepts Calvin's legal move slot")
+{
+    GIVEN {
+        RESET_EXTERNAL_AI_MOCK();
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE);
+        TRAINER_OPPONENT(TRAINER_CALVIN_1);
+        EXTERNAL_AI_MOCK_MOVE(1);
+        PLAYER(SPECIES_GASTLY) { Moves(MOVE_MEAN_LOOK); }
+        OPPONENT(SPECIES_LILLIPUP) { Moves(MOVE_LEER, MOVE_TACKLE); }
+    } WHEN {
+        TURN { MOVE(player, MOVE_MEAN_LOOK); EXPECT_MOVE(opponent, MOVE_TACKLE); }
+    }
+}
+
+AI_SINGLE_BATTLE_TEST("External AI Calvin without a response keeps vanilla move")
+{
+    GIVEN {
+        RESET_EXTERNAL_AI_MOCK();
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE);
+        TRAINER_OPPONENT(TRAINER_CALVIN_1);
+        PLAYER(SPECIES_GASTLY) { Moves(MOVE_MEAN_LOOK); }
+        OPPONENT(SPECIES_LILLIPUP) { Moves(MOVE_LEER, MOVE_TACKLE); }
+    } WHEN {
+        TURN { MOVE(player, MOVE_MEAN_LOOK); EXPECT_MOVE(opponent, MOVE_LEER); }
+    }
+}
+
+AI_SINGLE_BATTLE_TEST("External AI Calvin rejects a zero-PP mock move")
+{
+    GIVEN {
+        RESET_EXTERNAL_AI_MOCK();
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE);
+        TRAINER_OPPONENT(TRAINER_CALVIN_1);
+        EXTERNAL_AI_MOCK_MOVE(1);
+        PLAYER(SPECIES_GASTLY) { Moves(MOVE_MEAN_LOOK); }
+        OPPONENT(SPECIES_LILLIPUP) {
+            MovesWithPP(
+                ((struct moveWithPP){ .moveId = MOVE_LEER, .pp = 40 }),
+                ((struct moveWithPP){ .moveId = MOVE_TACKLE, .pp = 0 }));
+        }
+    } WHEN {
+        TURN { MOVE(player, MOVE_MEAN_LOOK); EXPECT_MOVE(opponent, MOVE_LEER); }
+    }
+}
+
+AI_SINGLE_BATTLE_TEST("External AI Calvin rejects an out-of-range mock move")
+{
+    GIVEN {
+        RESET_EXTERNAL_AI_MOCK();
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE);
+        TRAINER_OPPONENT(TRAINER_CALVIN_1);
+        EXTERNAL_AI_MOCK_MOVE(MAX_MON_MOVES);
+        PLAYER(SPECIES_GASTLY) { Moves(MOVE_MEAN_LOOK); }
+        OPPONENT(SPECIES_LILLIPUP) { Moves(MOVE_LEER, MOVE_TACKLE); }
+    } WHEN {
+        TURN { MOVE(player, MOVE_MEAN_LOOK); EXPECT_MOVE(opponent, MOVE_LEER); }
+    }
+}
+
+AI_SINGLE_BATTLE_TEST("External AI Calvin rejects an empty mock move")
+{
+    GIVEN {
+        RESET_EXTERNAL_AI_MOCK();
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE);
+        TRAINER_OPPONENT(TRAINER_CALVIN_1);
+        EXTERNAL_AI_MOCK_MOVE(2);
+        PLAYER(SPECIES_GASTLY) { Moves(MOVE_MEAN_LOOK); }
+        OPPONENT(SPECIES_LILLIPUP) { Moves(MOVE_LEER, MOVE_TACKLE, MOVE_NONE); }
+    } WHEN {
+        TURN { MOVE(player, MOVE_MEAN_LOOK); EXPECT_MOVE(opponent, MOVE_LEER); }
+    }
+}
+
+AI_SINGLE_BATTLE_TEST("External AI Calvin rejects a self-targeting mock move")
+{
+    GIVEN {
+        RESET_EXTERNAL_AI_MOCK();
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE);
+        TRAINER_OPPONENT(TRAINER_CALVIN_1);
+        EXTERNAL_AI_MOCK_MOVE(1);
+        PLAYER(SPECIES_GASTLY) { Moves(MOVE_MEAN_LOOK); }
+        OPPONENT(SPECIES_LILLIPUP) { Moves(MOVE_LEER, MOVE_REST); }
+    } WHEN {
+        TURN { MOVE(player, MOVE_MEAN_LOOK); EXPECT_MOVE(opponent, MOVE_LEER); }
+    }
+}
+
+AI_SINGLE_BATTLE_TEST("External AI mock does not affect an unflagged trainer")
+{
+    GIVEN {
+        RESET_EXTERNAL_AI_MOCK();
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE);
+        TRAINER_OPPONENT(TRAINER_BILLY);
+        EXTERNAL_AI_MOCK_MOVE(1);
+        PLAYER(SPECIES_GASTLY) { Moves(MOVE_MEAN_LOOK); }
+        OPPONENT(SPECIES_LILLIPUP) { Moves(MOVE_LEER, MOVE_TACKLE); }
+    } WHEN {
+        TURN { MOVE(player, MOVE_MEAN_LOOK); EXPECT_MOVE(opponent, MOVE_LEER); }
+    }
+}

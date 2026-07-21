@@ -1,5 +1,6 @@
 #include "global.h"
 #include "battle.h"
+#include "battle_ai_main.h"
 #include "battle_ai_util.h"
 #include "battle_anim.h"
 #include "battle_controllers.h"
@@ -11,6 +12,7 @@
 #include "random.h"
 #include "test/battle.h"
 #include "window.h"
+#include "constants/opponents.h"
 #include "constants/trainers.h"
 
 #if defined(__INTELLISENSE__)
@@ -259,6 +261,7 @@ static void BattleTest_Run(void *data)
     const struct BattleTest *test = data;
 
     memset(&DATA, 0, sizeof(DATA));
+    BattleAI_TestResetExternalAiMockResponse();
 
     DATA.recordedBattle.rngSeed = RNG_SEED_DEFAULT;
     DATA.recordedBattle.textSpeed = OPTIONS_TEXT_SPEED_FAST;
@@ -1466,6 +1469,28 @@ void AILogScores(u32 sourceLine)
 {
     INVALID_IF(!IsAITest(), "AI_LOG is usable only in AI_SINGLE_BATTLE_TEST & AI_DOUBLE_BATTLE_TEST");
     DATA.logAI = TRUE;
+}
+
+void TrainerOpponent_(u32 sourceLine, u16 trainerId)
+{
+    INVALID_IF(!STATE->runGiven, "TRAINER_OPPONENT is usable only in GIVEN");
+    INVALID_IF(!IsAITest(), "TRAINER_OPPONENT is usable only in AI_SINGLE_BATTLE_TEST & AI_DOUBLE_BATTLE_TEST");
+    INVALID_IF(trainerId >= TRAINERS_COUNT, "Illegal trainer: %d", trainerId);
+    DATA.recordedBattle.opponentA = trainerId;
+}
+
+void ExternalAiMockMove_(u32 sourceLine, s8 moveSlot)
+{
+    INVALID_IF(!STATE->runGiven, "EXTERNAL_AI_MOCK_MOVE is usable only in GIVEN");
+    INVALID_IF(!IsAITest(), "EXTERNAL_AI_MOCK_MOVE is usable only in AI_SINGLE_BATTLE_TEST & AI_DOUBLE_BATTLE_TEST");
+    BattleAI_TestSetExternalAiMockMoveSlot(moveSlot);
+}
+
+void ExternalAiMockReset_(u32 sourceLine)
+{
+    INVALID_IF(!STATE->runGiven, "RESET_EXTERNAL_AI_MOCK is usable only in GIVEN");
+    INVALID_IF(!IsAITest(), "RESET_EXTERNAL_AI_MOCK is usable only in AI_SINGLE_BATTLE_TEST & AI_DOUBLE_BATTLE_TEST");
+    BattleAI_TestResetExternalAiMockResponse();
 }
 
 const struct TestRunner gBattleTestRunner =
