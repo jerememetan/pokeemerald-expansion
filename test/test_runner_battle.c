@@ -2,6 +2,7 @@
 #include "battle.h"
 #include "battle_ai_main.h"
 #include "battle_ai_util.h"
+#include "battle_agent.h"
 #include "battle_anim.h"
 #include "battle_controllers.h"
 #include "characters.h"
@@ -48,6 +49,7 @@ static void CB2_BattleTest_NextTrial(void);
 static void PushBattlerAction(u32 sourceLine, s32 battlerId, u32 actionType, u32 byte);
 static void PrintAiMoveLog(u32 battlerId, u32 moveSlot, u32 moveId, s32 totalScore);
 static void ClearAiLog(u32 battlerId);
+static void CheckBattleAgentRequest(u32 battlerId);
 static const char *BattlerIdentifier(s32 battlerId);
 
 NAKED static void InvokeSingleTestFunctionWithStack(void *results, u32 i, struct BattlePokemon *player, struct BattlePokemon *opponent, SingleBattleTestFunction function, void *stack)
@@ -262,6 +264,7 @@ static void BattleTest_Run(void *data)
 
     memset(&DATA, 0, sizeof(DATA));
     BattleAI_TestResetExternalAiMockResponse();
+    BattleAgent_ResetMailbox();
 
     DATA.recordedBattle.rngSeed = RNG_SEED_DEFAULT;
     DATA.recordedBattle.textSpeed = OPTIONS_TEXT_SPEED_FAST;
@@ -787,6 +790,8 @@ void TestRunner_Battle_CheckChosenMove(u32 battlerId, u32 moveId, u32 target)
     u32 id = DATA.aiActionsPlayed[battlerId];
     struct ExpectedAIAction *expectedAction = &DATA.expectedAiActions[battlerId][id];
 
+    CheckBattleAgentRequest(battlerId);
+
     if (!expectedAction->actionSet)
         return;
 
@@ -848,6 +853,93 @@ void TestRunner_Battle_CheckChosenMove(u32 battlerId, u32 moveId, u32 target)
     // Turn passed, clear logs from the turn
     ClearAiLog(battlerId);
     DATA.aiActionsPlayed[battlerId]++;
+}
+
+static void CheckBattleAgentRequest(u32 battlerId)
+{
+    u32 i;
+    struct ExpectedBattleAgentRequest *expected = &DATA.expectedBattleAgentRequests[DATA.aiActionsPlayed[battlerId]];
+    const struct BattleAgentMailboxV1 *mailbox = &gBattleAgentMailbox;
+
+    if (!BattlerHasAi(battlerId))
+        return;
+
+    if (!expected->expected)
+        return;
+
+    if (mailbox->magic != BATTLE_AGENT_PROTOCOL_MAGIC
+     || mailbox->protocolVersion != BATTLE_AGENT_PROTOCOL_VERSION)
+    {
+        Test_ExitWithResult(TEST_RESULT_FAIL, "%s:%d: Battle-agent mailbox protocol header is invalid", gTestRunnerState.test->filename, expected->sourceLine);
+    }
+
+    if (mailbox->requestSequence != expected->sequence
+     || mailbox->responseStatus != BATTLE_AGENT_RESPONSE_NONE
+     || mailbox->responseSequence != 0
+     || mailbox->responseLegalActionIndex != 0
+     || mailbox->legalActionCount != expected->actionCount)
+    {
+        Test_ExitWithResult(TEST_RESULT_FAIL, "%s:%d: Expected battle-agent request sequence %d with %d actions", gTestRunnerState.test->filename, expected->sourceLine, expected->sequence, expected->actionCount);
+    }
+
+    if (expected->sequence == 0)
+    {
+        if (mailbox->requestStatus != BATTLE_AGENT_REQUEST_IDLE
+         || mailbox->responseSequence != 0
+         || mailbox->requestingBattler != 0
+         || mailbox->battleMode != 0
+         || mailbox->turnSequence != 0
+         || mailbox->responseLegalActionIndex != 0
+         || memcmp(&mailbox->snapshot, &(struct BattleAgentSnapshotV1){0}, sizeof(mailbox->snapshot)) != 0
+         || memcmp(mailbox->legalActions, (struct BattleAgentLegalActionV1[MAX_MON_MOVES]){0}, sizeof(mailbox->legalActions)) != 0)
+        {
+            Test_ExitWithResult(TEST_RESULT_FAIL, "%s:%d: Battle-agent mailbox is not canonically IDLE and zeroed", gTestRunnerState.test->filename, expected->sourceLine);
+        }
+    }
+    else if (mailbox->requestStatus != BATTLE_AGENT_REQUEST_PENDING)
+    {
+        Test_ExitWithResult(TEST_RESULT_FAIL, "%s:%d: Expected battle-agent request to be pending", gTestRunnerState.test->filename, expected->sourceLine);
+    }
+    else if (mailbox->requestingBattler != battlerId
+          || mailbox->battleMode != BATTLE_AGENT_BATTLE_MODE_TRAINER_SINGLE
+          || mailbox->turnSequence != expected->sequence)
+    {
+        Test_ExitWithResult(TEST_RESULT_FAIL, "%s:%d: Battle-agent request header metadata is invalid", gTestRunnerState.test->filename, expected->sourceLine);
+    }
+
+    for (i = 0; i < MAX_MON_MOVES; i++)
+    {
+        if (expected->expectedActions[i]
+         && memcmp(&mailbox->legalActions[i], &expected->legalActions[i], sizeof(mailbox->legalActions[i])) != 0)
+            Test_ExitWithResult(TEST_RESULT_FAIL, "%s:%d: Battle-agent legal action %d differs from the published expectation", gTestRunnerState.test->filename, expected->sourceLine, i);
+        if (expected->expectedRequesterMoves[i]
+         && memcmp(&mailbox->snapshot.requesterMoves[i], &expected->requesterMoves[i], sizeof(mailbox->snapshot.requesterMoves[i])) != 0)
+            Test_ExitWithResult(TEST_RESULT_FAIL, "%s:%d: Battle-agent requester move %d differs from the published expectation", gTestRunnerState.test->filename, expected->sourceLine, i);
+    }
+    for (i = 0; i < MAX_BATTLERS_COUNT; i++)
+    {
+        if (expected->expectedBattlers[i]
+         && (mailbox->snapshot.battlers[i].species != expected->battlers[i].species
+          || mailbox->snapshot.battlers[i].hp != expected->battlers[i].hp
+          || mailbox->snapshot.battlers[i].maxHp != expected->battlers[i].maxHp
+          || mailbox->snapshot.battlers[i].status1 != expected->battlers[i].status1))
+            Test_ExitWithResult(TEST_RESULT_FAIL, "%s:%d: Battle-agent battler snapshot %d differs from the published expectation", gTestRunnerState.test->filename, expected->sourceLine, i);
+        if (expected->expectedBattlers[i]
+         && memcmp(mailbox->snapshot.battlers[i].statStages, (u8[NUM_BATTLE_STATS]){ [0 ... NUM_BATTLE_STATS - 1] = DEFAULT_STAT_STAGE }, NUM_BATTLE_STATS) != 0)
+            Test_ExitWithResult(TEST_RESULT_FAIL, "%s:%d: Battle-agent stat-stage snapshot %d differs from the published expectation", gTestRunnerState.test->filename, expected->sourceLine, i);
+    }
+    if (expected->expectedEnvironment
+     && (mailbox->snapshot.weather != expected->weather || mailbox->snapshot.terrain != expected->terrain
+      || mailbox->snapshot.fieldStatuses != expected->fieldStatuses
+      || memcmp(mailbox->snapshot.sideStatuses, expected->sideStatuses, sizeof(expected->sideStatuses)) != 0))
+        Test_ExitWithResult(TEST_RESULT_FAIL, "%s:%d: Battle-agent environment snapshot differs from the published expectation", gTestRunnerState.test->filename, expected->sourceLine);
+
+    if (expected->setTestResponse)
+    {
+        gBattleAgentMailbox.responseStatus = 1;
+        gBattleAgentMailbox.responseSequence = expected->testResponseSequence;
+        gBattleAgentMailbox.responseLegalActionIndex = expected->testResponseLegalActionIndex;
+    }
 }
 
 void TestRunner_Battle_CheckSwitch(u32 battlerId, u32 partyIndex)
@@ -2100,6 +2192,88 @@ void ExpectMove(u32 sourceLine, struct BattlePokemon *battler, struct MoveContex
     s32 battlerId = battler - gBattleMons;
     TryMarkExpectMove(sourceLine, battler, &ctx);
     DATA.expectedAiActionIndex[battlerId]++;
+}
+
+void ExpectBattleAgentRequest_(u32 sourceLine, u32 sequence, u8 actionCount)
+{
+    struct ExpectedBattleAgentRequest *expected;
+
+    INVALID_IF(DATA.turnState == TURN_CLOSED, "EXPECT_AGENT_REQUEST outside TURN");
+    INVALID_IF(!IsAITest(), "EXPECT_AGENT_REQUEST is usable only in AI_SINGLE_BATTLE_TEST & AI_DOUBLE_BATTLE_TEST");
+    INVALID_IF(DATA.expectedBattleAgentRequests[DATA.turns].expected, "More than one EXPECT_AGENT_REQUEST in TURN");
+
+    expected = &DATA.expectedBattleAgentRequests[DATA.turns];
+    expected->sourceLine = sourceLine;
+    expected->sequence = sequence;
+    expected->actionCount = actionCount;
+    expected->expected = TRUE;
+}
+
+void ExpectBattleAgentAction_(u32 sourceLine, u8 actionIndex, u8 moveSlot, u8 targetBattler)
+{
+    struct ExpectedBattleAgentRequest *expected = &DATA.expectedBattleAgentRequests[DATA.turns];
+
+    INVALID_IF(DATA.turnState == TURN_CLOSED, "EXPECT_AGENT_ACTION outside TURN");
+    INVALID_IF(!expected->expected, "EXPECT_AGENT_ACTION must follow EXPECT_AGENT_REQUEST in TURN");
+    INVALID_IF(actionIndex >= MAX_MON_MOVES, "Illegal EXPECT_AGENT_ACTION index");
+    expected->legalActions[actionIndex] = (struct BattleAgentLegalActionV1){ actionIndex, moveSlot, targetBattler };
+    expected->expectedActions[actionIndex] = TRUE;
+}
+
+void ExpectBattleAgentEmptyAction_(u32 sourceLine, u8 actionIndex)
+{
+    struct ExpectedBattleAgentRequest *expected = &DATA.expectedBattleAgentRequests[DATA.turns];
+
+    INVALID_IF(DATA.turnState == TURN_CLOSED || !expected->expected || actionIndex >= MAX_MON_MOVES, "Illegal EXPECT_AGENT_EMPTY_ACTION");
+    expected->expectedActions[actionIndex] = TRUE;
+}
+
+void ExpectBattleAgentBattler_(u32 sourceLine, u8 battler, u16 species, u16 hp, u16 maxHp, u32 status1)
+{
+    struct ExpectedBattleAgentRequest *expected = &DATA.expectedBattleAgentRequests[DATA.turns];
+
+    INVALID_IF(DATA.turnState == TURN_CLOSED, "EXPECT_AGENT_BATTLER outside TURN");
+    INVALID_IF(!expected->expected || battler >= MAX_BATTLERS_COUNT, "Illegal EXPECT_AGENT_BATTLER");
+    expected->battlers[battler] = (struct BattleAgentBattlerSnapshotV1){ .species = species, .hp = hp, .maxHp = maxHp, .status1 = status1 };
+    expected->expectedBattlers[battler] = TRUE;
+}
+
+void ExpectBattleAgentRequesterMove_(u32 sourceLine, u8 moveSlot, u16 move, u8 pp)
+{
+    struct ExpectedBattleAgentRequest *expected = &DATA.expectedBattleAgentRequests[DATA.turns];
+
+    INVALID_IF(DATA.turnState == TURN_CLOSED, "EXPECT_AGENT_REQUESTER_MOVE outside TURN");
+    INVALID_IF(!expected->expected || moveSlot >= MAX_MON_MOVES, "Illegal EXPECT_AGENT_REQUESTER_MOVE");
+    expected->requesterMoves[moveSlot] = (struct BattleAgentMoveSnapshotV1){ .move = move, .pp = pp };
+    expected->expectedRequesterMoves[moveSlot] = TRUE;
+}
+
+void ExpectBattleAgentEnvironment_(u32 sourceLine, u16 weather, u8 terrain, u32 fieldStatuses, u32 playerSideStatuses, u32 opponentSideStatuses)
+{
+    struct ExpectedBattleAgentRequest *expected = &DATA.expectedBattleAgentRequests[DATA.turns];
+    INVALID_IF(DATA.turnState == TURN_CLOSED || !expected->expected, "Illegal EXPECT_AGENT_ENVIRONMENT");
+    expected->weather = weather;
+    expected->terrain = terrain;
+    expected->fieldStatuses = fieldStatuses;
+    expected->sideStatuses[B_SIDE_PLAYER] = playerSideStatuses;
+    expected->sideStatuses[B_SIDE_OPPONENT] = opponentSideStatuses;
+    expected->expectedEnvironment = TRUE;
+}
+
+void SetBattleAgentTestResponse_(u32 sourceLine, u32 sequence, u8 actionIndex)
+{
+    struct ExpectedBattleAgentRequest *expected;
+
+    INVALID_IF(DATA.turnState == TURN_CLOSED, "SET_AGENT_TEST_RESPONSE outside TURN");
+    INVALID_IF(!IsAITest(), "SET_AGENT_TEST_RESPONSE is usable only in AI_SINGLE_BATTLE_TEST & AI_DOUBLE_BATTLE_TEST");
+
+    expected = &DATA.expectedBattleAgentRequests[DATA.turns];
+    INVALID_IF(!expected->expected, "SET_AGENT_TEST_RESPONSE must follow EXPECT_AGENT_REQUEST in TURN");
+    INVALID_IF(expected->setTestResponse, "More than one SET_AGENT_TEST_RESPONSE in TURN");
+
+    expected->testResponseSequence = sequence;
+    expected->testResponseLegalActionIndex = actionIndex;
+    expected->setTestResponse = TRUE;
 }
 
 void ExpectSendOut(u32 sourceLine, struct BattlePokemon *battler, u32 partyIndex)

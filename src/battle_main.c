@@ -1,5 +1,6 @@
 #include "global.h"
 #include "battle.h"
+#include "battle_agent.h"
 #include "battle_anim.h"
 #include "battle_ai_main.h"
 #include "battle_ai_util.h"
@@ -4040,6 +4041,7 @@ static void HandleTurnActionSelectionState(void)
             {
                 AI_DATA->mostSuitableMonId[battler] = GetMostSuitableMonToSwitchInto(battler, FALSE);
                 gBattleStruct->aiMoveOrAction[battler] = ComputeBattleAiScores(battler);
+                BattleAgent_TryPublishRequest(battler);
                 BattleAI_TryApplyExternalAiMockMove(battler);
             }
             // fallthrough

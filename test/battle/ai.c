@@ -1,5 +1,7 @@
 #include "global.h"
 #include "test/battle.h"
+#include "battle_agent.h"
+#include "battle_ai_main.h"
 #include "battle_ai_util.h"
 
 AI_SINGLE_BATTLE_TEST("AI gets baited by Protect Switch tactics") // This behavior is to be fixed.
@@ -699,7 +701,11 @@ AI_SINGLE_BATTLE_TEST("External AI mock accepts Calvin's legal move slot")
         PLAYER(SPECIES_GASTLY) { Moves(MOVE_MEAN_LOOK); }
         OPPONENT(SPECIES_LILLIPUP) { Moves(MOVE_LEER, MOVE_TACKLE); }
     } WHEN {
-        TURN { MOVE(player, MOVE_MEAN_LOOK); EXPECT_MOVE(opponent, MOVE_TACKLE); }
+        TURN {
+            MOVE(player, MOVE_MEAN_LOOK);
+            EXPECT_AGENT_REQUEST(1, 2);
+            EXPECT_MOVE(opponent, MOVE_TACKLE, target:player);
+        }
     }
 }
 
@@ -714,6 +720,260 @@ AI_SINGLE_BATTLE_TEST("External AI Calvin without a response keeps vanilla move"
     } WHEN {
         TURN { MOVE(player, MOVE_MEAN_LOOK); EXPECT_MOVE(opponent, MOVE_LEER); }
     }
+}
+
+AI_SINGLE_BATTLE_TEST("External AI snapshot publishes Calvin's legal move actions")
+{
+    GIVEN {
+        RESET_EXTERNAL_AI_MOCK();
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE);
+        TRAINER_OPPONENT(TRAINER_CALVIN_1);
+        PLAYER(SPECIES_GASTLY) { Moves(MOVE_MEAN_LOOK); }
+        OPPONENT(SPECIES_LILLIPUP) { Moves(MOVE_LEER, MOVE_TACKLE, MOVE_REST); }
+    } WHEN {
+        TURN {
+            MOVE(player, MOVE_MEAN_LOOK);
+            EXPECT_AGENT_REQUEST(1, 3);
+            EXPECT_MOVE(opponent, MOVE_LEER, target:player);
+        }
+    }
+}
+
+AI_SINGLE_BATTLE_TEST("External AI snapshot replaces stale request")
+{
+    GIVEN {
+        RESET_EXTERNAL_AI_MOCK();
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE);
+        TRAINER_OPPONENT(TRAINER_CALVIN_1);
+        PLAYER(SPECIES_GASTLY) { Moves(MOVE_MEAN_LOOK, MOVE_DISABLE, MOVE_GROWL); }
+        OPPONENT(SPECIES_LILLIPUP) { Moves(MOVE_LEER, MOVE_TACKLE); }
+    } WHEN {
+        TURN {
+            MOVE(player, MOVE_MEAN_LOOK);
+            EXPECT_AGENT_REQUEST(1, 2);
+            EXPECT_MOVE(opponent, MOVE_LEER, target:player);
+        }
+        TURN {
+            MOVE(player, MOVE_DISABLE);
+            EXPECT_AGENT_REQUEST(2, 2);
+            SET_AGENT_TEST_RESPONSE(123, 3);
+            EXPECT_MOVE(opponent, MOVE_LEER, target:player);
+        }
+        TURN {
+            MOVE(player, MOVE_GROWL);
+            EXPECT_AGENT_REQUEST(3, 1);
+            EXPECT_AGENT_ACTION(0, 1, B_POSITION_PLAYER_LEFT);
+            EXPECT_AGENT_EMPTY_ACTION(1);
+            EXPECT_MOVE(opponent, MOVE_TACKLE, target:player);
+        }
+    }
+}
+
+AI_SINGLE_BATTLE_TEST("External AI snapshot includes selected and self targets")
+{
+    GIVEN {
+        RESET_EXTERNAL_AI_MOCK();
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE);
+        TRAINER_OPPONENT(TRAINER_CALVIN_1);
+        PLAYER(SPECIES_GASTLY) { Moves(MOVE_MEAN_LOOK); }
+        OPPONENT(SPECIES_LILLIPUP) { Moves(MOVE_LEER, MOVE_TACKLE, MOVE_REST); }
+    } WHEN {
+        TURN {
+            MOVE(player, MOVE_MEAN_LOOK);
+            EXPECT_AGENT_REQUEST(1, 3);
+            EXPECT_AGENT_ACTION(0, 0, B_POSITION_PLAYER_LEFT);
+            EXPECT_AGENT_ACTION(1, 1, B_POSITION_PLAYER_LEFT);
+            EXPECT_AGENT_ACTION(2, 2, B_POSITION_OPPONENT_LEFT);
+            EXPECT_MOVE(opponent, MOVE_LEER);
+        }
+    }
+}
+
+AI_SINGLE_BATTLE_TEST("External AI snapshot copies seeded visible battle state")
+{
+    GIVEN {
+        RESET_EXTERNAL_AI_MOCK();
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE);
+        TRAINER_OPPONENT(TRAINER_CALVIN_1);
+        PLAYER(SPECIES_GASTLY) {
+            MaxHP(120);
+            HP(90);
+            Moves(MOVE_GROWL);
+        }
+        OPPONENT(SPECIES_LILLIPUP) {
+            MaxHP(140);
+            HP(100);
+            Status1(STATUS1_POISON);
+            MovesWithPP(
+                ((struct moveWithPP){ .moveId = MOVE_LEER, .pp = 5 }),
+                ((struct moveWithPP){ .moveId = MOVE_TACKLE, .pp = 9 }),
+                ((struct moveWithPP){ .moveId = MOVE_REST, .pp = 3 }));
+        }
+    } WHEN {
+        TURN {
+            MOVE(player, MOVE_GROWL);
+            EXPECT_AGENT_REQUEST(1, 3);
+            EXPECT_AGENT_BATTLER(B_POSITION_PLAYER_LEFT, SPECIES_GASTLY, 90, 120, STATUS1_NONE);
+            EXPECT_AGENT_BATTLER(B_POSITION_OPPONENT_LEFT, SPECIES_LILLIPUP, 100, 140, STATUS1_POISON);
+            EXPECT_AGENT_REQUESTER_MOVE(0, MOVE_LEER, 5);
+            EXPECT_AGENT_REQUESTER_MOVE(1, MOVE_TACKLE, 9);
+            EXPECT_AGENT_REQUESTER_MOVE(2, MOVE_REST, 3);
+            EXPECT_AGENT_ENVIRONMENT(B_WEATHER_NONE, BATTLE_TERRAIN_PLAIN, 0, 0, 0);
+            EXPECT_MOVE(opponent, MOVE_LEER);
+        }
+    }
+}
+
+AI_SINGLE_BATTLE_TEST("External AI snapshot excludes empty and zero-PP move slots")
+{
+    GIVEN {
+        RESET_EXTERNAL_AI_MOCK();
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE);
+        TRAINER_OPPONENT(TRAINER_CALVIN_1);
+        PLAYER(SPECIES_GASTLY) { Moves(MOVE_MEAN_LOOK); }
+        OPPONENT(SPECIES_LILLIPUP) {
+            MovesWithPP(
+                ((struct moveWithPP){ .moveId = MOVE_LEER, .pp = 40 }),
+                ((struct moveWithPP){ .moveId = MOVE_TACKLE, .pp = 0 }),
+                ((struct moveWithPP){ .moveId = MOVE_NONE, .pp = 0 }));
+        }
+    } WHEN {
+        TURN {
+            MOVE(player, MOVE_MEAN_LOOK);
+            EXPECT_AGENT_REQUEST(1, 1);
+            EXPECT_AGENT_ACTION(0, 0, B_POSITION_PLAYER_LEFT);
+            EXPECT_MOVE(opponent, MOVE_LEER);
+        }
+    }
+}
+
+AI_SINGLE_BATTLE_TEST("External AI snapshot publishes an empty legal list for a valid fallback")
+{
+    GIVEN {
+        RESET_EXTERNAL_AI_MOCK();
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE);
+        TRAINER_OPPONENT(TRAINER_CALVIN_1);
+        PLAYER(SPECIES_GASTLY) { Moves(MOVE_MEAN_LOOK); }
+        OPPONENT(SPECIES_LILLIPUP) { Moves(MOVE_PERISH_SONG); }
+    } WHEN {
+        TURN {
+            MOVE(player, MOVE_MEAN_LOOK);
+            EXPECT_AGENT_REQUEST(1, 0);
+            EXPECT_MOVE(opponent, MOVE_PERISH_SONG);
+        }
+    }
+}
+
+AI_SINGLE_BATTLE_TEST("External AI snapshot does not construct a candidate for an unflagged trainer")
+{
+    GIVEN {
+        RESET_EXTERNAL_AI_MOCK();
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE);
+        TRAINER_OPPONENT(TRAINER_BILLY);
+        PLAYER(SPECIES_GASTLY) { Moves(MOVE_MEAN_LOOK); }
+        OPPONENT(SPECIES_LILLIPUP) { Moves(MOVE_LEER, MOVE_TACKLE); }
+    } WHEN {
+        TURN {
+            MOVE(player, MOVE_MEAN_LOOK);
+            EXPECT_AGENT_REQUEST(0, 0);
+            EXPECT_MOVE(opponent, MOVE_LEER);
+        }
+    }
+}
+
+AI_SINGLE_BATTLE_TEST("External AI snapshot preserves a pending request in excluded battles")
+{
+    u32 excludedIndex;
+    u32 action;
+    u32 battleTypeFlags;
+    static const u32 sExcludedFlags[] = {
+        BATTLE_TYPE_DOUBLE, BATTLE_TYPE_MULTI, BATTLE_TYPE_LINK, BATTLE_TYPE_SAFARI,
+        BATTLE_TYPE_PALACE, BATTLE_TYPE_BATTLE_TOWER, BATTLE_TYPE_DOME, BATTLE_TYPE_ARENA,
+        BATTLE_TYPE_FACTORY, BATTLE_TYPE_PIKE, BATTLE_TYPE_PYRAMID, BATTLE_TYPE_FRONTIER,
+        BATTLE_TYPE_EREADER_TRAINER,
+        BATTLE_TYPE_TRAINER_HILL, BATTLE_TYPE_SECRET_BASE, BATTLE_TYPE_TWO_OPPONENTS,
+    };
+
+    GIVEN {
+        RESET_EXTERNAL_AI_MOCK();
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE);
+        TRAINER_OPPONENT(TRAINER_CALVIN_1);
+        PLAYER(SPECIES_GASTLY) { Moves(MOVE_MEAN_LOOK); }
+        OPPONENT(SPECIES_LILLIPUP) { Moves(MOVE_LEER); }
+    } WHEN {
+        TURN { MOVE(player, MOVE_MEAN_LOOK); EXPECT_MOVE(opponent, MOVE_LEER); }
+    } THEN {
+        action = gBattleStruct->aiMoveOrAction[B_POSITION_OPPONENT_LEFT];
+        battleTypeFlags = gBattleTypeFlags;
+        for (excludedIndex = 0; excludedIndex < ARRAY_COUNT(sExcludedFlags); excludedIndex++) {
+            BattleAgent_ResetMailbox();
+            gBattleAgentMailbox.requestStatus = BATTLE_AGENT_REQUEST_PENDING;
+            gBattleAgentMailbox.requestSequence = 7;
+            gBattleAgentMailbox.requestingBattler = B_POSITION_OPPONENT_LEFT;
+            gBattleAgentMailbox.battleMode = BATTLE_AGENT_BATTLE_MODE_TRAINER_SINGLE;
+            gBattleAgentMailbox.turnSequence = 7;
+            gBattleAgentMailbox.legalActionCount = 1;
+            gBattleTypeFlags = battleTypeFlags | sExcludedFlags[excludedIndex];
+            EXPECT_EQ(BattleAgent_TryPublishRequest(B_POSITION_OPPONENT_LEFT), FALSE);
+            EXPECT_EQ(gBattleAgentMailbox.requestStatus, BATTLE_AGENT_REQUEST_PENDING);
+            EXPECT_EQ(gBattleAgentMailbox.requestSequence, 7);
+        }
+        gBattleTypeFlags = battleTypeFlags;
+        gBattleStruct->aiMoveOrAction[B_POSITION_OPPONENT_LEFT] = action;
+    }
+}
+
+AI_SINGLE_BATTLE_TEST("External AI snapshot preserves a pending request for a non-move fallback")
+{
+    u32 fallback;
+
+    GIVEN {
+        RESET_EXTERNAL_AI_MOCK();
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE);
+        TRAINER_OPPONENT(TRAINER_CALVIN_1);
+        PLAYER(SPECIES_GASTLY) { Moves(MOVE_MEAN_LOOK); }
+        OPPONENT(SPECIES_LILLIPUP) { Moves(MOVE_LEER); }
+    } WHEN {
+        TURN { MOVE(player, MOVE_MEAN_LOOK); EXPECT_MOVE(opponent, MOVE_LEER); }
+    } THEN {
+        fallback = gBattleStruct->aiMoveOrAction[B_POSITION_OPPONENT_LEFT];
+        BattleAgent_ResetMailbox();
+        gBattleAgentMailbox.requestStatus = BATTLE_AGENT_REQUEST_PENDING;
+        gBattleAgentMailbox.requestSequence = 7;
+        gBattleAgentMailbox.requestingBattler = B_POSITION_OPPONENT_LEFT;
+        gBattleAgentMailbox.battleMode = BATTLE_AGENT_BATTLE_MODE_TRAINER_SINGLE;
+        gBattleAgentMailbox.turnSequence = 7;
+        gBattleAgentMailbox.legalActionCount = 1;
+        gBattleStruct->aiMoveOrAction[B_POSITION_OPPONENT_LEFT] = AI_CHOICE_SWITCH;
+        EXPECT_EQ(BattleAgent_TryPublishRequest(B_POSITION_OPPONENT_LEFT), FALSE);
+        EXPECT_EQ(gBattleAgentMailbox.requestStatus, BATTLE_AGENT_REQUEST_PENDING);
+        EXPECT_EQ(gBattleAgentMailbox.requestSequence, 7);
+        gBattleStruct->aiMoveOrAction[B_POSITION_OPPONENT_LEFT] = fallback;
+    }
+}
+
+TEST("External AI snapshot rejects a fainted selected target")
+{
+    u8 target;
+    u8 battlersCount = gBattlersCount;
+    u8 absentBattlerFlags = gAbsentBattlerFlags;
+    u8 playerPosition = gBattlerPositions[B_POSITION_PLAYER_LEFT];
+    u8 opponentPosition = gBattlerPositions[B_POSITION_OPPONENT_LEFT];
+    u16 playerHp = gBattleMons[B_POSITION_PLAYER_LEFT].hp;
+
+    gBattlersCount = 2;
+    gAbsentBattlerFlags = 0;
+    gBattlerPositions[B_POSITION_PLAYER_LEFT] = B_POSITION_PLAYER_LEFT;
+    gBattlerPositions[B_POSITION_OPPONENT_LEFT] = B_POSITION_OPPONENT_LEFT;
+    gBattleMons[B_POSITION_PLAYER_LEFT].hp = 0;
+
+    EXPECT_EQ(BattleAgent_TestNormalizeSingleTarget(B_POSITION_OPPONENT_LEFT, MOVE_LEER, &target), FALSE);
+
+    gBattleMons[B_POSITION_PLAYER_LEFT].hp = playerHp;
+    gBattlerPositions[B_POSITION_OPPONENT_LEFT] = opponentPosition;
+    gBattlerPositions[B_POSITION_PLAYER_LEFT] = playerPosition;
+    gAbsentBattlerFlags = absentBattlerFlags;
+    gBattlersCount = battlersCount;
 }
 
 AI_SINGLE_BATTLE_TEST("External AI Calvin rejects a zero-PP mock move")

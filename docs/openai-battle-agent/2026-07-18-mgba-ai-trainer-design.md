@@ -139,3 +139,6 @@ Later phase specifications will select exact mailbox field widths, Python depend
 - [Phase 1 flow review](reviews/2026-07-18-phase-1-trainer-opt-in-and-rom-mock-flow-review.md)
 - [Phase 1 implementation plan](plans/2026-07-18-phase-1-trainer-opt-in-and-rom-mock.md)
 - [Phase 1 build and test evidence](reviews/2026-07-18-phase-1-build-and-test-evidence.md)
+- [Phase 2 specification](specs/2026-07-26-phase-2-legal-action-snapshot.md)
+- [Phase 2 flow review](reviews/2026-07-26-phase-2-legal-action-snapshot-flow-review.md)
+- [Phase 2 implementation plan](plans/2026-07-26-phase-2-legal-action-snapshot.md)

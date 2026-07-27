@@ -479,6 +479,7 @@
 
 #include "global.h"
 #include "battle.h"
+#include "battle_agent.h"
 #include "battle_anim.h"
 #include "data.h"
 #include "item.h"
@@ -614,6 +615,28 @@ struct ExpectedAIAction
     u8 actionSet:1; // Action was set and is expected to happen. Set only for battlers controlled by AI.
 };
 
+struct ExpectedBattleAgentRequest
+{
+    u16 sourceLine;
+    u32 sequence;
+    u32 testResponseSequence;
+    u8 actionCount;
+    u8 testResponseLegalActionIndex;
+    bool8 expected;
+    bool8 setTestResponse;
+    bool8 expectedActions[MAX_MON_MOVES];
+    struct BattleAgentLegalActionV1 legalActions[MAX_MON_MOVES];
+    bool8 expectedBattlers[MAX_BATTLERS_COUNT];
+    struct BattleAgentBattlerSnapshotV1 battlers[MAX_BATTLERS_COUNT];
+    bool8 expectedRequesterMoves[MAX_MON_MOVES];
+    struct BattleAgentMoveSnapshotV1 requesterMoves[MAX_MON_MOVES];
+    bool8 expectedEnvironment;
+    u16 weather;
+    u8 terrain;
+    u32 fieldStatuses;
+    u32 sideStatuses[NUM_BATTLE_SIDES];
+};
+
 #define MAX_AI_SCORE_COMPARISION_PER_TURN 4
 #define MAX_AI_LOG_LINES 10
 
@@ -678,6 +701,7 @@ struct BattleTestData
     u8 expectedAiActionIndex[MAX_BATTLERS_COUNT];
     u8 aiActionsPlayed[MAX_BATTLERS_COUNT];
     struct ExpectedAIAction expectedAiActions[MAX_BATTLERS_COUNT][MAX_EXPECTED_ACTIONS];
+    struct ExpectedBattleAgentRequest expectedBattleAgentRequests[MAX_TURNS];
     struct ExpectedAiScore expectedAiScores[MAX_BATTLERS_COUNT][MAX_TURNS][MAX_AI_SCORE_COMPARISION_PER_TURN]; // Max 4 comparisions per turn
     struct AILogLine aiLogLines[MAX_BATTLERS_COUNT][MAX_MON_MOVES][MAX_AI_LOG_LINES];
     u8 aiLogPrintedForMove[MAX_BATTLERS_COUNT]; // Marks ai score log as printed for move, so the same log isn't displayed multiple times.
@@ -904,6 +928,13 @@ enum { TURN_CLOSED, TURN_OPEN, TURN_CLOSING };
 #define NOT_EXPECT_MOVES(battler, ...) ExpectMoves(__LINE__, battler, TRUE, (struct FourMoves) {{ __VA_ARGS__ }})
 #define EXPECT_SEND_OUT(battler, partyIndex) ExpectSendOut(__LINE__, battler, partyIndex)
 #define EXPECT_SWITCH(battler, partyIndex) ExpectSwitch(__LINE__, battler, partyIndex)
+#define EXPECT_AGENT_REQUEST(sequence, actionCount) ExpectBattleAgentRequest_(__LINE__, sequence, actionCount)
+#define EXPECT_AGENT_ACTION(index, moveSlot, targetBattler) ExpectBattleAgentAction_(__LINE__, index, moveSlot, targetBattler)
+#define EXPECT_AGENT_EMPTY_ACTION(index) ExpectBattleAgentEmptyAction_(__LINE__, index)
+#define EXPECT_AGENT_BATTLER(battler, species, hp, maxHp, status1) ExpectBattleAgentBattler_(__LINE__, battler, species, hp, maxHp, status1)
+#define EXPECT_AGENT_REQUESTER_MOVE(moveSlot, move, pp) ExpectBattleAgentRequesterMove_(__LINE__, moveSlot, move, pp)
+#define EXPECT_AGENT_ENVIRONMENT(weather, terrain, fieldStatuses, playerSideStatuses, opponentSideStatuses) ExpectBattleAgentEnvironment_(__LINE__, weather, terrain, fieldStatuses, playerSideStatuses, opponentSideStatuses)
+#define SET_AGENT_TEST_RESPONSE(sequence, actionIndex) SetBattleAgentTestResponse_(__LINE__, sequence, actionIndex)
 #define SCORE_EQ(battler, ...) Score(__LINE__, battler, CMP_EQUAL, FALSE, (struct TestAIScoreStruct) { APPEND_TRUE(__VA_ARGS__) } )
 #define SCORE_NE(battler, ...) Score(__LINE__, battler, CMP_NOT_EQUAL, FALSE, (struct TestAIScoreStruct) { APPEND_TRUE(__VA_ARGS__) } )
 #define SCORE_GT(battler, ...) Score(__LINE__, battler, CMP_GREATER_THAN, FALSE, (struct TestAIScoreStruct) { APPEND_TRUE(__VA_ARGS__) } )
@@ -966,6 +997,13 @@ void ExpectMove(u32 sourceLine, struct BattlePokemon *, struct MoveContext);
 void ExpectMoves(u32 sourceLine, struct BattlePokemon *battler, bool32 notExpected, struct FourMoves moves);
 void ExpectSendOut(u32 sourceLine, struct BattlePokemon *battler, u32 partyIndex);
 void ExpectSwitch(u32 sourceLine, struct BattlePokemon *battler, u32 partyIndex);
+void ExpectBattleAgentRequest_(u32 sourceLine, u32 sequence, u8 actionCount);
+void ExpectBattleAgentAction_(u32 sourceLine, u8 actionIndex, u8 moveSlot, u8 targetBattler);
+void ExpectBattleAgentEmptyAction_(u32 sourceLine, u8 actionIndex);
+void ExpectBattleAgentBattler_(u32 sourceLine, u8 battler, u16 species, u16 hp, u16 maxHp, u32 status1);
+void ExpectBattleAgentRequesterMove_(u32 sourceLine, u8 moveSlot, u16 move, u8 pp);
+void ExpectBattleAgentEnvironment_(u32 sourceLine, u16 weather, u8 terrain, u32 fieldStatuses, u32 playerSideStatuses, u32 opponentSideStatuses);
+void SetBattleAgentTestResponse_(u32 sourceLine, u32 sequence, u8 actionIndex);
 void Score(u32 sourceLine, struct BattlePokemon *battler, u32 cmp, bool32 toValue, struct TestAIScoreStruct cmpCtx);
 void ForcedMove(u32 sourceLine, struct BattlePokemon *);
 void Switch(u32 sourceLine, struct BattlePokemon *, u32 partyIndex);
