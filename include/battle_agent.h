@@ -19,6 +19,7 @@ enum BattleAgentRequestStatus
 enum BattleAgentResponseStatus
 {
     BATTLE_AGENT_RESPONSE_NONE,
+    BATTLE_AGENT_RESPONSE_READY = 1,
 };
 
 struct BattleAgentBattlerSnapshotV1

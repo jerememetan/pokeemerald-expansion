@@ -936,7 +936,7 @@ static void CheckBattleAgentRequest(u32 battlerId)
 
     if (expected->setTestResponse)
     {
-        gBattleAgentMailbox.responseStatus = 1;
+        gBattleAgentMailbox.responseStatus = BATTLE_AGENT_RESPONSE_READY;
         gBattleAgentMailbox.responseSequence = expected->testResponseSequence;
         gBattleAgentMailbox.responseLegalActionIndex = expected->testResponseLegalActionIndex;
     }
