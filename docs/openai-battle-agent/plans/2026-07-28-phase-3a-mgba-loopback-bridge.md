@@ -116,7 +116,7 @@
 - [ ] **Step 2: Run the parser test to verify it fails.**
 
   ```powershell
-  py -3 -m unittest tools/mgba-bridge/tests/test_bridge_protocol.py -v
+  py -3 -B tools/mgba-bridge/tests/test_bridge_protocol.py -v
   ```
 
   Expected: import failure because `bridge_protocol` does not exist.
@@ -151,12 +151,12 @@
 
 - [ ] **Step 4: Implement the deterministic responder.**
 
-  Create `tools/mgba-bridge/test_responder.py` using only `socket`, `time`, and `bridge_protocol`. Its `main()` accepts optional `--host` (default `127.0.0.1`) and `--port` (default `57621`). It attempts a Python-side `socket.create_connection((host, port), timeout=1)` once every 250 ms until connected; this waiting is outside mGBA. For each complete bounded request line, it calls `parse_request`, writes `format_response(request.sequence, 0)`, and flushes. It closes on malformed input, EOF, or socket error. It must never bind/listen, inspect the ROM, or select an index when action count is zero.
+  Create `tools/mgba-bridge/test_responder.py` using the Python standard library plus `bridge_protocol`. Its `main()` accepts only optional `--port` (default `57621`), which must be an integer in `1..65535`; the destination is fixed to `127.0.0.1` and cannot be overridden. It attempts a Python-side `socket.create_connection(("127.0.0.1", port), timeout=1)` once every 250 ms until connected; this waiting is outside mGBA. For each complete bounded request line, it calls `parse_request`, writes `format_response(request.sequence, 0)`, and flushes. It closes on malformed input, EOF, or socket error. It must never bind/listen, inspect the ROM, or select an index when action count is zero.
 
 - [ ] **Step 5: Run transport tests.**
 
   ```powershell
-  py -3 -m unittest tools/mgba-bridge/tests/test_bridge_protocol.py -v
+  py -3 -B tools/mgba-bridge/tests/test_bridge_protocol.py -v
   ```
 
   Expected: every accepted and rejected line test passes.
@@ -375,7 +375,8 @@
   In Windows PowerShell:
 
   ```powershell
-  py -3 -m unittest tools/mgba-bridge/tests/test_bridge_protocol.py tools/mgba-bridge/tests/test_generate_mailbox_config.py -v
+  py -3 -B tools/mgba-bridge/tests/test_bridge_protocol.py -v
+  py -3 -B tools/mgba-bridge/tests/test_generate_mailbox_config.py -v
   ```
 
   Expected: External AI tests pass; ROM builds; every Python parser/generator test passes.
