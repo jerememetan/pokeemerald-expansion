@@ -1,6 +1,6 @@
 # mGBA AI Trainer Design
 
-**Status:** Phase 1 implemented; later phases remain planned
+**Status:** Phase 2 verified; Phase 3A bridge spike specified and planned
 
 **Goal:** Add a local, external AI decision layer to `pokeemerald-expansion` that can control selected trainer battle actions in a playable ROM, while the ROM remains the sole authority on battle rules and always falls back to the existing trainer AI.
 
@@ -142,3 +142,7 @@ Later phase specifications will select exact mailbox field widths, Python depend
 - [Phase 2 specification](specs/2026-07-26-phase-2-legal-action-snapshot.md)
 - [Phase 2 flow review](reviews/2026-07-26-phase-2-legal-action-snapshot-flow-review.md)
 - [Phase 2 implementation plan](plans/2026-07-26-phase-2-legal-action-snapshot.md)
+- [Phase 2 build and test evidence](reviews/2026-07-28-phase-2-build-and-test-evidence.md)
+- [Phase 3A specification](specs/2026-07-28-phase-3a-mgba-loopback-bridge.md)
+- [Phase 3A flow review](reviews/2026-07-28-phase-3a-mgba-loopback-bridge-flow-review.md)
+- [Phase 3A implementation plan](plans/2026-07-28-phase-3a-mgba-loopback-bridge.md)
