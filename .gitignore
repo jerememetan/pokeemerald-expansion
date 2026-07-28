@@ -48,3 +48,4 @@ prefabs.json
 *.sym
 *.js
 src/data/map_group_count.h
+/tools/mgba-bridge/generated/mailbox_address.lua
