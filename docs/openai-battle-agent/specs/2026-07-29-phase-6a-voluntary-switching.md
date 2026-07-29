@@ -51,11 +51,18 @@ authority and retain existing vanilla behavior.
 ### Eligibility and action timing
 
 The existing `externalAi` trainer flag remains the only opt-in. The ROM
-continues to exclude unsupported battle modes. For an eligible opponent that
-is choosing a normal voluntary turn action, the ROM computes its current
-vanilla trainer decision first, snapshots every fallback field that decision
-can use, then publishes the BAGB/3 request. Forced replacement and existing
-vanilla item handling do not publish an external request.
+continues to exclude unsupported battle modes. It publishes BAGB/3 only when
+the opponent has reached a normal voluntary action-selection turn: it does not
+publish during a forced replacement, recharge, multi-turn lock, or any state
+where the normal controller will force an action. The ROM computes its current
+vanilla move/target first and snapshots that move fallback before publishing.
+
+For an `externalAi` trainer turn that reaches BAGB/3, the accepted external
+move or switch replaces vanilla voluntary move/switch/item selection for that
+turn. Thus the external agent gets move/switch authority and no trainer item
+is used on that turn. If the request has no valid reply, the saved vanilla
+move/target is restored; forced engine handling outside this flow remains
+unchanged.
 
 ### BAGB/3 request data
 
@@ -118,17 +125,17 @@ existing service deadline and tool-call cap.
 - A switch action verifies that the slot is in the opposing trainer party, is
   currently switchable under the same engine rules used by trainer AI, is not
   active/fainted/empty, and remains legal at commit time.
-- A valid switch selects only the existing trainer-AI switch action plus its
-  validated party slot; it does not bypass the battle controller or write
-  player data.
+- A valid switch uses a dedicated external-action commit state and writes the
+  same opponent-side `B_ACTION_SWITCH` plus `AI_monToSwitchIntoId[battler]`
+  inputs used by the existing trainer switch helper. It never encodes a switch
+  in `aiMoveOrAction`, bypasses the battle controller, or writes player data.
 - A stale, malformed, duplicate, illegal, or changed-state response is
   discarded. The original wait continues until a valid response or the
   unchanged 900-frame deadline.
-- On timeout or any no-response case, restore the complete pre-wait vanilla
-  decision, including its move/action, target, and any trainer-AI switch slot;
-  then continue existing battle flow.
-- Items remain a vanilla trainer-AI path and do not become a legal external
-  action in BAGB/3.
+- On timeout or any no-response case, restore the pre-wait vanilla move/target
+  and clear any external-action commit state before continuing battle flow.
+- Items never become a legal BAGB/3 action and are suppressed only for an
+  `externalAi` trainer turn that reached the voluntary external-action flow.
 
 ## Tests
 
