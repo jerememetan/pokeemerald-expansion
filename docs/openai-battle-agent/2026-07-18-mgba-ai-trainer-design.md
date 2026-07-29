@@ -1,6 +1,6 @@
 # mGBA AI Trainer Design
 
-**Status:** Phase 2 and Phase 3A verified; Phase 4A specification reviewed
+**Status:** Phase 2 and Phase 3A verified; Phase 4A specification and plan reviewed
 
 **Goal:** Add a local, external AI decision layer to `pokeemerald-expansion` that can control selected trainer battle actions in a playable ROM, while the ROM remains the sole authority on battle rules and always falls back to the existing trainer AI.
 
@@ -88,7 +88,7 @@ Upgrade the mailbox and bridge to V2, add a bounded ROM response wait/acceptance
 
 **Exit criterion:** Calvin completes a playable trainer-single battle using a legal local-agent action when available. All absent, malformed, stale, illegal, or late replies take the saved vanilla fallback without freezing the battle.
 
-**Planning artifacts:** [specification](specs/2026-07-29-phase-4a-local-ollama-tool-agent.md) and [flow review](reviews/2026-07-29-phase-4a-local-ollama-tool-agent-flow-review.md). Implementation starts only after the reviewed plan is approved.
+**Planning artifacts:** [specification](specs/2026-07-29-phase-4a-local-ollama-tool-agent.md), [flow review](reviews/2026-07-29-phase-4a-local-ollama-tool-agent-flow-review.md), and [implementation plan](plans/2026-07-29-phase-4a-local-ollama-tool-agent.md). Implementation starts only after the reviewed plan is approved.
 
 ### Phase 5: Agent diagnostics and trainer demo hardening
 
@@ -153,3 +153,4 @@ Later phase specifications will select any additive protocol extensions and broa
 - [Phase 3A evidence](reviews/2026-07-29-phase-3a-mgba-loopback-bridge-evidence.md)
 - [Phase 4A specification](specs/2026-07-29-phase-4a-local-ollama-tool-agent.md)
 - [Phase 4A flow review](reviews/2026-07-29-phase-4a-local-ollama-tool-agent-flow-review.md)
+- [Phase 4A implementation plan](plans/2026-07-29-phase-4a-local-ollama-tool-agent.md)
