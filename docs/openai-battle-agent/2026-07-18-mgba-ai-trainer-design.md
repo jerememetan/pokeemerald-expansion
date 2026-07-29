@@ -1,6 +1,6 @@
 # mGBA AI Trainer Design
 
-**Status:** Phase 2 verified; Phase 3A bridge spike specified and planned
+**Status:** Phase 2 and Phase 3A verified
 
 **Goal:** Add a local, external AI decision layer to `pokeemerald-expansion` that can control selected trainer battle actions in a playable ROM, while the ROM remains the sole authority on battle rules and always falls back to the existing trainer AI.
 
@@ -19,7 +19,7 @@ The system has four bounded components:
 3. **mGBA Lua bridge.** A Lua script observes the mailbox on each frame, sends requests to a loopback-only host connection, and writes validated transport responses into the mailbox. It never alters arbitrary game memory and never blocks the emulator during a battle.
 4. **Local AI trainer service.** A separate local Python process accepts one bridge connection, converts snapshots into an AI prompt/tool context, chooses one provided legal action, records an explanation, and returns a small response message.
 
-The service starts before mGBA and establishes the TCP connection to a Lua listener. This avoids mGBA's blocking outbound socket connection behavior. The demo pins a tested mGBA 0.11 development build because its documented Lua API provides GBA-memory access, frame callbacks, sockets, and per-frame socket polling.
+The service starts before mGBA and establishes the TCP connection to a Lua listener. This avoids mGBA's blocking outbound socket connection behavior. Phase 3A manually validated Windows mGBA 0.10.5 for the bridge; the final evidence must record the exact executable's SHA-256 and `--version` output.
 
 ## ROM control-flow seam
 
@@ -74,11 +74,13 @@ Build a compact snapshot and legal-action list from engine-owned state. Initiall
 
 **Exit criterion:** Snapshot tests prove every emitted action is legal, and no external selector can force an unlisted move or target.
 
-### Phase 3: mGBA bridge spike
+### Phase 3A: mGBA bridge spike
 
-Pin a supported mGBA development build, implement a Lua frame-polling script, and prove it can round-trip a fixed mailbox response without blocking input or frames. Bind only to loopback and reject unexpected messages.
+Validated with Windows mGBA 0.10.5, a Lua frame-polling script round-trips a fixed mailbox response without blocking input or frames. It binds only to loopback and rejects unexpected messages. The evidence records the hash of the executable actually used, rather than an archive. The executable's `--version` invocation returned no console output on this Windows build, so the observed title-bar version is recorded instead.
 
 **Exit criterion:** A scripted test session demonstrates request/response sequencing, disconnection fallback, and no pause when the service is unavailable.
+
+**Verified:** See [Phase 3A evidence](reviews/2026-07-29-phase-3a-mgba-loopback-bridge-evidence.md). Phase 4 requires its own reviewed specification and plan for the full-snapshot local-service protocol and ROM-side response acceptance; Phase 3A's deterministic responder is not a service implementation.
 
 ### Phase 4: Local service and deterministic agent
 
@@ -146,3 +148,4 @@ Later phase specifications will select exact mailbox field widths, Python depend
 - [Phase 3A specification](specs/2026-07-28-phase-3a-mgba-loopback-bridge.md)
 - [Phase 3A flow review](reviews/2026-07-28-phase-3a-mgba-loopback-bridge-flow-review.md)
 - [Phase 3A implementation plan](plans/2026-07-28-phase-3a-mgba-loopback-bridge.md)
+- [Phase 3A evidence](reviews/2026-07-29-phase-3a-mgba-loopback-bridge-evidence.md)

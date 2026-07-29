@@ -10,7 +10,7 @@
 - The only production seam is immediately after `ComputeBattleAiScores` and before the Phase 1 test mock. The existing focused tests prove the output vanilla move remains unchanged.
 - The current response enum defines only `NONE`; a named `READY = 1` value is required before any external writer can use the response slot consistently.
 - The repository already ignores `*.elf` and `*.gba`, but has no mGBA bridge directory. `pokeemerald.elf` is the modern build artifact named by the Makefile. A generated Lua address config therefore needs a dedicated ignore entry.
-- Official mGBA documentation exposes Lua GBA memory reads/writes, frame callbacks, loopback socket binding, per-frame socket events/polling, and warns that Lua `socket.connect` is blocking. The official development-download channel currently identifies `0.11-9091-c034660f0`; Phase 3A pins that Windows 64-bit development build. [Scripting API](https://mgba.io/docs/scripting.html), [development downloads](https://mgba.io/downloads.html).
+- Official mGBA documentation exposes Lua GBA memory reads/writes, frame callbacks, loopback socket binding, per-frame socket events/polling, and warns that Lua `socket.connect` is blocking. Manual verification validated the Windows 64-bit stable mGBA `0.10.5` title-bar version; final evidence must record the SHA-256 and `--version` output of the exact executable used. [Scripting API](https://mgba.io/docs/scripting.html), [downloads](https://mgba.io/downloads.html).
 
 ## User flows
 
@@ -59,7 +59,7 @@
 
 ## Questions resolved by safe defaults
 
-1. **Which Windows mGBA build is used?** Pin the official 64-bit development build `0.11-9091-c034660f0`, record its archive SHA-256 in bridge documentation, and fail setup if the scripting window cannot load a probe script.
+1. **Which Windows mGBA build is used?** Use the manually validated Windows 64-bit mGBA `0.10.5`; record the SHA-256 and `--version` output of the exact executable, not an archive checksum, and fail setup if the scripting window cannot load a probe script.
 2. **Which port is used?** Default to `57621`, configurable only through a tracked Lua settings file. Bind address is fixed to `127.0.0.1`.
 3. **Does the bridge wait for a response?** No. It observes each frame and never calls an unbounded connection, receive, or retry operation inside mGBA.
 4. **What response can the deterministic responder select?** Index `0` only, and only when the announced count is in `1..4`. The bridge independently validates it.
@@ -74,4 +74,5 @@
 
 - [Phase 3A specification](../specs/2026-07-28-phase-3a-mgba-loopback-bridge.md)
 - [Phase 2 evidence](2026-07-28-phase-2-build-and-test-evidence.md)
+- [Phase 3A evidence](2026-07-29-phase-3a-mgba-loopback-bridge-evidence.md)
 - [mGBA scripting API](https://mgba.io/docs/scripting.html)

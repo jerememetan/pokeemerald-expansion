@@ -6,7 +6,7 @@
 
 **Architecture:** The Phase 2 ROM remains request-only. A generated Lua config supplies the current EWRAM mailbox address from the just-built ELF; the Lua script listens only on `127.0.0.1:57621`, frame-polls one client, validates a tiny `BAGB/1` line protocol, and writes response sequence/index before `READY`. A standard-library Python responder is a deterministic client, not an AI service.
 
-**Tech Stack:** pokeemerald-expansion C and battle-test runner; Python 3 standard library; Lua supplied by mGBA; Windows 64-bit mGBA development build `0.11-9091-c034660f0`; WSL devkitARM tools.
+**Tech Stack:** pokeemerald-expansion C and battle-test runner; Python 3 standard library; Lua supplied by validated Windows 64-bit mGBA `0.10.5`; WSL devkitARM tools. Before phase exit, record the SHA-256 and `--version` output of the exact `mGBA.exe` used.
 
 **Specification:** [`../specs/2026-07-28-phase-3a-mgba-loopback-bridge.md`](../specs/2026-07-28-phase-3a-mgba-loopback-bridge.md)  
 **Flow review:** [`../reviews/2026-07-28-phase-3a-mgba-loopback-bridge-flow-review.md`](../reviews/2026-07-28-phase-3a-mgba-loopback-bridge-flow-review.md)
@@ -22,6 +22,7 @@
 - Create: `tools/mgba-bridge/bridge_settings.lua` — tracked loopback/port constants; contains no generated address.
 - Create: `tools/mgba-bridge/tests/test_bridge_protocol.py` — Python `unittest` protocol/parser coverage.
 - Create: `tools/mgba-bridge/tests/test_generate_mailbox_config.py` — symbol-parser and generated-config coverage.
+- Create: `tools/mgba-bridge/tests/test_mgba_bridge_source.py` — static Lua-source safety coverage for the loopback bind, bounded transport, and permitted mailbox accesses.
 - Create: `tools/mgba-bridge/README.md` — Windows setup, version pin, generation, launch order, and manual verification matrix.
 - Create: `tools/mgba-bridge/generated/.gitkeep` — preserves the generated-config directory without tracking its address file.
 - Modify: `.gitignore` — ignore only `tools/mgba-bridge/generated/mailbox_address.lua`.
@@ -30,7 +31,7 @@
 - Modify: `test/battle/ai.c` — retain/add focused proof that a ready response is cleared by the next Phase 2 publication and has no action effect.
 - Modify: `docs/openai-battle-agent/2026-07-18-mgba-ai-trainer-design.md` — link Phase 3A artifacts after verification.
 - Modify: `docs/openai-battle-agent/specs/2026-07-28-phase-3a-mgba-loopback-bridge.md` — update status and evidence link after verification.
-- Create: `docs/openai-battle-agent/reviews/2026-07-28-phase-3a-mgba-loopback-bridge-evidence.md` — record tool versions, hashes, automated results, and mGBA manual cases.
+- Create: `docs/openai-battle-agent/reviews/2026-07-29-phase-3a-mgba-loopback-bridge-evidence.md` — record tool versions, hashes, automated results, and mGBA manual cases.
 
 ## Task 1: Add the named response-ready contract without consuming it
 
@@ -259,7 +260,7 @@
 
 - Create: `tools/mgba-bridge/bridge_settings.lua`
 - Create: `tools/mgba-bridge/mgba_bridge.lua`
-- Test: Windows mGBA scripting console
+- Test: `tools/mgba-bridge/tests/test_mgba_bridge_source.py`; Windows mGBA scripting console
 
 - [ ] **Step 1: Add a Lua startup probe before mailbox writes exist.**
 
@@ -275,7 +276,7 @@
 
 - [ ] **Step 2: Verify the Lua probe manually.**
 
-  In Windows, install the official 64-bit development archive `0.11-9091-c034660f0` from <https://mgba.io/downloads.html>, record `Get-FileHash -Algorithm SHA256` in the evidence file, open the rebuilt `pokeemerald.gba`, then use **Tools → Scripting…** to load `mgba_bridge.lua`.
+  In Windows, use the validated 64-bit mGBA `0.10.5`, record `Get-FileHash -Algorithm SHA256` and `mGBA.exe --version` for the executable actually run (not an archive), open the rebuilt `pokeemerald.gba`, then use **Tools → Scripting…** to load `mgba_bridge.lua`.
 
   In a separate PowerShell window run:
 
@@ -357,11 +358,11 @@
 - Create: `tools/mgba-bridge/README.md`
 - Modify: `docs/openai-battle-agent/2026-07-18-mgba-ai-trainer-design.md`
 - Modify: `docs/openai-battle-agent/specs/2026-07-28-phase-3a-mgba-loopback-bridge.md`
-- Create: `docs/openai-battle-agent/reviews/2026-07-28-phase-3a-mgba-loopback-bridge-evidence.md`
+- Create: `docs/openai-battle-agent/reviews/2026-07-29-phase-3a-mgba-loopback-bridge-evidence.md`
 
 - [ ] **Step 1: Write reproducible Windows/WSL instructions.**
 
-  `tools/mgba-bridge/README.md` must state the exact mGBA version pin, archive SHA-256, ROM build command, config-generation command, PowerShell responder command, mGBA scripting-menu action, listener address/port, and shutdown order. It must explicitly say: do not commit `generated/mailbox_address.lua`; the responder is not AI; the ROM ignores `READY` in Phase 3A; and use no interface except `127.0.0.1`.
+  `tools/mgba-bridge/README.md` must state the exact mGBA version pin, executable SHA-256 and `--version` output, ROM build command, config-generation command, PowerShell responder command, mGBA scripting-menu action, listener address/port, and shutdown order. It must explicitly say: do not commit `generated/mailbox_address.lua`; the responder is not AI; the ROM ignores `READY` in Phase 3A; and use no interface except `127.0.0.1`.
 
 - [ ] **Step 2: Run final automated verification.**
 
@@ -377,13 +378,14 @@
   ```powershell
   py -3 -B tools/mgba-bridge/tests/test_bridge_protocol.py -v
   py -3 -B tools/mgba-bridge/tests/test_generate_mailbox_config.py -v
+  py -3 -B tools/mgba-bridge/tests/test_mgba_bridge_source.py -v
   ```
 
   Expected: External AI tests pass; ROM builds; every Python parser/generator test passes.
 
 - [ ] **Step 3: Record evidence and phase exit.**
 
-  The evidence review must record exact mGBA archive filename/SHA-256, `mGBA.exe --version` output if available, Python version, generated mailbox address, automated command results, valid round trip, unavailable responder, disconnect, stale, invalid-index, malformed, and wrong-version outcomes. State explicitly that the ROM did not apply the response and that the vanilla fallback remained authoritative.
+  The evidence review must record exact mGBA executable path/SHA-256 and `mGBA.exe --version` output, Python version, same-ELF successful address generation in the permitted EWRAM range, `git check-ignore tools/mgba-bridge/generated/mailbox_address.lua` output, automated command results, valid round trip, unavailable responder, disconnect, stale, invalid-index, malformed, and wrong-version outcomes. Do not record the generated mailbox address value. State explicitly that the ROM did not apply the response and that the vanilla fallback remained authoritative.
 
   Update the Phase 3A spec status to `Implemented and verified`, link the evidence review from the parent roadmap, and state the Phase 4 prerequisite: a separately specified full-snapshot local-service protocol and ROM-side response acceptance.
 
@@ -399,7 +401,7 @@
 - [ ] **Step 5: Commit documentation and evidence.**
 
   ```bash
-  git add tools/mgba-bridge/README.md docs/openai-battle-agent/2026-07-18-mgba-ai-trainer-design.md docs/openai-battle-agent/specs/2026-07-28-phase-3a-mgba-loopback-bridge.md docs/openai-battle-agent/reviews/2026-07-28-phase-3a-mgba-loopback-bridge-flow-review.md docs/openai-battle-agent/reviews/2026-07-28-phase-3a-mgba-loopback-bridge-evidence.md docs/openai-battle-agent/plans/2026-07-28-phase-3a-mgba-loopback-bridge.md
+  git add tools/mgba-bridge/README.md docs/openai-battle-agent/2026-07-18-mgba-ai-trainer-design.md docs/openai-battle-agent/specs/2026-07-28-phase-3a-mgba-loopback-bridge.md docs/openai-battle-agent/reviews/2026-07-28-phase-3a-mgba-loopback-bridge-flow-review.md docs/openai-battle-agent/reviews/2026-07-29-phase-3a-mgba-loopback-bridge-evidence.md docs/openai-battle-agent/plans/2026-07-28-phase-3a-mgba-loopback-bridge.md
   git commit -m "docs(ai): record phase 3 bridge spike"
   ```
 
@@ -416,3 +418,4 @@
 - [Phase 3A specification](../specs/2026-07-28-phase-3a-mgba-loopback-bridge.md)
 - [Phase 3A flow review](../reviews/2026-07-28-phase-3a-mgba-loopback-bridge-flow-review.md)
 - [Phase 2 evidence](../reviews/2026-07-28-phase-2-build-and-test-evidence.md)
+- [Phase 3A evidence](../reviews/2026-07-29-phase-3a-mgba-loopback-bridge-evidence.md)

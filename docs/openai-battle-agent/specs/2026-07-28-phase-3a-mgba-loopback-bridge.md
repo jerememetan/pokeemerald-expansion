@@ -1,6 +1,6 @@
 # Phase 3A Specification: mGBA Loopback Bridge Spike
 
-**Status:** Flow reviewed; ready for implementation planning  
+**Status:** Implemented and verified
 **Parent roadmap:** [`../2026-07-18-mgba-ai-trainer-design.md`](../2026-07-18-mgba-ai-trainer-design.md)  
 **Prerequisite:** [Phase 2 build and test evidence](../reviews/2026-07-28-phase-2-build-and-test-evidence.md)
 
@@ -14,7 +14,7 @@ This is a bridge spike. It does **not** make the ROM apply an external choice. C
 
 ### In scope
 
-- Windows 64-bit mGBA development build `0.11-9091-c034660f0` with Lua scripting. Its archive SHA-256 must be recorded in the Phase 3A evidence review before smoke testing.
+- Windows 64-bit mGBA `0.10.5` with Lua scripting, validated by the mGBA title bar during manual bridge checks. Before phase exit, record the SHA-256 and `--version` output of the exact `mGBA.exe` used; an archive hash is not sufficient.
 - One Lua script that binds a TCP listener to `127.0.0.1` on a documented configurable port, accepts at most one local client, and runs all socket work through frame polling/callbacks.
 - One deterministic local Python responder for the bridge spike. It connects to the Lua listener, returns action index `0` only when the bridge announces a pending request with at least one legal action, and otherwise sends no response.
 - A small, line-delimited bridge transport for the spike:
@@ -92,5 +92,6 @@ The generator must invoke `arm-none-eabi-nm -n pokeemerald.elf`, locate the uniq
 - [Phase 2 evidence](../reviews/2026-07-28-phase-2-build-and-test-evidence.md)
 - [Phase 3A flow review](../reviews/2026-07-28-phase-3a-mgba-loopback-bridge-flow-review.md)
 - [Phase 3A implementation plan](../plans/2026-07-28-phase-3a-mgba-loopback-bridge.md)
+- [Phase 3A evidence](../reviews/2026-07-29-phase-3a-mgba-loopback-bridge-evidence.md)
 - [mGBA scripting API](https://mgba.io/docs/scripting.html)
 - [mGBA development downloads](https://mgba.io/downloads.html)
