@@ -29,7 +29,9 @@ def _parse_arguments() -> argparse.Namespace:
 def _connect(port: int) -> socket.socket:
     while True:
         try:
-            return socket.create_connection((LOOPBACK_HOST, port), timeout=1)
+            connection = socket.create_connection((LOOPBACK_HOST, port), timeout=1)
+            connection.settimeout(None)
+            return connection
         except OSError:
             time.sleep(0.25)
 

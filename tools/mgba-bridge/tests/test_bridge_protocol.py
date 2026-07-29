@@ -36,7 +36,11 @@ class FakeSocket:
         self._send_error = send_error
         self.received_sizes: list[int] = []
         self.sent: list[bytes] = []
+        self.timeout_values: list[float | None] = []
         self.closed = False
+
+    def settimeout(self, value: float | None) -> None:
+        self.timeout_values.append(value)
 
     def recv(self, size: int) -> bytes:
         self.received_sizes.append(size)
@@ -174,6 +178,7 @@ class BridgeProtocolTests(unittest.TestCase):
             ],
         )
         sleep.assert_called_once_with(0.25)
+        self.assertEqual(connected_socket.timeout_values, [None])
 
     def test_responder_reassembles_a_fragmented_request(self) -> None:
         connection = FakeSocket([b"BAGB/1 REQUEST 7 ", b"3\n", b""])
