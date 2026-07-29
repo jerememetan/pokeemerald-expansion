@@ -208,7 +208,8 @@ local function send_request(header)
     append_u8(payload, header.action_count)
     for index = 0, 3 do
         local action = MAILBOX_ADDRESS + OFFSET_LEGAL_ACTIONS + index * 8
-        for field = 0, 5 do append_u8(payload, emu:read8(action + field)) end
+        for field = 0, 2 do append_u8(payload, emu:read8(action + field)) end
+        for field = 4, 6 do append_u8(payload, emu:read8(action + field)) end
     end
     local payload_bytes = table.concat(payload)
     if #payload_bytes ~= REQUEST_PAYLOAD_SIZE then

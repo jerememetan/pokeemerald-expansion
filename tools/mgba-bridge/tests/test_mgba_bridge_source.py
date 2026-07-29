@@ -45,6 +45,12 @@ class LuaBridgeV2SourceTests(unittest.TestCase):
         self.assertIn("append_u8(parts, 0)", move_serialization)
         self.assertIn("if #payload_bytes ~= REQUEST_PAYLOAD_SIZE then", SOURCE)
 
+    def test_request_assembly_omits_legal_action_padding(self) -> None:
+        action_serialization = SOURCE[SOURCE.index("for index = 0, 3 do"):SOURCE.index("local payload_bytes")]
+        self.assertIn("for field = 0, 2", action_serialization)
+        self.assertIn("for field = 4, 6", action_serialization)
+        self.assertNotIn("for field = 0, 5", action_serialization)
+
 
 if __name__ == "__main__":
     unittest.main()
