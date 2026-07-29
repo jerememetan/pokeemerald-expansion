@@ -1,10 +1,12 @@
 #include "global.h"
 #include "battle_agent.h"
 #include "battle_ai_util.h"
+#include "battle_message.h"
 #include "battle_setup.h"
 #include "battle_util.h"
 #include "constants/battle_ai.h"
 #include "data.h"
+#include "text.h"
 #include "util.h"
 
 #if TESTING
@@ -24,6 +26,20 @@ struct BattleAgentWaitState
 
 static EWRAM_DATA struct BattleAgentWaitState sBattleAgentWaitStates[MAX_BATTLERS_COUNT];
 
+struct BattleAgentThinkingStatusState
+{
+    u8 displayState;
+    u8 frames;
+    bool8 ownsMessageWindow;
+};
+
+static EWRAM_DATA struct BattleAgentThinkingStatusState sBattleAgentThinkingStatuses[MAX_BATTLERS_COUNT];
+
+static const u8 sText_AiThinking[] = _("AI is thinking");
+static const u8 sText_AiThinkingOneDot[] = _("AI is thinking.");
+static const u8 sText_AiThinkingTwoDots[] = _("AI is thinking..");
+static const u8 sText_AiThinkingThreeDots[] = _("AI is thinking...");
+
 static bool32 BattleAgent_IsEligible(u32 battler);
 static bool32 BattleAgent_NormalizeSingleTarget(u32 requester, u16 move, u8 *target);
 static void BattleAgent_CopySnapshot(u32 requester);
@@ -31,6 +47,8 @@ static void BattleAgent_BuildLegalActions(u32 requester);
 static void BattleAgent_BeginRequest(void);
 static void BattleAgent_CommitRequest(void);
 static void BattleAgent_ClearResponse(void);
+static const u8 *BattleAgent_GetThinkingText(u8 displayState);
+static bool32 BattleAgent_UpdateThinkingStatusState(u32 battler, bool32 playerActionConfirmed, bool32 messageWindowIdle);
 
 static u8 BattleAgent_GetEffectivenessCategory(u8 effectiveness)
 {
@@ -41,6 +59,64 @@ static u8 BattleAgent_GetEffectivenessCategory(u8 effectiveness)
     if (effectiveness == AI_EFFECTIVENESS_x1)
         return 2;
     return 3;
+}
+
+static const u8 *BattleAgent_GetThinkingText(u8 displayState)
+{
+    switch (displayState)
+    {
+    case BATTLE_AGENT_THINKING_THREE_DOTS:
+        return sText_AiThinkingThreeDots;
+    case BATTLE_AGENT_THINKING_NO_DOTS:
+        return sText_AiThinking;
+    case BATTLE_AGENT_THINKING_ONE_DOT:
+        return sText_AiThinkingOneDot;
+    case BATTLE_AGENT_THINKING_TWO_DOTS:
+        return sText_AiThinkingTwoDots;
+    default:
+        return gText_EmptyString3;
+    }
+}
+
+static bool32 BattleAgent_UpdateThinkingStatusState(u32 battler, bool32 playerActionConfirmed, bool32 messageWindowIdle)
+{
+    struct BattleAgentThinkingStatusState *status;
+
+    if (battler >= MAX_BATTLERS_COUNT || !sBattleAgentWaitStates[battler].active)
+        return FALSE;
+
+    status = &sBattleAgentThinkingStatuses[battler];
+    if (!status->ownsMessageWindow)
+    {
+        if (!playerActionConfirmed || !messageWindowIdle)
+            return FALSE;
+
+        status->ownsMessageWindow = TRUE;
+        status->displayState = BATTLE_AGENT_THINKING_THREE_DOTS;
+        status->frames = 0;
+        return TRUE;
+    }
+
+    if (!messageWindowIdle || ++status->frames < BATTLE_AGENT_THINKING_DOT_INTERVAL)
+        return FALSE;
+
+    status->frames = 0;
+    switch (status->displayState)
+    {
+    case BATTLE_AGENT_THINKING_THREE_DOTS:
+        status->displayState = BATTLE_AGENT_THINKING_NO_DOTS;
+        break;
+    case BATTLE_AGENT_THINKING_NO_DOTS:
+        status->displayState = BATTLE_AGENT_THINKING_ONE_DOT;
+        break;
+    case BATTLE_AGENT_THINKING_ONE_DOT:
+        status->displayState = BATTLE_AGENT_THINKING_TWO_DOTS;
+        break;
+    default:
+        status->displayState = BATTLE_AGENT_THINKING_THREE_DOTS;
+        break;
+    }
+    return TRUE;
 }
 
 static bool32 BattleAgent_IsEligible(u32 battler)
@@ -240,6 +316,10 @@ static void BattleAgent_ClearResponse(void)
 
 void BattleAgent_ResetMailbox(void)
 {
+    u32 battler;
+
+    for (battler = 0; battler < MAX_BATTLERS_COUNT; battler++)
+        BattleAgent_ClearThinkingStatus(battler);
     memset(&gBattleAgentMailbox, 0, sizeof(gBattleAgentMailbox));
     memset(sBattleAgentWaitStates, 0, sizeof(sBattleAgentWaitStates));
     gBattleAgentMailbox.magic = BATTLE_AGENT_PROTOCOL_MAGIC;
@@ -297,6 +377,25 @@ bool32 BattleAgent_BeginExternalWait(u32 battler)
     return TRUE;
 }
 
+void BattleAgent_UpdateThinkingStatus(u32 battler, bool32 playerActionConfirmed)
+{
+    if (BattleAgent_UpdateThinkingStatusState(battler, playerActionConfirmed, !IsTextPrinterActive(B_WIN_MSG)))
+        BattlePutTextOnWindow(BattleAgent_GetThinkingText(sBattleAgentThinkingStatuses[battler].displayState), B_WIN_MSG);
+}
+
+void BattleAgent_ClearThinkingStatus(u32 battler)
+{
+    struct BattleAgentThinkingStatusState *status;
+
+    if (battler >= MAX_BATTLERS_COUNT)
+        return;
+
+    status = &sBattleAgentThinkingStatuses[battler];
+    if (status->ownsMessageWindow)
+        BattlePutTextOnWindow(gText_EmptyString3, B_WIN_MSG);
+    memset(status, 0, sizeof(*status));
+}
+
 bool32 BattleAgent_TryConsumeResponse(u32 battler)
 {
     struct BattleAgentWaitState *waitState;
@@ -341,6 +440,7 @@ bool32 BattleAgent_TryConsumeResponse(u32 battler)
     gBattleStruct->aiMoveOrAction[battler] = action->moveSlot;
     gBattleStruct->aiChosenTarget[battler] = target;
     waitState->active = FALSE;
+    BattleAgent_ClearThinkingStatus(battler);
     BattleAgent_ClearResponse();
     return TRUE;
 }
@@ -367,6 +467,7 @@ void BattleAgent_UseVanillaFallback(u32 battler)
     gBattleStruct->aiMoveOrAction[battler] = waitState->fallbackMoveOrAction;
     gBattleStruct->aiChosenTarget[battler] = waitState->fallbackTarget;
     waitState->active = FALSE;
+    BattleAgent_ClearThinkingStatus(battler);
     BattleAgent_ClearResponse();
 }
 
@@ -374,5 +475,35 @@ void BattleAgent_UseVanillaFallback(u32 battler)
 bool32 BattleAgent_TestNormalizeSingleTarget(u32 requester, u16 move, u8 *target)
 {
     return BattleAgent_NormalizeSingleTarget(requester, move, target);
+}
+
+void BattleAgent_TestStartThinkingStatus(u32 battler)
+{
+    if (battler >= MAX_BATTLERS_COUNT)
+        return;
+
+    memset(&sBattleAgentThinkingStatuses[battler], 0, sizeof(sBattleAgentThinkingStatuses[battler]));
+    sBattleAgentWaitStates[battler].active = TRUE;
+}
+
+void BattleAgent_TestUpdateThinkingStatus(u32 battler, bool32 playerActionConfirmed, bool32 messageWindowIdle)
+{
+    BattleAgent_UpdateThinkingStatusState(battler, playerActionConfirmed, messageWindowIdle);
+}
+
+u8 BattleAgent_TestGetThinkingStatus(u32 battler)
+{
+    if (battler >= MAX_BATTLERS_COUNT)
+        return BATTLE_AGENT_THINKING_HIDDEN;
+
+    return sBattleAgentThinkingStatuses[battler].displayState;
+}
+
+u8 BattleAgent_TestGetThinkingStatusFrames(u32 battler)
+{
+    if (battler >= MAX_BATTLERS_COUNT)
+        return 0;
+
+    return sBattleAgentThinkingStatuses[battler].frames;
 }
 #endif

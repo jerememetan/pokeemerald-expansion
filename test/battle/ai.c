@@ -691,6 +691,75 @@ AI_DOUBLE_BATTLE_TEST("AI will not try to switch for the same pokemon for 2 spot
     }
 }
 
+TEST("External AI thinking status waits for player action confirmation")
+{
+    BattleAgent_ResetMailbox();
+    BattleAgent_TestStartThinkingStatus(B_POSITION_OPPONENT_LEFT);
+
+    BattleAgent_TestUpdateThinkingStatus(B_POSITION_OPPONENT_LEFT, FALSE, TRUE);
+    EXPECT_EQ(BattleAgent_TestGetThinkingStatus(B_POSITION_OPPONENT_LEFT), BATTLE_AGENT_THINKING_HIDDEN);
+
+    BattleAgent_TestUpdateThinkingStatus(B_POSITION_OPPONENT_LEFT, TRUE, TRUE);
+    EXPECT_EQ(BattleAgent_TestGetThinkingStatus(B_POSITION_OPPONENT_LEFT), BATTLE_AGENT_THINKING_THREE_DOTS);
+    EXPECT_EQ(BattleAgent_TestGetThinkingStatusFrames(B_POSITION_OPPONENT_LEFT), 0);
+}
+
+TEST("External AI thinking status waits for an idle message window")
+{
+    BattleAgent_ResetMailbox();
+    BattleAgent_TestStartThinkingStatus(B_POSITION_OPPONENT_LEFT);
+
+    BattleAgent_TestUpdateThinkingStatus(B_POSITION_OPPONENT_LEFT, TRUE, FALSE);
+    EXPECT_EQ(BattleAgent_TestGetThinkingStatus(B_POSITION_OPPONENT_LEFT), BATTLE_AGENT_THINKING_HIDDEN);
+
+    BattleAgent_TestUpdateThinkingStatus(B_POSITION_OPPONENT_LEFT, TRUE, TRUE);
+    EXPECT_EQ(BattleAgent_TestGetThinkingStatus(B_POSITION_OPPONENT_LEFT), BATTLE_AGENT_THINKING_THREE_DOTS);
+}
+
+TEST("External AI thinking status advances dots every thirty frames")
+{
+    u32 frame;
+
+    BattleAgent_ResetMailbox();
+    BattleAgent_TestStartThinkingStatus(B_POSITION_OPPONENT_LEFT);
+    BattleAgent_TestUpdateThinkingStatus(B_POSITION_OPPONENT_LEFT, TRUE, TRUE);
+    for (frame = 0; frame < BATTLE_AGENT_THINKING_DOT_INTERVAL - 1; frame++)
+        BattleAgent_TestUpdateThinkingStatus(B_POSITION_OPPONENT_LEFT, TRUE, TRUE);
+    EXPECT_EQ(BattleAgent_TestGetThinkingStatus(B_POSITION_OPPONENT_LEFT), BATTLE_AGENT_THINKING_THREE_DOTS);
+
+    BattleAgent_TestUpdateThinkingStatus(B_POSITION_OPPONENT_LEFT, TRUE, TRUE);
+    EXPECT_EQ(BattleAgent_TestGetThinkingStatus(B_POSITION_OPPONENT_LEFT), BATTLE_AGENT_THINKING_NO_DOTS);
+    for (frame = 0; frame < BATTLE_AGENT_THINKING_DOT_INTERVAL; frame++)
+        BattleAgent_TestUpdateThinkingStatus(B_POSITION_OPPONENT_LEFT, TRUE, TRUE);
+    EXPECT_EQ(BattleAgent_TestGetThinkingStatus(B_POSITION_OPPONENT_LEFT), BATTLE_AGENT_THINKING_ONE_DOT);
+}
+
+TEST("External AI thinking status cleanup resets a completed wait")
+{
+    BattleAgent_ResetMailbox();
+    BattleAgent_TestStartThinkingStatus(B_POSITION_OPPONENT_LEFT);
+    BattleAgent_TestUpdateThinkingStatus(B_POSITION_OPPONENT_LEFT, TRUE, TRUE);
+    BattleAgent_ClearThinkingStatus(B_POSITION_OPPONENT_LEFT);
+
+    EXPECT_EQ(BattleAgent_TestGetThinkingStatus(B_POSITION_OPPONENT_LEFT), BATTLE_AGENT_THINKING_HIDDEN);
+    EXPECT_EQ(BattleAgent_TestGetThinkingStatusFrames(B_POSITION_OPPONENT_LEFT), 0);
+    BattleAgent_ClearThinkingStatus(B_POSITION_OPPONENT_LEFT);
+    EXPECT_EQ(BattleAgent_TestGetThinkingStatus(B_POSITION_OPPONENT_LEFT), BATTLE_AGENT_THINKING_HIDDEN);
+}
+
+TEST("External AI thinking status starts fresh after a previous wait")
+{
+    BattleAgent_ResetMailbox();
+    BattleAgent_TestStartThinkingStatus(B_POSITION_OPPONENT_LEFT);
+    BattleAgent_TestUpdateThinkingStatus(B_POSITION_OPPONENT_LEFT, TRUE, TRUE);
+    BattleAgent_ClearThinkingStatus(B_POSITION_OPPONENT_LEFT);
+    BattleAgent_TestStartThinkingStatus(B_POSITION_OPPONENT_LEFT);
+    BattleAgent_TestUpdateThinkingStatus(B_POSITION_OPPONENT_LEFT, TRUE, TRUE);
+
+    EXPECT_EQ(BattleAgent_TestGetThinkingStatus(B_POSITION_OPPONENT_LEFT), BATTLE_AGENT_THINKING_THREE_DOTS);
+    EXPECT_EQ(BattleAgent_TestGetThinkingStatusFrames(B_POSITION_OPPONENT_LEFT), 0);
+}
+
 AI_SINGLE_BATTLE_TEST("External AI mock accepts Calvin's legal move slot")
 {
     GIVEN {

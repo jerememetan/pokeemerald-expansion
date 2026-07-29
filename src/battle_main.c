@@ -4022,6 +4022,14 @@ enum
     STATE_SELECTION_SCRIPT_MAY_RUN
 };
 
+static bool32 IsPlayerActionConfirmedForExternalAiStatus(void)
+{
+    u32 playerBattler = GetBattlerAtPosition(B_POSITION_PLAYER_LEFT);
+
+    return gBattleCommunication[playerBattler] == STATE_WAIT_ACTION_CONFIRMED
+        || gBattleCommunication[playerBattler] == STATE_WAIT_ACTION_CONFIRMED_STANDBY;
+}
+
 static void HandleTurnActionSelectionState(void)
 {
     s32 i, battler;
@@ -4059,6 +4067,10 @@ static void HandleTurnActionSelectionState(void)
             else if (BattleAgent_TryConsumeResponse(battler))
             {
                 gBattleCommunication[battler] = STATE_BEFORE_ACTION_CHOSEN;
+            }
+            else
+            {
+                BattleAgent_UpdateThinkingStatus(battler, IsPlayerActionConfirmedForExternalAiStatus());
             }
             break;
         case STATE_BEFORE_ACTION_CHOSEN: // Choose an action.

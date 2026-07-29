@@ -23,6 +23,17 @@ enum BattleAgentResponseStatus
     BATTLE_AGENT_RESPONSE_READY = 1,
 };
 
+enum BattleAgentThinkingStatus
+{
+    BATTLE_AGENT_THINKING_HIDDEN,
+    BATTLE_AGENT_THINKING_THREE_DOTS,
+    BATTLE_AGENT_THINKING_NO_DOTS,
+    BATTLE_AGENT_THINKING_ONE_DOT,
+    BATTLE_AGENT_THINKING_TWO_DOTS,
+};
+
+#define BATTLE_AGENT_THINKING_DOT_INTERVAL 30
+
 struct BattleAgentBattlerSnapshotV2
 {
     u16 species;
@@ -130,9 +141,15 @@ bool32 BattleAgent_BeginExternalWait(u32 battler);
 bool32 BattleAgent_TryConsumeResponse(u32 battler);
 bool32 BattleAgent_IsWaitExpired(u32 battler);
 void BattleAgent_UseVanillaFallback(u32 battler);
+void BattleAgent_UpdateThinkingStatus(u32 battler, bool32 playerActionConfirmed);
+void BattleAgent_ClearThinkingStatus(u32 battler);
 
 #if TESTING
 bool32 BattleAgent_TestNormalizeSingleTarget(u32 requester, u16 move, u8 *target);
+void BattleAgent_TestStartThinkingStatus(u32 battler);
+void BattleAgent_TestUpdateThinkingStatus(u32 battler, bool32 playerActionConfirmed, bool32 messageWindowIdle);
+u8 BattleAgent_TestGetThinkingStatus(u32 battler);
+u8 BattleAgent_TestGetThinkingStatusFrames(u32 battler);
 #endif
 
 #endif // GUARD_BATTLE_AGENT_H
