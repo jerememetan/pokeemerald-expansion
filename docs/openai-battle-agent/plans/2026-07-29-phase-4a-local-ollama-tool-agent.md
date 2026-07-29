@@ -433,4 +433,5 @@
 
 - [Phase 4A specification](../specs/2026-07-29-phase-4a-local-ollama-tool-agent.md)
 - [Phase 4A flow review](../reviews/2026-07-29-phase-4a-local-ollama-tool-agent-flow-review.md)
+- [qwen2.5-coder tool-call compatibility amendment](2026-07-29-phase-4a-tool-call-compatibility.md)
 - [Project roadmap](../2026-07-18-mgba-ai-trainer-design.md)

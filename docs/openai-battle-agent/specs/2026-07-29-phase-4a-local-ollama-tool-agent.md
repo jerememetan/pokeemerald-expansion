@@ -45,6 +45,20 @@ This phase uses the locally installed `qwen2.5-coder:7b` model through the Ollam
 - Damage simulation invented by Python. Phase 4A exposes the existing engine's per-action KO predicate and deterministic metadata, not an independently reimplemented damage formula.
 - Unbounded model/tool loops, a wait longer than 900 frames, replacing vanilla AI globally, or changing move effects, damage calculation, targeting rules, or turn resolution.
 
+### qwen2.5-coder compatibility decision
+
+Ollama-native `message.tool_calls` remains the preferred service input. During
+local verification on this project, the approved `qwen2.5-coder:7b` model
+instead emitted an assistant `content` value that was exactly one JSON object
+with `name` and `arguments` keys. The service may accept that alternate shape
+only when all of the following are true: `content` is a JSON object with
+exactly those two keys, `name` is one advertised tool name, and `arguments` is
+an object that passes the same per-tool validation as a native tool call.
+Plain text, Markdown, JSON arrays, extra keys, duplicate terminal choices,
+unknown names, malformed JSON, and invalid arguments produce no response.
+This is a local-model message compatibility adapter; it does not change the
+ROM/Lua wire protocol, the tool allowlist, or action authority.
+
 ## Boundaries
 
 | Component | Responsibility | Must not do |
