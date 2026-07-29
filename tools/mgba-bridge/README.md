@@ -11,7 +11,8 @@ or Ollama response is absent or invalid, Calvin acts after at most 900 frames
 - Only Youngster Calvin (`TRAINER_CALVIN_1`) in a standard trainer single
   battle is eligible. Moves only; no switches, items, benches, doubles, or
   other trainers.
-- The Lua listener and Python service bind only to `127.0.0.1:57621`.
+- Lua binds the `127.0.0.1:57621` listener; Python connects only to that
+  loopback listener.
 - The agent receives only read-only snapshot tools and can finish only with
   `choose_action(action_index)`. It cannot name a move or target, access mGBA,
   run commands, or use a network tool.

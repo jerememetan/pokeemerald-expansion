@@ -22,6 +22,7 @@ OLLAMA_MODEL = "qwen2.5-coder:7b"
 MAX_TOOL_CALLS = 12
 SERVICE_TIMEOUT_SECONDS = 12.0
 CATALOG_PATH = Path(__file__).with_name("catalog_v2.json")
+LOOPBACK_HOST = "127.0.0.1"
 
 
 def load_catalog(path: Path = CATALOG_PATH) -> dict[str, dict[str, str]]:
@@ -245,34 +246,50 @@ def handle_request_frame(frame: bytes) -> bytes | None:
     return format_response_frame(request.sequence, action_index)
 
 
-def serve(host: str = "127.0.0.1", port: int = 57621) -> None:
-    """Serve one loopback client; malformed/incomplete frames receive no response."""
-    if host != "127.0.0.1":
-        raise ValueError("battle-agent service binds only to loopback")
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listener:
-        listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        listener.bind((host, port))
-        listener.listen(1)
-        log(f"listening on {host}:{port}")
-        while True:
-            connection, _ = listener.accept()
-            with connection:
-                log("bridge connected")
-                buffer = b""
-                while True:
-                    chunk = connection.recv(REQUEST_FRAME_SIZE - len(buffer))
-                    if not chunk:
-                        break
-                    buffer += chunk
-                    if len(buffer) != REQUEST_FRAME_SIZE:
-                        continue
-                    try:
-                        response = handle_request_frame(buffer)
-                    except (ToolError, ValueError):
-                        response = None
-                    if response is not None:
-                        connection.sendall(response)
-                    buffer = b""
+def _connect(port: int) -> socket.socket:
+    """Connect to mGBA's one-client Lua listener, retrying until it is ready."""
+    while True:
+        try:
+            connection = socket.create_connection((LOOPBACK_HOST, port), timeout=1)
+            connection.settimeout(None)
+            return connection
+        except OSError:
+            time.sleep(0.25)
+
+
+def _serve_connection(connection: socket.socket) -> None:
+    """Forward complete fixed request frames over one established Lua connection."""
+    buffer = b""
+    while True:
+        try:
+            chunk = connection.recv(REQUEST_FRAME_SIZE - len(buffer))
+        except OSError:
+            return
+        if not chunk:
+            return
+        buffer += chunk
+        if len(buffer) != REQUEST_FRAME_SIZE:
+            continue
+        try:
+            response = handle_request_frame(buffer)
+        except (ToolError, ValueError):
+            response = None
+        if response is not None:
+            try:
+                connection.sendall(response)
+            except OSError:
+                return
+        buffer = b""
+
+
+def serve(host: str = LOOPBACK_HOST, port: int = 57621) -> None:
+    """Connect once to mGBA's loopback listener and process its request frames."""
+    if host != LOOPBACK_HOST:
+        raise ValueError("battle-agent service connects only to the loopback Lua listener")
+    log(f"connecting to mGBA at {host}:{port}")
+    with _connect(port) as connection:
+        log("mGBA bridge connected")
+        _serve_connection(connection)
 
 
 def main() -> None:

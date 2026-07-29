@@ -13,6 +13,7 @@ sys.path.insert(0, str(BRIDGE_DIRECTORY))
 
 from battle_agent_service import (  # noqa: E402
     ToolError,
+    _connect,
     analyze_action,
     choose_action,
     get_battle_state,
@@ -144,6 +145,19 @@ class BattleAgentServiceTests(unittest.TestCase):
 
         with mock.patch("battle_agent_service.run_tool_agent", return_value=0):
             self.assertEqual(handle_request_frame(frame), b"BAGB\x02\x02\x05\x00\x07\x00\x00\x00\x00")
+
+    def test_connect_retries_to_the_lua_listener_and_returns_the_client_socket(self) -> None:
+        connection = mock.Mock()
+        with mock.patch("battle_agent_service.socket.create_connection", side_effect=[OSError("not ready"), connection]) as create_connection:
+            with mock.patch("battle_agent_service.time.sleep") as sleep:
+                self.assertIs(_connect(57621), connection)
+
+        self.assertEqual(
+            create_connection.call_args_list,
+            [mock.call(("127.0.0.1", 57621), timeout=1), mock.call(("127.0.0.1", 57621), timeout=1)],
+        )
+        sleep.assert_called_once_with(0.25)
+        connection.settimeout.assert_called_once_with(None)
 
 
 if __name__ == "__main__":

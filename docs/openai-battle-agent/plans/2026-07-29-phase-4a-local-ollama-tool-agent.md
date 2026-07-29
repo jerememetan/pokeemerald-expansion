@@ -282,7 +282,10 @@
   {"abilities": {"1": "STENCH"}, "effects": {"0": "HIT"}, "items": {}, "moves": {"33": "TACKLE"}, "species": {"261": "POOCHYENA"}}
   ```
 
-  `battle_agent_service.py` must bind only `127.0.0.1:57621`, accept one client, read exactly `REQUEST_FRAME_SIZE`, and return a response only from `choose_action`. Define the complete tool map:
+  `battle_agent_service.py` must connect only to the Lua listener at
+  `127.0.0.1:57621`, retry until that one listener is ready, read exactly
+  `REQUEST_FRAME_SIZE`, and return a response only from `choose_action`.
+  Define the complete tool map:
 
   ```python
   TOOL_HANDLERS = {
