@@ -23,6 +23,12 @@ from bridge_protocol import (  # noqa: E402
     parse_request,
     parse_response,
 )
+from bridge_protocol import (  # noqa: E402
+    REQUEST_FRAME_SIZE,
+    RESPONSE_FRAME_SIZE,
+    format_response_frame,
+    parse_request_frame,
+)
 import test_responder  # noqa: E402
 
 
@@ -61,6 +67,40 @@ class FakeSocket:
 
 
 class BridgeProtocolTests(unittest.TestCase):
+    def test_v2_request_frame_parses_fixed_binary_header_and_payload(self) -> None:
+        payload = bytearray(417)
+        payload[0:4] = (7).to_bytes(4, "little")
+        payload[4] = 1
+        payload[5] = 1
+        payload[6:8] = (3).to_bytes(2, "little")
+        payload[8] = 2
+        payload[392] = 1
+        payload[393:399] = bytes((0, 1, 0, 2, 1, 0))
+        frame = b"BAGB" + bytes((2, 1)) + len(payload).to_bytes(2, "little") + bytes(payload)
+
+        request = parse_request_frame(frame)
+
+        self.assertEqual(len(frame), REQUEST_FRAME_SIZE)
+        self.assertEqual(request.sequence, 7)
+        self.assertEqual(request.requesting_battler, 1)
+        self.assertEqual(request.turn_sequence, 3)
+        self.assertEqual(request.battler_count, 2)
+        self.assertEqual(request.legal_actions[0].action_index, 0)
+        self.assertEqual(request.legal_actions[0].move_slot, 1)
+
+    def test_v2_request_frame_rejects_wrong_or_extra_bytes(self) -> None:
+        valid = b"BAGB" + bytes((2, 1)) + (417).to_bytes(2, "little") + bytes(417)
+        for frame in (valid[:-1], valid + b"x", b"BAGB" + bytes((1, 1)) + valid[6:]):
+            with self.subTest(frame_length=len(frame)):
+                with self.assertRaises(ProtocolError):
+                    parse_request_frame(frame)
+
+    def test_v2_response_frame_has_fixed_binary_shape(self) -> None:
+        frame = format_response_frame(7, 2)
+
+        self.assertEqual(len(frame), RESPONSE_FRAME_SIZE)
+        self.assertEqual(frame, b"BAGB\x02\x02\x05\x00\x07\x00\x00\x00\x02")
+
     def test_request_parses_a_valid_bounded_line(self) -> None:
         self.assertEqual(
             parse_request(b"BAGB/1 REQUEST 7 3\n"),
