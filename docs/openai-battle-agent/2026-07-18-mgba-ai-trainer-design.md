@@ -1,6 +1,6 @@
 # mGBA AI Trainer Design
 
-**Status:** Phase 2 and Phase 3A verified
+**Status:** Phase 2 and Phase 3A verified; Phase 4A specification reviewed
 
 **Goal:** Add a local, external AI decision layer to `pokeemerald-expansion` that can control selected trainer battle actions in a playable ROM, while the ROM remains the sole authority on battle rules and always falls back to the existing trainer AI.
 
@@ -82,15 +82,17 @@ Validated with Windows mGBA 0.10.5, a Lua frame-polling script round-trips a fix
 
 **Verified:** See [Phase 3A evidence](reviews/2026-07-29-phase-3a-mgba-loopback-bridge-evidence.md). Phase 4 requires its own reviewed specification and plan for the full-snapshot local-service protocol and ROM-side response acceptance; Phase 3A's deterministic responder is not a service implementation.
 
-### Phase 4: Local service and deterministic agent
+### Phase 4A: Local Ollama tool agent and ROM response acceptance
 
-Create the Python service with a deterministic policy first, then add the model adapter behind the same internal decision interface. The service receives only the snapshot, selects one supplied legal action, and logs a human-readable explanation outside the ROM.
+Upgrade the mailbox and bridge to V2, add a bounded ROM response wait/acceptance seam, and create a loopback-only Python tool service for the local `qwen2.5-coder:7b` Ollama model. The model receives only read-only battle-analysis tools and can return one supplied legal action index; it never gets a rule-based move scorer, direct emulator access, or authority to name a move or target. The ROM keeps its already-computed vanilla choice and uses it at the 900-frame deadline or on any invalid response.
 
-**Exit criterion:** The deterministic service completes a playable trainer battle through the bridge, and all malformed service replies trigger ROM fallback.
+**Exit criterion:** Calvin completes a playable trainer-single battle using a legal local-agent action when available. All absent, malformed, stale, illegal, or late replies take the saved vanilla fallback without freezing the battle.
 
-### Phase 5: Model-backed trainer demo
+**Planning artifacts:** [specification](specs/2026-07-29-phase-4a-local-ollama-tool-agent.md) and [flow review](reviews/2026-07-29-phase-4a-local-ollama-tool-agent-flow-review.md). Implementation starts only after the reviewed plan is approved.
 
-Add an OpenAI-compatible model adapter with strict structured output and a small tool/action budget. Instrument latency, choices, rejected responses, fallback count, and battle outcome. Demonstrate one named trainer in mGBA.
+### Phase 5: Agent diagnostics and trainer demo hardening
+
+Instrument local-agent latency, tool calls, selections, rejected responses, fallback count, and battle outcome. Improve the repeatable mGBA demo and error diagnostics without widening the action authority beyond the Phase 4A tool/action contract.
 
 **Exit criterion:** A documented repeatable demo works with the service connected and remains playable when it is disconnected.
 
@@ -126,7 +128,7 @@ Before a phase is declared complete, run the full relevant battle-test suite and
 
 ## Deferred decisions
 
-Later phase specifications will select exact mailbox field widths, Python dependencies, and the model/provider configuration. The mailbox symbol strategy, trainer opt-in bit, and 600-frame asynchronous deadline are now established by the Phase 0 contract. These details do not alter the safety invariant: only engine-provided legal actions may be executed.
+Later phase specifications will select any additive protocol extensions and broader trainer/model configuration. The mailbox symbol strategy, trainer opt-in bit, V2 wire contract, and 900-frame asynchronous deadline are established by the completed phases and Phase 4A specification. These details do not alter the safety invariant: only engine-provided legal actions may be executed.
 
 ## Phase 0 reference set
 
@@ -149,3 +151,5 @@ Later phase specifications will select exact mailbox field widths, Python depend
 - [Phase 3A flow review](reviews/2026-07-28-phase-3a-mgba-loopback-bridge-flow-review.md)
 - [Phase 3A implementation plan](plans/2026-07-28-phase-3a-mgba-loopback-bridge.md)
 - [Phase 3A evidence](reviews/2026-07-29-phase-3a-mgba-loopback-bridge-evidence.md)
+- [Phase 4A specification](specs/2026-07-29-phase-4a-local-ollama-tool-agent.md)
+- [Phase 4A flow review](reviews/2026-07-29-phase-4a-local-ollama-tool-agent-flow-review.md)
