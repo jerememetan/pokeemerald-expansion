@@ -104,6 +104,21 @@ Instrument local-agent latency, tool calls, selections, rejected responses, fall
 
 **Exit criterion:** A documented repeatable demo works with the service connected and remains playable when it is disconnected.
 
+### Phase 5A: In-battle thinking status
+
+Add a presentation-only status to the normal lower battle message window while
+the ROM waits for an external trainer action. It displays `AI is thinking` with
+an animated ellipsis and clears before either an accepted response resumes
+action selection or the existing timeout uses vanilla fallback. This is a
+separate vertical slice from Phase 5 diagnostics: it does not change the
+mailbox, bridge, service, action authority, or deadline.
+
+**Exit criterion:** Calvin visibly shows the status during a pending external
+request; it clears automatically on both accepted response and absent-service
+fallback, while battle behavior remains unchanged.
+
+**Planning artifacts:** [specification](specs/2026-07-29-phase-5a-thinking-status.md) and [flow review](reviews/2026-07-29-phase-5a-thinking-status-flow-review.md). An implementation plan is required before production changes.
+
 ### Phase 6: Broaden trainer coverage
 
 Add a debug/global enable mode and then opt-in trainer configuration. Keep the same mailbox protocol version unless an additive, backward-compatible extension is needed.
