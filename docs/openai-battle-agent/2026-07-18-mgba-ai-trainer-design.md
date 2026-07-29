@@ -1,6 +1,8 @@
 # mGBA AI Trainer Design
 
-**Status:** Phase 2 and Phase 3A verified; Phase 4A implementation in progress
+**Status:** Phases 0 through 5 are verified for the Calvin trainer-single
+demo. Phase 6 broadens trainer coverage; switching/items and double battles
+remain deferred.
 
 **Goal:** Add a local, external AI decision layer to `pokeemerald-expansion` that can control selected trainer battle actions in a playable ROM, while the ROM remains the sole authority on battle rules and always falls back to the existing trainer AI.
 
@@ -103,6 +105,11 @@ Add an operator-only, deterministic decision audit to the local service. It reco
 Instrument local-agent latency, tool calls, selections, rejected responses, fallback count, and battle outcome. Improve the repeatable mGBA demo and error diagnostics without widening the action authority beyond the Phase 4A tool/action contract.
 
 **Exit criterion:** A documented repeatable demo works with the service connected and remains playable when it is disconnected.
+
+**Status:** Complete. [Phase 5B specification](specs/2026-07-29-phase-5b-demo-guide.md),
+[flow review](reviews/2026-07-29-phase-5b-demo-guide-flow-review.md),
+[implementation plan](plans/2026-07-29-phase-5b-demo-guide.md), and
+[verification evidence](reviews/2026-07-29-phase-5b-demo-guide-evidence.md).
 
 ### Phase 5A: In-battle thinking status
 
