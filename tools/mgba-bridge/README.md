@@ -40,7 +40,16 @@ or Ollama response is absent or invalid, Calvin acts after at most 900 frames
    ```
 
    The list must contain `qwen2.5-coder:7b`. Start `ollama serve` in a
-   separate window only if its local API is not already available.
+   separate window only if its local API is not already available. Before the
+   first battle after a restart, warm the model in another PowerShell window:
+
+   ```powershell
+   ollama run qwen2.5-coder:7b "Reply with exactly READY"
+   ```
+
+   Wait for `READY`, then start the service and mGBA within Ollama's normal
+   model-residency window. This matters because a cold 7B model load can take
+   longer than the ROM's fixed 15-second fallback deadline.
 
 3. Open the newly built `pokeemerald.gba` in Windows mGBA. Select **Tools →
    Scripting…**, then load `tools\mgba-bridge\mgba_bridge.lua`.
