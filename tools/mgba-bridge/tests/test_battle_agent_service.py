@@ -13,6 +13,7 @@ BRIDGE_DIRECTORY = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(BRIDGE_DIRECTORY))
 
 from battle_agent_service import (  # noqa: E402
+    AgentDecision,
     ToolError,
     _connect,
     analyze_action,
@@ -23,6 +24,7 @@ from battle_agent_service import (  # noqa: E402
     get_field_state,
     list_legal_actions,
     compare_speed,
+    format_decision_audit,
     handle_request_frame,
     run_tool_agent,
 )
@@ -108,7 +110,9 @@ class BattleAgentServiceTests(unittest.TestCase):
         with mock.patch("battle_agent_service.request_ollama", side_effect=responses) as request:
             selected = run_tool_agent(7, 3, 1, self.actions, payload)
 
-        self.assertEqual(selected, 1)
+        self.assertIsNotNone(selected)
+        self.assertEqual(selected.action_index, 1)
+        self.assertEqual(selected.tools_used, ("list_legal_actions", "choose_action"))
         self.assertEqual(request.call_count, 2)
 
     def test_tool_loop_accepts_qwen_exact_json_tool_content(self) -> None:
@@ -119,7 +123,10 @@ class BattleAgentServiceTests(unittest.TestCase):
         ]
 
         with mock.patch("battle_agent_service.request_ollama", side_effect=responses):
-            self.assertEqual(run_tool_agent(7, 3, 1, self.actions, payload), 1)
+            selected = run_tool_agent(7, 3, 1, self.actions, payload)
+
+        self.assertIsNotNone(selected)
+        self.assertEqual(selected.action_index, 1)
 
     def test_tool_loop_rejects_noncanonical_qwen_json_content(self) -> None:
         payload = bytes(417)
@@ -140,13 +147,58 @@ class BattleAgentServiceTests(unittest.TestCase):
         ]
 
         with mock.patch("battle_agent_service.request_ollama", side_effect=responses) as request:
-            self.assertEqual(run_tool_agent(7, 3, 1, self.actions, payload), 1)
+            selected = run_tool_agent(7, 3, 1, self.actions, payload)
 
+        self.assertIsNotNone(selected)
+        self.assertEqual(selected.action_index, 1)
+        self.assertEqual(selected.tools_used, ("list_legal_actions", "choose_action"))
         self.assertEqual(request.call_count, 3)
         self.assertEqual(
             json.loads(request.call_args_list[2].args[0][-1]["content"]),
             list_legal_actions(self.actions),
         )
+
+    def test_decision_audit_reports_tools_actions_and_rom_facts(self) -> None:
+        payload = bytearray(417)
+        requester_move = 9 + 92 + 44 + 12
+        payload[requester_move : requester_move + 12] = bytes((52, 0, 20, 10, 40, 100, 0, 0, 0, 0, 1, 0))
+        payload[9 + 18 : 9 + 20] = (18).to_bytes(2, "little")
+        payload[9 + 92 + 18 : 9 + 92 + 20] = (27).to_bytes(2, "little")
+
+        audit = format_decision_audit(7, 1, AgentDecision(1, ("get_battle_state", "list_legal_actions")), self.actions, bytes(payload))
+
+        self.assertIn("audit #7", audit)
+        self.assertIn("tools used: get_battle_state, list_legal_actions", audit)
+        self.assertIn("legal actions: 0=", audit)
+        self.assertIn("selected: 1=EMBER->battler 0", audit)
+        self.assertIn("selected ROM facts: STAB=yes, effectiveness=super-effective, KO=yes", audit)
+        self.assertIn("speed context: battler_1_first", audit)
+        self.assertNotIn("reasoning", audit)
+        self.assertNotIn("payload", audit)
+
+    def test_handle_request_frame_emits_audit_before_a_valid_response(self) -> None:
+        payload = bytearray(417)
+        payload[0:4] = (7).to_bytes(4, "little")
+        payload[4:9] = bytes((1, 1, 3, 0, 2))
+        payload[392:399] = bytes((1, 0, 0, 0, 2, 1, 0))
+        frame = b"BAGB\x02\x01\xa1\x01" + bytes(payload)
+
+        with mock.patch("battle_agent_service.run_tool_agent", return_value=AgentDecision(0, ("list_legal_actions", "choose_action"))), mock.patch("battle_agent_service.log") as log:
+            self.assertEqual(handle_request_frame(frame), b"BAGB\x02\x02\x05\x00\x07\x00\x00\x00\x00")
+
+        self.assertTrue(any(call.args[0].startswith("audit #7") for call in log.call_args_list))
+
+    def test_handle_request_frame_audits_vanilla_fallback_without_a_response(self) -> None:
+        payload = bytearray(417)
+        payload[0:4] = (7).to_bytes(4, "little")
+        payload[4:9] = bytes((1, 1, 3, 0, 2))
+        payload[392:399] = bytes((1, 0, 0, 0, 2, 1, 0))
+        frame = b"BAGB\x02\x01\xa1\x01" + bytes(payload)
+
+        with mock.patch("battle_agent_service.run_tool_agent", return_value=None), mock.patch("battle_agent_service.log") as log:
+            self.assertIsNone(handle_request_frame(frame))
+
+        log.assert_any_call("audit #7: no legal model decision; vanilla_fallback")
 
     def test_tool_loop_rejects_a_second_malformed_reply(self) -> None:
         payload = bytes(417)
@@ -173,7 +225,7 @@ class BattleAgentServiceTests(unittest.TestCase):
         payload[392:399] = bytes((1, 0, 0, 0, 2, 1, 0))
         frame = b"BAGB\x02\x01\xa1\x01" + bytes(payload)
 
-        with mock.patch("battle_agent_service.run_tool_agent", return_value=0):
+        with mock.patch("battle_agent_service.run_tool_agent", return_value=AgentDecision(0, ("choose_action",))):
             self.assertEqual(handle_request_frame(frame), b"BAGB\x02\x02\x05\x00\x07\x00\x00\x00\x00")
 
     def test_connect_retries_to_the_lua_listener_and_returns_the_client_socket(self) -> None:

@@ -73,6 +73,20 @@ or Ollama response is absent or invalid, Calvin acts after at most 900 frames
    The `response written` sequence must match the service request sequence.
    Calvin then uses the corresponding legal move before the deadline.
 
+   Each accepted decision also prints an operator audit, for example:
+
+   ```text
+   BAGB service: audit #5
+     tools used: get_battle_state, compare_speed, list_legal_actions, choose_action
+     legal actions: 0=EMBER->battler 0; 1=GROWL->battler 0
+     selected: 0=EMBER->battler 0
+     selected ROM facts: STAB=yes, effectiveness=super-effective, KO=no, priority=0
+     speed context: battler_1_first
+   ```
+
+   This is a deterministic record of the tools actually used and ROM-provided
+   facts. It is not the model's hidden reasoning or a model-written rationale.
+
 ## Fallback smoke test
 
 Start Calvin's battle without the Python service, or close the service after

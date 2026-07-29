@@ -7,6 +7,7 @@ import argparse
 import socket
 import struct
 import time
+from dataclasses import dataclass
 from pathlib import Path
 from urllib.request import Request, urlopen
 
@@ -15,6 +16,14 @@ from bridge_protocol import LegalAction, REQUEST_FRAME_SIZE, format_response_fra
 
 class ToolError(ValueError):
     """Raised when a model attempts an unavailable or illegal action."""
+
+
+@dataclass(frozen=True)
+class AgentDecision:
+    """A validated model action and the read-only tools dispatched to reach it."""
+
+    action_index: int
+    tools_used: tuple[str, ...]
 
 
 OLLAMA_URL = "http://127.0.0.1:11434/api/chat"
@@ -27,6 +36,12 @@ FORMAT_RETRY_MESSAGE = (
 )
 CATALOG_PATH = Path(__file__).with_name("catalog_v2.json")
 LOOPBACK_HOST = "127.0.0.1"
+EFFECTIVENESS_LABELS = {
+    0: "immune",
+    1: "not-very-effective",
+    2: "neutral",
+    3: "super-effective",
+}
 
 
 def load_catalog(path: Path = CATALOG_PATH) -> dict[str, dict[str, str]]:
@@ -157,6 +172,41 @@ def compare_speed(payload: bytes) -> dict[str, int | str]:
     }
 
 
+def format_legal_action(action: LegalAction, requester_moves: list[dict[str, int]]) -> str:
+    """Format one ROM-authorized action without attributing it to the model."""
+    if action.move_slot >= len(requester_moves):
+        raise ToolError("legal action references an unavailable requester move")
+    return f"{action.action_index}={requester_moves[action.move_slot]['move_name']}->battler {action.target_battler}"
+
+
+def format_decision_audit(sequence: int, requesting_battler: int, decision: AgentDecision, actions: tuple[LegalAction, ...], payload: bytes) -> str:
+    """Return one deterministic, operator-facing audit for a validated choice."""
+    requester_moves = get_battler_moves(payload, requesting_battler)
+    selected = next((action for action in actions if action.action_index == decision.action_index), None)
+    if selected is None:
+        raise ToolError("decision references an unavailable legal action")
+    selected_facts = analyze_action(actions, decision.action_index, requester_moves)
+    effectiveness = EFFECTIVENESS_LABELS.get(selected_facts["type_effectiveness"])
+    if effectiveness is None:
+        raise ToolError("decision has an unknown effectiveness category")
+    speed_context = compare_speed(payload)["normal_order"]
+    tools_used = ", ".join(decision.tools_used) if decision.tools_used else "none"
+    legal_actions = "; ".join(format_legal_action(action, requester_moves) for action in actions)
+    selected_action = format_legal_action(selected, requester_moves)
+    return "\n".join((
+        f"audit #{sequence}",
+        f"  tools used: {tools_used}",
+        f"  legal actions: {legal_actions}",
+        f"  selected: {selected_action}",
+        "  selected ROM facts: "
+        f"STAB={'yes' if selected_facts['has_stab'] else 'no'}, "
+        f"effectiveness={effectiveness}, "
+        f"KO={'yes' if selected_facts['can_faint_target'] else 'no'}, "
+        f"priority={selected_facts['priority']}",
+        f"  speed context: {speed_context}",
+    ))
+
+
 def request_ollama(messages: list[dict[str, object]]) -> dict[str, object]:
     """Call only the local Ollama chat endpoint with the bounded tool schema."""
     body = json.dumps({"model": OLLAMA_MODEL, "stream": False, "messages": messages, "tools": TOOL_SCHEMAS}).encode()
@@ -191,11 +241,12 @@ def extract_tool_call(message: dict[str, object]) -> tuple[str, dict[str, object
     return compatibility_call["name"], compatibility_call["arguments"]
 
 
-def run_tool_agent(sequence: int, turn_sequence: int, requesting_battler: int, actions: tuple[LegalAction, ...], payload: bytes) -> int | None:
+def run_tool_agent(sequence: int, turn_sequence: int, requesting_battler: int, actions: tuple[LegalAction, ...], payload: bytes) -> AgentDecision | None:
     """Run a bounded local model/tool exchange and return one legal index or None."""
     messages: list[dict[str, object]] = [{"role": "system", "content": "Use only the supplied read-only tools to inspect this battle. Do not answer in text. Finish exactly once with choose_action using a legal action_index."}]
     started = time.monotonic()
     format_retry_used = False
+    tools_used: list[str] = []
     for _ in range(MAX_TOOL_CALLS):
         if time.monotonic() - started >= SERVICE_TIMEOUT_SECONDS:
             return None
@@ -214,7 +265,7 @@ def run_tool_agent(sequence: int, turn_sequence: int, requesting_battler: int, a
             if name == "choose_action":
                 action_index = choose_action(actions, arguments.get("action_index"))
                 log(f"request {sequence} chose action {action_index}")
-                return action_index
+                return AgentDecision(action_index, tuple(tools_used + [name]))
             if name == "get_battle_state" and not arguments:
                 result = get_battle_state(sequence=sequence, turn_sequence=turn_sequence, requesting_battler=requesting_battler, payload=payload)
             elif name == "get_field_state" and not arguments:
@@ -231,6 +282,7 @@ def run_tool_agent(sequence: int, turn_sequence: int, requesting_battler: int, a
                 result = compare_speed(payload)
             else:
                 return None
+            tools_used.append(name)
             messages.append(message)
             messages.append({"role": "tool", "content": json.dumps(result)})
         except (OSError, ValueError, ToolError) as error:
@@ -243,17 +295,29 @@ def handle_request_frame(frame: bytes) -> bytes | None:
     """Decode one bridge request and return a response only for a valid model choice."""
     request = parse_request_frame(frame)
     log(f"request {request.sequence} received")
-    action_index = run_tool_agent(
+    decision = run_tool_agent(
         request.sequence,
         request.turn_sequence,
         request.requesting_battler,
         request.legal_actions,
         request.payload,
     )
-    if action_index is None:
+    if decision is None:
         log(f"request {request.sequence} produced no response")
+        log(f"audit #{request.sequence}: no legal model decision; vanilla_fallback")
         return None
-    return format_response_frame(request.sequence, action_index)
+    try:
+        log(format_decision_audit(
+            request.sequence,
+            request.requesting_battler,
+            decision,
+            request.legal_actions,
+            request.payload,
+        ))
+        return format_response_frame(request.sequence, decision.action_index)
+    except (ToolError, ValueError) as error:
+        log(f"request {request.sequence} audit rejected: {error}")
+        return None
 
 
 def _connect(port: int) -> socket.socket:

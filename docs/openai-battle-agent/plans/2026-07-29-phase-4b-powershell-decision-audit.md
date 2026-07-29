@@ -26,12 +26,12 @@
 
 - [ ] **Step 1: Add a failing successful-decision audit test.**
 
-  Import `AgentDecision` and the pure `format_decision_audit` helper. Create a 417-byte payload whose requester move slot 1 is `MOVE_EMBER`, whose active speeds make battler 1 faster, and use existing two legal actions. Assert:
+  Import `AgentDecision` and the pure `format_decision_audit` helper. Create a 417-byte payload whose requester (battler 1) move slot 1 is `MOVE_EMBER`, whose active speeds make battler 1 faster, and use existing two legal actions. Assert:
 
   ```python
   decision = AgentDecision(1, ("get_battle_state", "list_legal_actions"))
-  audit = format_decision_audit(7, decision, actions, payload)
-  self.assertIn("BAGB audit #7", audit)
+  audit = format_decision_audit(7, 1, decision, actions, payload)
+  self.assertIn("audit #7", audit)
   self.assertIn("tools used: get_battle_state, list_legal_actions", audit)
   self.assertIn("legal actions: 0=", audit)
   self.assertIn("selected: 1=", audit)
@@ -114,7 +114,7 @@
 
 - [ ] **Step 1: Add pure formatting helpers.**
 
-  Define `EFFECTIVENESS_LABELS = {0: "immune", 1: "not-very-effective", 2: "neutral", 3: "super-effective"}`. Add `format_legal_action(action, requester_moves)` and `format_decision_audit(sequence, decision, actions, payload)`. The latter must use `get_battler_moves(payload, 0)`, `analyze_action(actions, decision.action_index, requester_moves)`, and `compare_speed(payload)`; it must join only the fixed fields required by the specification.
+  Define `EFFECTIVENESS_LABELS = {0: "immune", 1: "not-very-effective", 2: "neutral", 3: "super-effective"}`. Add `format_legal_action(action, requester_moves)` and `format_decision_audit(sequence, requesting_battler, decision, actions, payload)`. The latter must use `get_battler_moves(payload, requesting_battler)`, `analyze_action(actions, decision.action_index, requester_moves)`, and `compare_speed(payload)`; it must join only the fixed fields required by the specification.
 
   Raise `ToolError` when an action index is absent or an effectiveness category is not in `EFFECTIVENESS_LABELS`. Do not calculate damage, inspect mGBA, or call Ollama.
 
@@ -166,7 +166,7 @@
   Reset mGBA Scripting, load `tools/mgba-bridge/mgba_bridge.lua` exactly once, start `py -3 tools/mgba-bridge/battle_agent_service.py`, and fight Calvin. Expected PowerShell/mGBA evidence:
 
   ```text
-  BAGB audit #N
+  BAGB service: audit #N
     tools used: ...
     legal actions: ...
     selected: ...

@@ -10,6 +10,8 @@
 
 **Implementation plan:** [Phase 4B audit plan](../plans/2026-07-29-phase-4b-powershell-decision-audit.md)
 
+**Evidence:** [Phase 4B audit evidence](../reviews/2026-07-29-phase-4b-powershell-decision-audit-evidence.md)
+
 ## Goal
 
 Make every completed local-agent decision observable in the PowerShell service log. The audit must show which read-only tools the model called, the ROM-provided legal action options, the selected legal action, and ROM-derived facts relevant to judging that action. It must not claim to expose or reconstruct the model's hidden reasoning.
@@ -37,10 +39,12 @@ The audit can say that a tool was called and can display deterministic ROM facts
 
 ## Audit format
 
-For a successful action, the service writes this fixed-shape record after validating `choose_action`:
+For a successful action, the service passes this fixed-shape record to its
+existing `log` function after validating `choose_action`; the function adds
+the established `BAGB service:` prefix:
 
 ```text
-BAGB audit #5
+audit #5
   tools used: get_battle_state, compare_speed, list_legal_actions
   legal actions: 0=Ember->battler 0; 1=Growl->battler 0
   selected: 0=Ember->battler 0
@@ -53,7 +57,7 @@ Tool names appear in call order and may repeat. Legal actions appear in the ROM'
 For a no-response run, the service writes one line:
 
 ```text
-BAGB audit #5: no legal model decision; vanilla_fallback
+audit #5: no legal model decision; vanilla_fallback
 ```
 
 It may still retain the existing concise failure diagnostics, but must not add raw model content or full snapshot data.
