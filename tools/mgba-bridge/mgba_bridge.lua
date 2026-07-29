@@ -86,8 +86,8 @@ if not ok_listen or listen_result ~= LUA_SOCKET_SUCCESS then
     error("BAGB startup failed: could not listen on 127.0.0.1:" .. BRIDGE_PORT .. ": " .. tostring(reason))
 end
 
-local MAGIC = 0x42414731
-local VERSION = 1
+local MAGIC = 0x42414732
+local VERSION = 2
 local REQUEST_PENDING = 1
 local RESPONSE_READY = 1
 
@@ -98,13 +98,21 @@ local OFFSET_RESPONSE_STATUS = 7
 local OFFSET_REQUEST_SEQUENCE = 8
 local OFFSET_REQUESTING_BATTLER = 12
 local OFFSET_BATTLE_MODE = 13
-local OFFSET_LEGAL_ACTION_COUNT = 128
-local OFFSET_RESPONSE_SEQUENCE = 148
-local OFFSET_RESPONSE_ACTION_INDEX = 152
+local OFFSET_SNAPSHOT = 16
+local OFFSET_LEGAL_ACTION_COUNT = 464
+local OFFSET_LEGAL_ACTIONS = 468
+local OFFSET_RESPONSE_SEQUENCE = 500
+local OFFSET_RESPONSE_ACTION_INDEX = 504
+
+local REQUEST_PAYLOAD_SIZE = 417
+local RESPONSE_PAYLOAD_SIZE = 5
+local REQUEST_FRAME_SIZE = 425
+local RESPONSE_FRAME_SIZE = 13
+local BATTLER_SIZE = 48
+local MOVE_SIZE = 12
+local SNAPSHOT_BATTLER_MOVES = 240
 
 local TRAINER_SINGLE = 1
-local U32_MAX = 4294967295
-
 local client_accepted = false
 local client_socket = nil
 local client_disconnected = false
@@ -155,10 +163,57 @@ local function disconnect_client(reason)
     log("BAGB client disconnected: " .. reason)
 end
 
+local function append_u8(parts, value)
+    parts[#parts + 1] = string.char(value % 256)
+end
+
+local function append_u16(parts, value)
+    append_u8(parts, value)
+    append_u8(parts, math.floor(value / 256))
+end
+
+local function append_u32(parts, value)
+    append_u16(parts, value)
+    append_u16(parts, math.floor(value / 65536))
+end
+
+local function append_battler(parts, battler)
+    local base = MAILBOX_ADDRESS + OFFSET_SNAPSHOT + battler * BATTLER_SIZE
+    append_u16(parts, emu:read16(base)); append_u8(parts, emu:read8(base + 20))
+    for offset = 21, 23 do append_u8(parts, emu:read8(base + offset)) end
+    append_u16(parts, emu:read16(base + 24)); append_u16(parts, emu:read16(base + 26))
+    append_u16(parts, emu:read16(base + 2)); append_u16(parts, emu:read16(base + 4))
+    for offset = 28, 36, 2 do append_u16(parts, emu:read16(base + offset)) end
+    append_u32(parts, emu:read32(base + 8)); append_u32(parts, emu:read32(base + 40)); append_u32(parts, emu:read32(base + 44))
+    for offset = 12, 19 do append_u8(parts, emu:read8(base + offset)) end
+    for slot = 0, 3 do
+        local move = MAILBOX_ADDRESS + OFFSET_SNAPSHOT + SNAPSHOT_BATTLER_MOVES + (battler * 4 + slot) * MOVE_SIZE
+        append_u16(parts, emu:read16(move)); append_u8(parts, emu:read8(move + 2)); append_u8(parts, emu:read8(move + 3)); append_u8(parts, emu:read8(move + 4)); append_u8(parts, emu:read8(move + 5)); append_u16(parts, emu:read16(move + 6)); append_u8(parts, emu:read8(move + 8)); append_u8(parts, emu:read8(move + 10)); append_u8(parts, emu:read8(move + 11))
+    end
+end
+
 local function send_request(header)
-    local request_line = "BAGB/1 REQUEST " .. header.sequence .. " " .. header.action_count .. "\n"
-    local ok_send, send_result, send_error = pcall(client_socket.send, client_socket, request_line)
-    if not ok_send or send_result == nil or send_result ~= #request_line then
+    local payload = {}
+    append_u32(payload, header.sequence)
+    append_u8(payload, header.requester)
+    append_u8(payload, header.battle_mode)
+    append_u16(payload, emu:read16(MAILBOX_ADDRESS + 14))
+    append_u8(payload, 2)
+    for battler = 0, 3 do append_battler(payload, battler) end
+    append_u16(payload, emu:read16(MAILBOX_ADDRESS + 448))
+    append_u8(payload, emu:read8(MAILBOX_ADDRESS + 450))
+    append_u32(payload, emu:read32(MAILBOX_ADDRESS + 452))
+    append_u32(payload, emu:read32(MAILBOX_ADDRESS + 456))
+    append_u32(payload, emu:read32(MAILBOX_ADDRESS + 460))
+    append_u8(payload, header.action_count)
+    for index = 0, 3 do
+        local action = MAILBOX_ADDRESS + OFFSET_LEGAL_ACTIONS + index * 8
+        for field = 0, 5 do append_u8(payload, emu:read8(action + field)) end
+    end
+    local payload_bytes = table.concat(payload)
+    local request_frame = "BAGB" .. string.char(VERSION, 1, REQUEST_PAYLOAD_SIZE % 256, math.floor(REQUEST_PAYLOAD_SIZE / 256)) .. payload_bytes
+    local ok_send, send_result, send_error = pcall(client_socket.send, client_socket, request_frame)
+    if not ok_send or send_result == nil or send_result ~= #request_frame then
         local reason = send_error
         if not ok_send then
             reason = send_result
@@ -173,37 +228,18 @@ local function send_request(header)
     return true
 end
 
-local function contains_only_non_nul_ascii(value)
-    for index = 1, #value do
-        local byte = string.byte(value, index)
-        if byte == 0 or byte > 127 then
-            return false
-        end
-    end
-    return true
-end
-
-local function parse_u32(token)
-    if token == nil or token:match("^[0-9]+$") == nil then
+local function parse_response_frame(frame)
+    if #frame ~= RESPONSE_FRAME_SIZE
+     or frame:sub(1, 4) ~= "BAGB"
+     or string.byte(frame, 5) ~= VERSION
+     or string.byte(frame, 6) ~= 2
+     or string.byte(frame, 7) ~= RESPONSE_PAYLOAD_SIZE
+     or string.byte(frame, 8) ~= 0 then
         return nil
     end
-
-    local value = tonumber(token)
-    if value == nil or value > U32_MAX then
-        return nil
-    end
-    return value
-end
-
-local function parse_response_line(line)
-    if #line > MAX_LINE_BYTES or not contains_only_non_nul_ascii(line) then
-        return nil
-    end
-
-    local sequence_token, action_token = line:match("^BAGB/1 RESPONSE ([0-9]+) ([0-9]+)\n$")
-    local sequence = parse_u32(sequence_token)
-    local action_index = parse_u32(action_token)
-    if sequence == nil or action_index == nil or action_index > 3 then
+    local sequence = string.byte(frame, 9) + string.byte(frame, 10) * 256 + string.byte(frame, 11) * 65536 + string.byte(frame, 12) * 16777216
+    local action_index = string.byte(frame, 13)
+    if action_index > 3 then
         return nil
     end
 
@@ -306,15 +342,15 @@ local function on_frame()
         return
     end
 
-    if #receive_buffer == MAX_LINE_BYTES then
-        disconnect_client("response line exceeded 96 bytes")
+    if #receive_buffer >= RESPONSE_FRAME_SIZE then
+        disconnect_client("response frame exceeded 13 bytes")
         return
     end
 
     local ok_receive, chunk, receive_error = pcall(
         client_socket.receive,
         client_socket,
-        MAX_LINE_BYTES - #receive_buffer
+        RESPONSE_FRAME_SIZE - #receive_buffer
     )
     if not ok_receive or chunk == nil then
         local reason = receive_error
@@ -326,24 +362,16 @@ local function on_frame()
     end
 
     receive_buffer = receive_buffer .. chunk
-    if #receive_buffer > MAX_LINE_BYTES or not contains_only_non_nul_ascii(receive_buffer) then
-        disconnect_client("invalid response bytes")
+    if #receive_buffer > RESPONSE_FRAME_SIZE then
+        disconnect_client("response frame has extra bytes")
         return
     end
-
-    local newline_index = receive_buffer:find("\n", 1, true)
-    if newline_index == nil then
+    if #receive_buffer < RESPONSE_FRAME_SIZE then
         return
     end
-
-    if newline_index < #receive_buffer then
-        disconnect_client("multiple response lines in one receive")
-        return
-    end
-
-    local line = receive_buffer:sub(1, newline_index)
+    local frame = receive_buffer
     receive_buffer = ""
-    local response = parse_response_line(line)
+    local response = parse_response_frame(frame)
     if response == nil then
         disconnect_client("malformed response")
         return
