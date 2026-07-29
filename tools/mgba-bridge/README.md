@@ -1,98 +1,157 @@
-# mGBA local Ollama battle agent (Phase 4A)
+# Play the local Ollama AI-trainer demo
 
-This is the playable Calvin-only vertical slice. The ROM gives the local agent
-read-only battle tools and accepts only one existing legal action index. It
-keeps the normal trainer-AI decision as its fallback: if the bridge, service,
-or Ollama response is absent or invalid, Calvin acts after at most 900 frames
-(about 15 seconds).
+This is the existing manual Youngster Calvin demo. Keep Ollama, the Python
+service, and mGBA in their own windows; this guide does not start them for you.
 
 ## Scope and safety
 
-- Only Youngster Calvin (`TRAINER_CALVIN_1`) in a standard trainer single
-  battle is eligible. Moves only; no switches, items, benches, doubles, or
-  other trainers.
-- Lua binds the `127.0.0.1:57621` listener; Python connects only to that
-  loopback listener.
-- The agent receives only read-only snapshot tools and can finish only with
-  `choose_action(action_index)`. It cannot name a move or target, access mGBA,
-  run commands, or use a network tool.
-- `generated/mailbox_address.lua` is generated from the current ELF, ignored
-  by Git, and must be regenerated after every ROM rebuild.
-- One mGBA script accepts one service connection. Restart mGBA and reload the
-  script before starting another service session.
-- If the local model emits one malformed tool-call reply, the service makes
-  one bounded correction request. A second malformed reply, invalid command,
-  endpoint failure, or timeout sends no response, so the ROM keeps its vanilla
-  trainer-AI fallback.
+- Only Youngster Calvin (`TRAINER_CALVIN_1`) is configured, in a standard
+  trainer single battle.
+- The agent reads battle data and may finish only by selecting one current
+  ROM-authorized action index. It cannot name moves or targets, access mGBA,
+  run commands, or use the network.
+- The ordinary trainer AI is the fallback. If no valid response arrives,
+  Calvin uses the saved vanilla action after at most 900 frames (about 15 s).
+- Lua listens only on `127.0.0.1:57621`; the Python service is its one client.
+  Do not probe that port or start another service to test it.
+- `generated/mailbox_address.lua` is ignored by Git. Regenerate it from a
+  fresh ELF after every ROM rebuild; never edit it manually.
 
-## Build and launch
+## Play the Calvin demo
 
-1. In WSL, build the ROM and generate the mailbox address:
+### 1. Build the ROM and mailbox address
 
-   ```bash
-   cd /mnt/c/Users/jerem/Documents/Github/pokeemerald-expansion
-   make -j16
-   python3 tools/mgba-bridge/generate_mailbox_config.py --elf pokeemerald.elf
-   ```
+In WSL:
 
-2. In Windows PowerShell, confirm the local model exists, then start the
-   service and leave the window open:
+```bash
+cd /mnt/c/Users/jerem/Documents/Github/pokeemerald-expansion
+make -j16
+python3 tools/mgba-bridge/generate_mailbox_config.py --elf pokeemerald.elf
+```
 
-   ```powershell
-   ollama list
-   cd C:\Users\jerem\Documents\Github\pokeemerald-expansion
-   py -3 tools\mgba-bridge\battle_agent_service.py
-   ```
+Expected: `make` produces `pokeemerald.gba` and the generator writes
+`tools/mgba-bridge/generated/mailbox_address.lua`.
 
-   The list must contain `qwen2.5-coder:7b`. Start `ollama serve` in a
-   separate window only if its local API is not already available. Before the
-   first battle after a restart, warm the model in another PowerShell window:
+### 2. Confirm and warm Ollama
 
-   ```powershell
-   ollama run qwen2.5-coder:7b "Reply with exactly READY"
-   ```
+In Windows PowerShell:
 
-   Wait for `READY`, then start the service and mGBA within Ollama's normal
-   model-residency window. This matters because a cold 7B model load can take
-   longer than the ROM's fixed 15-second fallback deadline.
+```powershell
+ollama list
+```
 
-3. Open the newly built `pokeemerald.gba` in Windows mGBA. Select **Tools →
-   Scripting…**, then load `tools\mgba-bridge\mgba_bridge.lua`.
+The list must contain `qwen2.5-coder:7b`. Before a live demo after an Ollama
+restart, warm it in a separate PowerShell window:
 
-4. Start a battle with Youngster Calvin. A successful agent turn has logs like:
+```powershell
+ollama run qwen2.5-coder:7b "Reply with exactly READY"
+```
+
+Wait for `READY`. Warming is optional but recommended: a cold 7B-model load
+can exceed the fallback deadline. A fallback alone does not prove cold loading
+was the cause; use the service and Lua logs below to find known bridge errors.
+
+### 3. Start the Python service
+
+Leave this PowerShell process running:
+
+```powershell
+cd C:\Users\jerem\Documents\Github\pokeemerald-expansion
+py -3 tools\mgba-bridge\battle_agent_service.py
+```
+
+It is normal for the service to print this once and wait silently until Lua is
+loaded in mGBA:
+
+```text
+BAGB service: connecting to mGBA at 127.0.0.1:57621
+```
+
+Do not restart a service waiting at that line. It retries the Lua listener
+until the next step completes.
+
+### 4. Open mGBA, load Lua, and battle Calvin
+
+1. Open the freshly built `pokeemerald.gba` in Windows mGBA.
+2. Choose **Tools → Scripting…** and load
+   `tools\mgba-bridge\mgba_bridge.lua` exactly once.
+3. Confirm the Scripting window says:
 
    ```text
-   BAGB service: request 1 received
-   BAGB service: request 1 tool get_battler
-   BAGB service: request 1 tool choose_action
-   BAGB service: request 1 chose action 0
-   BAGB request forwarded: 1
-   BAGB response written: 1
+   BAGB listener ready 127.0.0.1:57621
+   BAGB client connected
    ```
 
-   The `response written` sequence must match the service request sequence.
-   Calvin then uses the corresponding legal move before the deadline.
-
-   Each accepted decision also prints an operator audit, for example:
+4. Confirm PowerShell says:
 
    ```text
-   BAGB service: audit #5
-     tools used: get_battle_state, compare_speed, list_legal_actions, choose_action
-     legal actions: 0=EMBER->battler 0; 1=GROWL->battler 0
-     selected: 0=EMBER->battler 0
-     selected ROM facts: STAB=yes, effectiveness=super-effective, KO=no, priority=0
-     speed context: battler_1_first
+   BAGB service: mGBA bridge connected
    ```
 
-   This is a deterministic record of the tools actually used and ROM-provided
-   facts. It is not the model's hidden reasoning or a model-written rationale.
+5. Start Youngster Calvin's battle and choose the player's move.
 
-## Fallback smoke test
+## What success looks like
 
-Start Calvin's battle without the Python service, or close the service after
-`BAGB request forwarded`. mGBA must remain responsive; Lua writes no later
-response, and Calvin eventually performs the already-computed vanilla move.
-To retry after a service disconnect, restart mGBA and reload the Lua script.
+Move/tool details vary by battle state, but every sequence number must match:
+
+```text
+mGBA Scripting:
+BAGB request forwarded: 1
+BAGB response written: 1
+
+Python service:
+BAGB service: request 1 received
+BAGB service: request 1 tool list_legal_actions
+BAGB service: request 1 tool choose_action
+BAGB service: request 1 chose action 0
+BAGB service: audit #1
+  tools used: list_legal_actions, choose_action
+  legal actions: 0=TACKLE->battler 0; 1=LEER->battler 0
+  selected: 0=TACKLE->battler 0
+  selected ROM facts: STAB=yes, effectiveness=neutral, KO=no, priority=0
+  speed context: battler_1_first
+```
+
+While a response is pending, the normal lower battle-message panel shows
+`AI is thinking...`. It clears automatically when mGBA writes an accepted
+response and the normal battle action continues. The audit reports dispatched
+tools and ROM facts; it is not hidden model reasoning or model-written prose.
+
+## Recovery
+
+| Symptom | Meaning and safe recovery |
+| --- | --- |
+| `ollama list` lacks `qwen2.5-coder:7b` | Install/pull that configured model before starting the service. |
+| Ollama is unavailable or a first turn falls back | Start Ollama normally, warm the model, then begin a new Calvin demo. Inspect logs: a fallback is not a conclusive diagnosis. |
+| Lua cannot bind/listen on `127.0.0.1:57621` | Close the earlier mGBA/Lua session that owns the listener. Reopen mGBA and load Lua once. |
+| Lua cannot load `generated/mailbox_address.lua`, or the ROM was rebuilt | Run the generator in step 1 against fresh `pokeemerald.elf`, then reopen mGBA. |
+| `BAGB client disconnected`, malformed response, or `BAGB response rejected` | Let the current wait resolve through vanilla fallback. Then restart mGBA, reload Lua, and start one new service session. |
+| `BAGB service: ... vanilla_fallback` or no response | The ROM intentionally keeps the saved trainer-AI action. Wait for the battle to proceed and inspect logs before resetting. |
+
+Never edit generated files, send a mailbox reply manually, probe port 57621,
+or run a second Python service. After a service disconnect, a new attempt
+requires mGBA restart and Lua reload.
+
+## Smoke-test checklists
+
+### Connected service
+
+1. Complete the launch steps and fight Calvin.
+2. Choose the player's move and observe `AI is thinking...`.
+3. Verify matching `BAGB request forwarded: N` and `BAGB response written: N`.
+4. Verify the service logged `request N received`, `chose action`, and
+   `audit #N`.
+5. Verify Calvin acts and the thinking message clears without a button press.
+
+### Absent-service fallback
+
+1. Omit the Python service, or stop it after `BAGB request forwarded`.
+2. Choose the player's move in Calvin's battle.
+3. Observe `AI is thinking...` during the bounded wait.
+4. Verify the message clears and Calvin uses saved vanilla trainer AI without
+   a stuck battle.
+5. Before another connected demo after a disconnect, restart mGBA and reload
+   Lua.
 
 ## Automated checks
 
@@ -105,5 +164,11 @@ make -j16 check TESTS='External AI'
 make -j16
 ```
 
-The protocol and acceptance criteria are defined in the [Phase 4A
-specification](../../docs/openai-battle-agent/specs/2026-07-29-phase-4a-local-ollama-tool-agent.md).
+## Phase artifacts
+
+- [Phase 4A local Ollama agent specification](../../docs/openai-battle-agent/specs/2026-07-29-phase-4a-local-ollama-tool-agent.md)
+- [Phase 4B decision-audit evidence](../../docs/openai-battle-agent/reviews/2026-07-29-phase-4b-powershell-decision-audit-evidence.md)
+- [Phase 5A thinking-status evidence](../../docs/openai-battle-agent/reviews/2026-07-29-phase-5a-thinking-status-evidence.md)
+- [Phase 5B specification](../../docs/openai-battle-agent/specs/2026-07-29-phase-5b-demo-guide.md)
+- [Phase 5B flow review](../../docs/openai-battle-agent/reviews/2026-07-29-phase-5b-demo-guide-flow-review.md)
+- [Phase 5B implementation plan](../../docs/openai-battle-agent/plans/2026-07-29-phase-5b-demo-guide.md)
