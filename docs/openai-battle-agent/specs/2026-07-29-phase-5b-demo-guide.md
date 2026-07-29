@@ -1,8 +1,12 @@
 # Phase 5B Specification: Manual Demo Guide and Recovery
 
-**Status:** Approved design; awaiting flow review and implementation plan
+**Status:** Approved design, flow review, and implementation plan; awaiting implementation
 
 **Roadmap:** [mGBA AI Trainer Design](../2026-07-18-mgba-ai-trainer-design.md#phase-5-agent-diagnostics-and-trainer-demo-hardening)
+
+**Flow review:** [Phase 5B demo-guide flow review](../reviews/2026-07-29-phase-5b-demo-guide-flow-review.md)
+
+**Implementation plan:** [Phase 5B demo-guide plan](../plans/2026-07-29-phase-5b-demo-guide.md)
 
 **Prerequisite:** Phase 4A local Ollama action selection, Phase 4B decision
 audit, and Phase 5A thinking-status presentation remain unchanged.

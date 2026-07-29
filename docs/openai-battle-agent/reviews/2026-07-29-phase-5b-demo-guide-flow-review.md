@@ -2,6 +2,8 @@
 
 **Specification reviewed:** [Phase 5B manual demo guide](../specs/2026-07-29-phase-5b-demo-guide.md)
 
+**Implementation plan:** [Phase 5B demo-guide plan](../plans/2026-07-29-phase-5b-demo-guide.md)
+
 ## Codebase grounding
 
 `tools/mgba-bridge/battle_agent_service.py` logs `connecting to mGBA` and
