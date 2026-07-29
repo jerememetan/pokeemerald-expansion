@@ -117,7 +117,7 @@ mailbox, bridge, service, action authority, or deadline.
 request; it clears automatically on both accepted response and absent-service
 fallback, while battle behavior remains unchanged.
 
-**Planning artifacts:** [specification](specs/2026-07-29-phase-5a-thinking-status.md) and [flow review](reviews/2026-07-29-phase-5a-thinking-status-flow-review.md). An implementation plan is required before production changes.
+**Planning artifacts:** [specification](specs/2026-07-29-phase-5a-thinking-status.md), [flow review](reviews/2026-07-29-phase-5a-thinking-status-flow-review.md), and [implementation plan](plans/2026-07-29-phase-5a-thinking-status.md).
 
 ### Phase 6: Broaden trainer coverage
 

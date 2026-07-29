@@ -8,6 +8,8 @@
 
 **Flow review:** [Phase 5A thinking-status flow review](../reviews/2026-07-29-phase-5a-thinking-status-flow-review.md)
 
+**Implementation plan:** [Phase 5A thinking-status plan](../plans/2026-07-29-phase-5a-thinking-status.md)
+
 ## Goal
 
 Make the existing external-AI response wait visibly intentional in a playable
