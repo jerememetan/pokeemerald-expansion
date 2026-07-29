@@ -81,6 +81,13 @@ does not require a button press. When the wait ends, the helper clears only a
 window it previously claimed. The normal battle controller/battle script may
 then write the next standard message.
 
+When the helper first claims this window, it must restore the normal battle
+message viewport (`gBattle_BG0_X = 0` and `gBattle_BG0_Y = 0`) before writing
+the text. Player move selection scrolls that same BG0 to a lower menu region;
+without this reset the status text exists but is off-screen. Claiming remains
+deferred until the player action is confirmed, so this reset cannot hide an
+interactive player menu.
+
 ## Failure and fallback behavior
 
 - If the external wait cannot begin, do not show the status; continue directly

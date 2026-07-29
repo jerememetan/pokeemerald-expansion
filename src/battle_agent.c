@@ -380,7 +380,11 @@ bool32 BattleAgent_BeginExternalWait(u32 battler)
 void BattleAgent_UpdateThinkingStatus(u32 battler, bool32 playerActionConfirmed)
 {
     if (BattleAgent_UpdateThinkingStatusState(battler, playerActionConfirmed, !IsTextPrinterActive(B_WIN_MSG)))
+    {
+        gBattle_BG0_X = 0;
+        gBattle_BG0_Y = 0;
         BattlePutTextOnWindow(BattleAgent_GetThinkingText(sBattleAgentThinkingStatuses[battler].displayState), B_WIN_MSG);
+    }
 }
 
 void BattleAgent_ClearThinkingStatus(u32 battler)

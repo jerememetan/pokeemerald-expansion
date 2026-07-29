@@ -168,10 +168,17 @@ No Lua, Python service, mailbox layout, wire contract, trainer data, battle-cont
   Implement `BattleAgent_UpdateThinkingStatus` by calling the state helper with `!IsTextPrinterActive(B_WIN_MSG)`. When the helper returns `TRUE`, call:
 
   ```c
+  gBattle_BG0_X = 0;
+  gBattle_BG0_Y = 0;
   BattlePutTextOnWindow(
       BattleAgent_GetThinkingText(sBattleAgentThinkingStatuses[battler].displayState),
       B_WIN_MSG);
   ```
+
+The BG0 assignments restore the normal message viewport after player move
+selection has scrolled it to the lower move-menu region. They occur only once
+the helper has claimed the status, which remains deferred until the player has
+confirmed an action.
 
   Do not implement `BattleAgent_ClearThinkingStatus` in this task. Task 3 adds the cleanup function and connects it to accepted-response, timeout, and reset paths after its failing cleanup test exists.
 

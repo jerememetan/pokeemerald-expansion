@@ -66,6 +66,13 @@ a move, target, mailbox field, or response deadline.
    specification now requires explicit ownership; cleanup clears only a window
    claimed by this status helper.
 
+5. **The standard message window is off-screen after the player chooses a
+   move.** `HandleChooseMoveAfterDma3` scrolls BG0 to the move-menu region.
+   Writing `B_WIN_MSG` without resetting that viewport produces an apparently
+   frozen blank screen even though the text was rendered. The specification
+   now requires the helper to restore BG0 X/Y to zero immediately before its
+   first status render, after player-action confirmation.
+
 ### Minor
 
 1. **The existing battle tests are action-oriented rather than visual.** The
@@ -91,4 +98,3 @@ implementation default is safe:
    Python for this UI-only slice.
 3. Run the full relevant battle test suite, bridge-service tests, a fresh ROM
    build, then connected and absent-service Calvin smoke tests.
-

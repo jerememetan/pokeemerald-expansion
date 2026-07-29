@@ -760,6 +760,20 @@ TEST("External AI thinking status starts fresh after a previous wait")
     EXPECT_EQ(BattleAgent_TestGetThinkingStatusFrames(B_POSITION_OPPONENT_LEFT), 0);
 }
 
+TEST("External AI thinking status shows the normal message panel")
+{
+    BattleAgent_ResetMailbox();
+    BattleAgent_TestStartThinkingStatus(B_POSITION_OPPONENT_LEFT);
+    gBattle_BG0_X = 24;
+    gBattle_BG0_Y = DISPLAY_HEIGHT * 2;
+
+    BattleAgent_UpdateThinkingStatus(B_POSITION_OPPONENT_LEFT, TRUE);
+
+    EXPECT_EQ(gBattle_BG0_X, 0);
+    EXPECT_EQ(gBattle_BG0_Y, 0);
+    BattleAgent_ClearThinkingStatus(B_POSITION_OPPONENT_LEFT);
+}
+
 AI_SINGLE_BATTLE_TEST("External AI mock accepts Calvin's legal move slot")
 {
     GIVEN {
