@@ -90,6 +90,14 @@ Upgrade the mailbox and bridge to V2, add a bounded ROM response wait/acceptance
 
 **Planning artifacts:** [specification](specs/2026-07-29-phase-4a-local-ollama-tool-agent.md), [flow review](reviews/2026-07-29-phase-4a-local-ollama-tool-agent-flow-review.md), [implementation plan](plans/2026-07-29-phase-4a-local-ollama-tool-agent.md), and [qwen compatibility review](reviews/2026-07-29-phase-4a-tool-call-compatibility-flow-review.md). Phase 4A is not verified until fresh ROM build/test and connected mGBA evidence are recorded.
 
+### Phase 4B: PowerShell decision audit
+
+Add an operator-only, deterministic decision audit to the local service. It records tools actually used, ROM-provided legal move options, the selected legal action, and ROM facts that make the choice assessable; it does not expose model reasoning, alter the V2 protocol, or add action authority.
+
+**Exit criterion:** A connected Calvin turn emits an audit that matches its accepted bridge sequence and action; all no-decision cases log `vanilla_fallback` and preserve the existing ROM fallback.
+
+**Planning artifacts:** [specification](specs/2026-07-29-phase-4b-powershell-decision-audit.md), [flow review](reviews/2026-07-29-phase-4b-powershell-decision-audit-flow-review.md), and [implementation plan](plans/2026-07-29-phase-4b-powershell-decision-audit.md).
+
 ### Phase 5: Agent diagnostics and trainer demo hardening
 
 Instrument local-agent latency, tool calls, selections, rejected responses, fallback count, and battle outcome. Improve the repeatable mGBA demo and error diagnostics without widening the action authority beyond the Phase 4A tool/action contract.
@@ -154,3 +162,6 @@ Later phase specifications will select any additive protocol extensions and broa
 - [Phase 4A specification](specs/2026-07-29-phase-4a-local-ollama-tool-agent.md)
 - [Phase 4A flow review](reviews/2026-07-29-phase-4a-local-ollama-tool-agent-flow-review.md)
 - [Phase 4A implementation plan](plans/2026-07-29-phase-4a-local-ollama-tool-agent.md)
+- [Phase 4B specification](specs/2026-07-29-phase-4b-powershell-decision-audit.md)
+- [Phase 4B flow review](reviews/2026-07-29-phase-4b-powershell-decision-audit-flow-review.md)
+- [Phase 4B implementation plan](plans/2026-07-29-phase-4b-powershell-decision-audit.md)

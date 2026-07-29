@@ -1,8 +1,14 @@
 # Phase 4B Specification: PowerShell Decision Audit
 
-**Status:** User-approved design; awaiting flow review and implementation plan  
-**Parent roadmap:** [mGBA AI trainer design](../2026-07-18-mgba-ai-trainer-design.md)  
+**Status:** Flow reviewed and implementation planned
+
+**Parent roadmap:** [mGBA AI trainer design](../2026-07-18-mgba-ai-trainer-design.md)
+
 **Prerequisite:** [Phase 4A evidence](../reviews/2026-07-29-phase-4a-model-format-retry-evidence.md)
+
+**Flow review:** [Phase 4B audit flow review](../reviews/2026-07-29-phase-4b-powershell-decision-audit-flow-review.md)
+
+**Implementation plan:** [Phase 4B audit plan](../plans/2026-07-29-phase-4b-powershell-decision-audit.md)
 
 ## Goal
 
