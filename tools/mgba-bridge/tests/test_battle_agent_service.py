@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import sys
 import unittest
 from pathlib import Path
@@ -129,6 +130,35 @@ class BattleAgentServiceTests(unittest.TestCase):
         ):
             with self.subTest(content=content), mock.patch("battle_agent_service.request_ollama", return_value={"content": content}):
                 self.assertIsNone(run_tool_agent(7, 3, 1, self.actions, payload))
+
+    def test_tool_loop_retries_one_malformed_reply_before_a_legal_choice(self) -> None:
+        payload = bytes(417)
+        responses = [
+            {"content": '{"name": list_legal_actions, "arguments": {}}'},
+            {"content": '{"name":"list_legal_actions","arguments":{}}'},
+            {"content": '{"name":"choose_action","arguments":{"action_index":1}}'},
+        ]
+
+        with mock.patch("battle_agent_service.request_ollama", side_effect=responses) as request:
+            self.assertEqual(run_tool_agent(7, 3, 1, self.actions, payload), 1)
+
+        self.assertEqual(request.call_count, 3)
+        self.assertEqual(
+            json.loads(request.call_args_list[2].args[0][-1]["content"]),
+            list_legal_actions(self.actions),
+        )
+
+    def test_tool_loop_rejects_a_second_malformed_reply(self) -> None:
+        payload = bytes(417)
+        responses = [
+            {"content": '{"name": list_legal_actions, "arguments": {}}'},
+            {"content": '{"name": choose_action, "arguments": {}}'},
+        ]
+
+        with mock.patch("battle_agent_service.request_ollama", side_effect=responses) as request:
+            self.assertIsNone(run_tool_agent(7, 3, 1, self.actions, payload))
+
+        self.assertEqual(request.call_count, 2)
 
     def test_tool_loop_rejects_text_only_or_unknown_tool_completion(self) -> None:
         payload = bytes(417)

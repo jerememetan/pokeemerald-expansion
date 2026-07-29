@@ -20,6 +20,10 @@ or Ollama response is absent or invalid, Calvin acts after at most 900 frames
   by Git, and must be regenerated after every ROM rebuild.
 - One mGBA script accepts one service connection. Restart mGBA and reload the
   script before starting another service session.
+- If the local model emits one malformed tool-call reply, the service makes
+  one bounded correction request. A second malformed reply, invalid command,
+  endpoint failure, or timeout sends no response, so the ROM keeps its vanilla
+  trainer-AI fallback.
 
 ## Build and launch
 

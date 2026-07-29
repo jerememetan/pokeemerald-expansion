@@ -166,3 +166,5 @@ The V2 wire payload has one fixed byte size defined by the ROM header and duplic
 - [Phase 3A specification](2026-07-28-phase-3a-mgba-loopback-bridge.md)
 - [Phase 4A flow review](../reviews/2026-07-29-phase-4a-local-ollama-tool-agent-flow-review.md)
 - [Phase 4A implementation plan](../plans/2026-07-29-phase-4a-local-ollama-tool-agent.md)
+- [Bounded model-format retry specification](2026-07-29-phase-4a-model-format-retry.md)
+- [Model-format retry evidence](../reviews/2026-07-29-phase-4a-model-format-retry-evidence.md)

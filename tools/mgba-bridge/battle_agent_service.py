@@ -21,6 +21,10 @@ OLLAMA_URL = "http://127.0.0.1:11434/api/chat"
 OLLAMA_MODEL = "qwen2.5-coder:7b"
 MAX_TOOL_CALLS = 12
 SERVICE_TIMEOUT_SECONDS = 12.0
+FORMAT_RETRY_MESSAGE = (
+    "Your previous reply was not a valid tool call. Reply with exactly one "
+    "supported tool call; do not answer in prose or malformed JSON."
+)
 CATALOG_PATH = Path(__file__).with_name("catalog_v2.json")
 LOOPBACK_HOST = "127.0.0.1"
 
@@ -191,6 +195,7 @@ def run_tool_agent(sequence: int, turn_sequence: int, requesting_battler: int, a
     """Run a bounded local model/tool exchange and return one legal index or None."""
     messages: list[dict[str, object]] = [{"role": "system", "content": "Use only the supplied read-only tools to inspect this battle. Do not answer in text. Finish exactly once with choose_action using a legal action_index."}]
     started = time.monotonic()
+    format_retry_used = False
     for _ in range(MAX_TOOL_CALLS):
         if time.monotonic() - started >= SERVICE_TIMEOUT_SECONDS:
             return None
@@ -198,7 +203,12 @@ def run_tool_agent(sequence: int, turn_sequence: int, requesting_battler: int, a
             message = request_ollama(messages)
             tool_call = extract_tool_call(message)
             if tool_call is None:
-                return None
+                if format_retry_used:
+                    return None
+                format_retry_used = True
+                log(f"request {sequence} retrying malformed tool call")
+                messages.append({"role": "system", "content": FORMAT_RETRY_MESSAGE})
+                continue
             name, arguments = tool_call
             log(f"request {sequence} tool {name}")
             if name == "choose_action":
