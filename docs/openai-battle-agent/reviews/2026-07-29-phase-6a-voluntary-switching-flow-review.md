@@ -2,6 +2,8 @@
 
 **Specification reviewed:** [Phase 6A voluntary switching](../specs/2026-07-29-phase-6a-voluntary-switching.md)
 
+**Implementation plan:** [Phase 6A plan](../plans/2026-07-29-phase-6a-voluntary-switching.md)
+
 ## Codebase grounding
 
 The current mailbox is fixed BAGB/2: `BattleAgentMailboxV2` has four move-only

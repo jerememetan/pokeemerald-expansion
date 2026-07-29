@@ -1,8 +1,12 @@
 # Phase 6A Specification: Voluntary AI Switching in Trainer Singles
 
-**Status:** Approved design; awaiting flow review and implementation plan
+**Status:** Approved design, flow review, and implementation plan; awaiting implementation
 
 **Roadmap:** [mGBA AI Trainer Design](../2026-07-18-mgba-ai-trainer-design.md)
+
+**Flow review:** [Phase 6A flow review](../reviews/2026-07-29-phase-6a-voluntary-switching-flow-review.md)
+
+**Implementation plan:** [Phase 6A plan](../plans/2026-07-29-phase-6a-voluntary-switching.md)
 
 **Prerequisite:** Phases 0–5 are verified for the Calvin trainer-single demo.
 
