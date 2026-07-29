@@ -15,6 +15,7 @@ void TestRunner_Battle_RecordMessage(const u8 *message);
 void TestRunner_Battle_RecordStatus1(u32 battlerId, u32 status1);
 void TestRunner_Battle_AfterLastTurn(void);
 void TestRunner_Battle_CheckChosenMove(u32 battlerId, u32 moveId, u32 target);
+void TestRunner_Battle_InjectBattleAgentResponse(u32 battlerId);
 void TestRunner_Battle_CheckSwitch(u32 battlerId, u32 partyIndex);
 void TestRunner_Battle_CheckAiMoveScores(u32 battlerId);
 void TestRunner_Battle_AISetScore(const char *file, u32 line, u32 battlerId, u32 moveIndex, s32 score);
@@ -34,6 +35,7 @@ u32 TestRunner_Battle_GetForcedAbility(u32 side, u32 partyIndex);
 #define TestRunner_Battle_RecordStatus1(...) (void)0
 #define TestRunner_Battle_AfterLastTurn(...) (void)0
 #define TestRunner_Battle_CheckChosenMove(...) (void)0
+#define TestRunner_Battle_InjectBattleAgentResponse(...) (void)0
 #define TestRunner_Battle_CheckSwitch(...) (void)0
 #define TestRunner_Battle_CheckAiMoveScores(...) (void)0
 #define TestRunner_Battle_AISetScore(...) (void)0

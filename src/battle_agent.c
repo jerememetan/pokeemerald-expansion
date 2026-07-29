@@ -3,6 +3,7 @@
 #include "battle_ai_util.h"
 #include "battle_setup.h"
 #include "battle_util.h"
+#include "constants/battle_ai.h"
 #include "data.h"
 #include "util.h"
 
@@ -10,7 +11,18 @@
 #include "test_runner.h"
 #endif
 
-EWRAM_DATA struct BattleAgentMailboxV1 gBattleAgentMailbox;
+EWRAM_DATA struct BattleAgentMailboxV2 gBattleAgentMailbox;
+
+struct BattleAgentWaitState
+{
+    u32 sequence;
+    u16 frames;
+    u8 fallbackMoveOrAction;
+    u8 fallbackTarget;
+    bool8 active;
+};
+
+static EWRAM_DATA struct BattleAgentWaitState sBattleAgentWaitStates[MAX_BATTLERS_COUNT];
 
 static bool32 BattleAgent_IsEligible(u32 battler);
 static bool32 BattleAgent_NormalizeSingleTarget(u32 requester, u16 move, u8 *target);
@@ -18,6 +30,18 @@ static void BattleAgent_CopySnapshot(u32 requester);
 static void BattleAgent_BuildLegalActions(u32 requester);
 static void BattleAgent_BeginRequest(void);
 static void BattleAgent_CommitRequest(void);
+static void BattleAgent_ClearResponse(void);
+
+static u8 BattleAgent_GetEffectivenessCategory(u8 effectiveness)
+{
+    if (effectiveness == AI_EFFECTIVENESS_x0)
+        return 0;
+    if (effectiveness < AI_EFFECTIVENESS_x1)
+        return 1;
+    if (effectiveness == AI_EFFECTIVENESS_x1)
+        return 2;
+    return 3;
+}
 
 static bool32 BattleAgent_IsEligible(u32 battler)
 {
@@ -101,16 +125,50 @@ static void BattleAgent_CopySnapshot(u32 requester)
 {
     u32 battler;
     u32 moveSlot;
-    struct BattleAgentSnapshotV1 *snapshot = &gBattleAgentMailbox.snapshot;
+    struct BattleAgentSnapshotV2 *snapshot = &gBattleAgentMailbox.snapshot;
 
     memset(snapshot, 0, sizeof(*snapshot));
     for (battler = 0; battler < gBattlersCount && battler < MAX_BATTLERS_COUNT; battler++)
     {
-        snapshot->battlers[battler].species = gBattleMons[battler].species;
-        snapshot->battlers[battler].hp = gBattleMons[battler].hp;
-        snapshot->battlers[battler].maxHp = gBattleMons[battler].maxHP;
-        snapshot->battlers[battler].status1 = gBattleMons[battler].status1;
-        memcpy(snapshot->battlers[battler].statStages, gBattleMons[battler].statStages, sizeof(snapshot->battlers[battler].statStages));
+        struct BattleAgentBattlerSnapshotV2 *snapshotBattler = &snapshot->battlers[battler];
+
+        snapshotBattler->species = gBattleMons[battler].species;
+        snapshotBattler->hp = gBattleMons[battler].hp;
+        snapshotBattler->maxHp = gBattleMons[battler].maxHP;
+        snapshotBattler->status1 = gBattleMons[battler].status1;
+        memcpy(snapshotBattler->statStages, gBattleMons[battler].statStages, sizeof(snapshotBattler->statStages));
+        snapshotBattler->level = gBattleMons[battler].level;
+        snapshotBattler->type1 = gBattleMons[battler].type1;
+        snapshotBattler->type2 = gBattleMons[battler].type2;
+        snapshotBattler->type3 = gBattleMons[battler].type3;
+        snapshotBattler->ability = gBattleMons[battler].ability;
+        snapshotBattler->item = gBattleMons[battler].item;
+        snapshotBattler->attack = gBattleMons[battler].attack;
+        snapshotBattler->defense = gBattleMons[battler].defense;
+        snapshotBattler->speed = gBattleMons[battler].speed;
+        snapshotBattler->spAttack = gBattleMons[battler].spAttack;
+        snapshotBattler->spDefense = gBattleMons[battler].spDefense;
+        snapshotBattler->status2 = gBattleMons[battler].status2;
+        snapshotBattler->status3 = gStatuses3[battler];
+
+        for (moveSlot = 0; moveSlot < MAX_MON_MOVES; moveSlot++)
+        {
+            u16 move = gBattleMons[battler].moves[moveSlot];
+            struct BattleAgentMoveSnapshotV2 *snapshotMove = &snapshot->battlerMoves[battler][moveSlot];
+
+            snapshotMove->move = move;
+            snapshotMove->pp = gBattleMons[battler].pp[moveSlot];
+            if (move != MOVE_NONE)
+            {
+                snapshotMove->type = gBattleMoves[move].type;
+                snapshotMove->power = gBattleMoves[move].power;
+                snapshotMove->accuracy = gBattleMoves[move].accuracy;
+                snapshotMove->effect = gBattleMoves[move].effect;
+                snapshotMove->target = gBattleMoves[move].target;
+                snapshotMove->priority = gBattleMoves[move].priority;
+                snapshotMove->split = gBattleMoves[move].split;
+            }
+        }
     }
 
     for (moveSlot = 0; moveSlot < MAX_MON_MOVES; moveSlot++)
@@ -136,7 +194,7 @@ static void BattleAgent_BuildLegalActions(u32 requester)
 
     for (moveSlot = 0; moveSlot < MAX_MON_MOVES; moveSlot++)
     {
-        struct BattleAgentLegalActionV1 *action;
+        struct BattleAgentLegalActionV2 *action;
         u16 move = gBattleMons[requester].moves[moveSlot];
         u8 target;
 
@@ -153,6 +211,9 @@ static void BattleAgent_BuildLegalActions(u32 requester)
         action->moveSlot = moveSlot;
         action->targetBattler = target;
         action->reserved = 0;
+        action->typeEffectiveness = BattleAgent_GetEffectivenessCategory(AI_DATA->effectiveness[requester][target][moveSlot]);
+        action->hasStab = IS_BATTLER_OF_TYPE(requester, gBattleMoves[move].type);
+        action->canFaintTarget = CanIndexMoveFaintTarget(requester, target, moveSlot, 0);
         gBattleAgentMailbox.legalActionCount++;
     }
 }
@@ -170,13 +231,21 @@ static void BattleAgent_BeginRequest(void)
     asm volatile("" ::: "memory");
 }
 
+static void BattleAgent_ClearResponse(void)
+{
+    gBattleAgentMailbox.responseStatus = BATTLE_AGENT_RESPONSE_NONE;
+    gBattleAgentMailbox.responseSequence = 0;
+    gBattleAgentMailbox.responseLegalActionIndex = 0;
+}
+
 void BattleAgent_ResetMailbox(void)
 {
     memset(&gBattleAgentMailbox, 0, sizeof(gBattleAgentMailbox));
+    memset(sBattleAgentWaitStates, 0, sizeof(sBattleAgentWaitStates));
     gBattleAgentMailbox.magic = BATTLE_AGENT_PROTOCOL_MAGIC;
     gBattleAgentMailbox.protocolVersion = BATTLE_AGENT_PROTOCOL_VERSION;
     BattleAgent_BeginRequest();
-    gBattleAgentMailbox.responseStatus = BATTLE_AGENT_RESPONSE_NONE;
+    BattleAgent_ClearResponse();
 }
 
 bool32 BattleAgent_TryPublishRequest(u32 battler)
@@ -191,9 +260,7 @@ bool32 BattleAgent_TryPublishRequest(u32 battler)
     }
 
     BattleAgent_BeginRequest();
-    gBattleAgentMailbox.responseStatus = BATTLE_AGENT_RESPONSE_NONE;
-    gBattleAgentMailbox.responseSequence = 0;
-    gBattleAgentMailbox.responseLegalActionIndex = 0;
+    BattleAgent_ClearResponse();
     BattleAgent_CopySnapshot(battler);
     BattleAgent_BuildLegalActions(battler);
 
@@ -209,6 +276,98 @@ bool32 BattleAgent_TryPublishRequest(u32 battler)
 
     BattleAgent_CommitRequest();
     return TRUE;
+}
+
+bool32 BattleAgent_BeginExternalWait(u32 battler)
+{
+    struct BattleAgentWaitState *waitState;
+
+    if (battler >= MAX_BATTLERS_COUNT || !BattleAgent_TryPublishRequest(battler) || gBattleAgentMailbox.legalActionCount == 0)
+        return FALSE;
+
+    waitState = &sBattleAgentWaitStates[battler];
+    waitState->sequence = gBattleAgentMailbox.requestSequence;
+    waitState->frames = 0;
+    waitState->fallbackMoveOrAction = gBattleStruct->aiMoveOrAction[battler];
+    waitState->fallbackTarget = gBattleStruct->aiChosenTarget[battler];
+    waitState->active = TRUE;
+#if TESTING
+    TestRunner_Battle_InjectBattleAgentResponse(battler);
+#endif
+    return TRUE;
+}
+
+bool32 BattleAgent_TryConsumeResponse(u32 battler)
+{
+    struct BattleAgentWaitState *waitState;
+    struct BattleAgentLegalActionV2 *action;
+    u8 target;
+    u16 move;
+    u8 moveLimitations;
+
+    if (battler >= MAX_BATTLERS_COUNT)
+        return FALSE;
+
+    waitState = &sBattleAgentWaitStates[battler];
+    if (!waitState->active || gBattleAgentMailbox.responseStatus != BATTLE_AGENT_RESPONSE_READY)
+        return FALSE;
+
+    if (gBattleAgentMailbox.requestStatus != BATTLE_AGENT_REQUEST_PENDING
+     || gBattleAgentMailbox.responseSequence != waitState->sequence
+     || gBattleAgentMailbox.responseLegalActionIndex >= gBattleAgentMailbox.legalActionCount)
+    {
+        BattleAgent_ClearResponse();
+        return FALSE;
+    }
+
+    action = &gBattleAgentMailbox.legalActions[gBattleAgentMailbox.responseLegalActionIndex];
+    if (action->moveSlot >= MAX_MON_MOVES)
+    {
+        BattleAgent_ClearResponse();
+        return FALSE;
+    }
+
+    move = gBattleMons[battler].moves[action->moveSlot];
+    moveLimitations = CheckMoveLimitations(battler, 0, MOVE_LIMITATIONS_ALL);
+    if (move == MOVE_NONE
+     || (moveLimitations & gBitTable[action->moveSlot])
+     || !BattleAgent_NormalizeSingleTarget(battler, move, &target)
+     || target != action->targetBattler)
+    {
+        BattleAgent_ClearResponse();
+        return FALSE;
+    }
+
+    gBattleStruct->aiMoveOrAction[battler] = action->moveSlot;
+    gBattleStruct->aiChosenTarget[battler] = target;
+    waitState->active = FALSE;
+    BattleAgent_ClearResponse();
+    return TRUE;
+}
+
+bool32 BattleAgent_IsWaitExpired(u32 battler)
+{
+    if (battler >= MAX_BATTLERS_COUNT || !sBattleAgentWaitStates[battler].active)
+        return FALSE;
+
+    return ++sBattleAgentWaitStates[battler].frames >= BATTLE_AGENT_RESPONSE_TIMEOUT_FRAMES;
+}
+
+void BattleAgent_UseVanillaFallback(u32 battler)
+{
+    struct BattleAgentWaitState *waitState;
+
+    if (battler >= MAX_BATTLERS_COUNT)
+        return;
+
+    waitState = &sBattleAgentWaitStates[battler];
+    if (!waitState->active)
+        return;
+
+    gBattleStruct->aiMoveOrAction[battler] = waitState->fallbackMoveOrAction;
+    gBattleStruct->aiChosenTarget[battler] = waitState->fallbackTarget;
+    waitState->active = FALSE;
+    BattleAgent_ClearResponse();
 }
 
 #if TESTING

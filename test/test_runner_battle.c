@@ -859,7 +859,7 @@ static void CheckBattleAgentRequest(u32 battlerId)
 {
     u32 i;
     struct ExpectedBattleAgentRequest *expected = &DATA.expectedBattleAgentRequests[DATA.aiActionsPlayed[battlerId]];
-    const struct BattleAgentMailboxV1 *mailbox = &gBattleAgentMailbox;
+    const struct BattleAgentMailboxV2 *mailbox = &gBattleAgentMailbox;
 
     if (!BattlerHasAi(battlerId))
         return;
@@ -890,8 +890,8 @@ static void CheckBattleAgentRequest(u32 battlerId)
          || mailbox->battleMode != 0
          || mailbox->turnSequence != 0
          || mailbox->responseLegalActionIndex != 0
-         || memcmp(&mailbox->snapshot, &(struct BattleAgentSnapshotV1){0}, sizeof(mailbox->snapshot)) != 0
-         || memcmp(mailbox->legalActions, (struct BattleAgentLegalActionV1[MAX_MON_MOVES]){0}, sizeof(mailbox->legalActions)) != 0)
+         || memcmp(&mailbox->snapshot, &(struct BattleAgentSnapshotV2){0}, sizeof(mailbox->snapshot)) != 0
+         || memcmp(mailbox->legalActions, (struct BattleAgentLegalActionV2[MAX_MON_MOVES]){0}, sizeof(mailbox->legalActions)) != 0)
         {
             Test_ExitWithResult(TEST_RESULT_FAIL, "%s:%d: Battle-agent mailbox is not canonically IDLE and zeroed", gTestRunnerState.test->filename, expected->sourceLine);
         }
@@ -910,10 +910,13 @@ static void CheckBattleAgentRequest(u32 battlerId)
     for (i = 0; i < MAX_MON_MOVES; i++)
     {
         if (expected->expectedActions[i]
-         && memcmp(&mailbox->legalActions[i], &expected->legalActions[i], sizeof(mailbox->legalActions[i])) != 0)
+         && (mailbox->legalActions[i].actionIndex != expected->legalActions[i].actionIndex
+          || mailbox->legalActions[i].moveSlot != expected->legalActions[i].moveSlot
+          || mailbox->legalActions[i].targetBattler != expected->legalActions[i].targetBattler))
             Test_ExitWithResult(TEST_RESULT_FAIL, "%s:%d: Battle-agent legal action %d differs from the published expectation", gTestRunnerState.test->filename, expected->sourceLine, i);
         if (expected->expectedRequesterMoves[i]
-         && memcmp(&mailbox->snapshot.requesterMoves[i], &expected->requesterMoves[i], sizeof(mailbox->snapshot.requesterMoves[i])) != 0)
+         && (mailbox->snapshot.requesterMoves[i].move != expected->requesterMoves[i].move
+          || mailbox->snapshot.requesterMoves[i].pp != expected->requesterMoves[i].pp))
             Test_ExitWithResult(TEST_RESULT_FAIL, "%s:%d: Battle-agent requester move %d differs from the published expectation", gTestRunnerState.test->filename, expected->sourceLine, i);
     }
     for (i = 0; i < MAX_BATTLERS_COUNT; i++)
@@ -934,12 +937,18 @@ static void CheckBattleAgentRequest(u32 battlerId)
       || memcmp(mailbox->snapshot.sideStatuses, expected->sideStatuses, sizeof(expected->sideStatuses)) != 0))
         Test_ExitWithResult(TEST_RESULT_FAIL, "%s:%d: Battle-agent environment snapshot differs from the published expectation", gTestRunnerState.test->filename, expected->sourceLine);
 
-    if (expected->setTestResponse)
+    if (expected->setTestResponse && !expected->testResponseInjected)
     {
         gBattleAgentMailbox.responseStatus = BATTLE_AGENT_RESPONSE_READY;
         gBattleAgentMailbox.responseSequence = expected->testResponseSequence;
         gBattleAgentMailbox.responseLegalActionIndex = expected->testResponseLegalActionIndex;
+        expected->testResponseInjected = TRUE;
     }
+}
+
+void TestRunner_Battle_InjectBattleAgentResponse(u32 battlerId)
+{
+    CheckBattleAgentRequest(battlerId);
 }
 
 void TestRunner_Battle_CheckSwitch(u32 battlerId, u32 partyIndex)
@@ -2216,7 +2225,7 @@ void ExpectBattleAgentAction_(u32 sourceLine, u8 actionIndex, u8 moveSlot, u8 ta
     INVALID_IF(DATA.turnState == TURN_CLOSED, "EXPECT_AGENT_ACTION outside TURN");
     INVALID_IF(!expected->expected, "EXPECT_AGENT_ACTION must follow EXPECT_AGENT_REQUEST in TURN");
     INVALID_IF(actionIndex >= MAX_MON_MOVES, "Illegal EXPECT_AGENT_ACTION index");
-    expected->legalActions[actionIndex] = (struct BattleAgentLegalActionV1){ actionIndex, moveSlot, targetBattler };
+    expected->legalActions[actionIndex] = (struct BattleAgentLegalActionV2){ actionIndex, moveSlot, targetBattler };
     expected->expectedActions[actionIndex] = TRUE;
 }
 
@@ -2234,7 +2243,7 @@ void ExpectBattleAgentBattler_(u32 sourceLine, u8 battler, u16 species, u16 hp, 
 
     INVALID_IF(DATA.turnState == TURN_CLOSED, "EXPECT_AGENT_BATTLER outside TURN");
     INVALID_IF(!expected->expected || battler >= MAX_BATTLERS_COUNT, "Illegal EXPECT_AGENT_BATTLER");
-    expected->battlers[battler] = (struct BattleAgentBattlerSnapshotV1){ .species = species, .hp = hp, .maxHp = maxHp, .status1 = status1 };
+    expected->battlers[battler] = (struct BattleAgentBattlerSnapshotV2){ .species = species, .hp = hp, .maxHp = maxHp, .status1 = status1 };
     expected->expectedBattlers[battler] = TRUE;
 }
 
@@ -2244,7 +2253,7 @@ void ExpectBattleAgentRequesterMove_(u32 sourceLine, u8 moveSlot, u16 move, u8 p
 
     INVALID_IF(DATA.turnState == TURN_CLOSED, "EXPECT_AGENT_REQUESTER_MOVE outside TURN");
     INVALID_IF(!expected->expected || moveSlot >= MAX_MON_MOVES, "Illegal EXPECT_AGENT_REQUESTER_MOVE");
-    expected->requesterMoves[moveSlot] = (struct BattleAgentMoveSnapshotV1){ .move = move, .pp = pp };
+    expected->requesterMoves[moveSlot] = (struct BattleAgentMoveSnapshotV2){ .move = move, .pp = pp };
     expected->expectedRequesterMoves[moveSlot] = TRUE;
 }
 

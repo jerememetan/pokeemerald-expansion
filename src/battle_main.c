@@ -4011,6 +4011,7 @@ void SwitchPartyOrder(u32 battler)
 enum
 {
     STATE_TURN_START_RECORD,
+    STATE_WAIT_EXTERNAL_AI_RESPONSE,
     STATE_BEFORE_ACTION_CHOSEN,
     STATE_WAIT_ACTION_CHOSEN,
     STATE_WAIT_ACTION_CASE_CHOSEN,
@@ -4041,10 +4042,25 @@ static void HandleTurnActionSelectionState(void)
             {
                 AI_DATA->mostSuitableMonId[battler] = GetMostSuitableMonToSwitchInto(battler, FALSE);
                 gBattleStruct->aiMoveOrAction[battler] = ComputeBattleAiScores(battler);
-                BattleAgent_TryPublishRequest(battler);
                 BattleAI_TryApplyExternalAiMockMove(battler);
+                if (BattleAgent_BeginExternalWait(battler))
+                {
+                    gBattleCommunication[battler] = STATE_WAIT_EXTERNAL_AI_RESPONSE;
+                    break;
+                }
             }
             // fallthrough
+        case STATE_WAIT_EXTERNAL_AI_RESPONSE:
+            if (BattleAgent_IsWaitExpired(battler))
+            {
+                BattleAgent_UseVanillaFallback(battler);
+                gBattleCommunication[battler] = STATE_BEFORE_ACTION_CHOSEN;
+            }
+            else if (BattleAgent_TryConsumeResponse(battler))
+            {
+                gBattleCommunication[battler] = STATE_BEFORE_ACTION_CHOSEN;
+            }
+            break;
         case STATE_BEFORE_ACTION_CHOSEN: // Choose an action.
             *(gBattleStruct->monToSwitchIntoId + battler) = PARTY_SIZE;
             if (gBattleTypeFlags & BATTLE_TYPE_MULTI

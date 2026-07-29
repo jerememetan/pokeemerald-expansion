@@ -709,6 +709,11 @@ AI_SINGLE_BATTLE_TEST("External AI mock accepts Calvin's legal move slot")
     }
 }
 
+TEST("External AI mailbox uses protocol V2")
+{
+    EXPECT(BATTLE_AGENT_PROTOCOL_VERSION == 2);
+}
+
 AI_SINGLE_BATTLE_TEST("External AI Calvin without a response keeps vanilla move")
 {
     GIVEN {
@@ -719,6 +724,24 @@ AI_SINGLE_BATTLE_TEST("External AI Calvin without a response keeps vanilla move"
         OPPONENT(SPECIES_LILLIPUP) { Moves(MOVE_LEER, MOVE_TACKLE); }
     } WHEN {
         TURN { MOVE(player, MOVE_MEAN_LOOK); EXPECT_MOVE(opponent, MOVE_LEER); }
+    }
+}
+
+AI_SINGLE_BATTLE_TEST("External AI V2 response applies a current legal action")
+{
+    GIVEN {
+        RESET_EXTERNAL_AI_MOCK();
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE);
+        TRAINER_OPPONENT(TRAINER_CALVIN_1);
+        PLAYER(SPECIES_GASTLY) { Moves(MOVE_MEAN_LOOK); }
+        OPPONENT(SPECIES_LILLIPUP) { Moves(MOVE_LEER, MOVE_TACKLE); }
+    } WHEN {
+        TURN {
+            MOVE(player, MOVE_MEAN_LOOK);
+            EXPECT_AGENT_REQUEST(1, 2);
+            SET_AGENT_TEST_RESPONSE(1, 1);
+            EXPECT_MOVE(opponent, MOVE_TACKLE, target:player);
+        }
     }
 }
 

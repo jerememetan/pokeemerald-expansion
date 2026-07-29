@@ -624,12 +624,13 @@ struct ExpectedBattleAgentRequest
     u8 testResponseLegalActionIndex;
     bool8 expected;
     bool8 setTestResponse;
+    bool8 testResponseInjected;
     bool8 expectedActions[MAX_MON_MOVES];
-    struct BattleAgentLegalActionV1 legalActions[MAX_MON_MOVES];
+    struct BattleAgentLegalActionV2 legalActions[MAX_MON_MOVES];
     bool8 expectedBattlers[MAX_BATTLERS_COUNT];
-    struct BattleAgentBattlerSnapshotV1 battlers[MAX_BATTLERS_COUNT];
+    struct BattleAgentBattlerSnapshotV2 battlers[MAX_BATTLERS_COUNT];
     bool8 expectedRequesterMoves[MAX_MON_MOVES];
-    struct BattleAgentMoveSnapshotV1 requesterMoves[MAX_MON_MOVES];
+    struct BattleAgentMoveSnapshotV2 requesterMoves[MAX_MON_MOVES];
     bool8 expectedEnvironment;
     u16 weather;
     u8 terrain;
