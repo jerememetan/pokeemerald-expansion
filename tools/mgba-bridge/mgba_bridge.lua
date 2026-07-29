@@ -188,7 +188,7 @@ local function append_battler(parts, battler)
     for offset = 12, 19 do append_u8(parts, emu:read8(base + offset)) end
     for slot = 0, 3 do
         local move = MAILBOX_ADDRESS + OFFSET_SNAPSHOT + SNAPSHOT_BATTLER_MOVES + (battler * 4 + slot) * MOVE_SIZE
-        append_u16(parts, emu:read16(move)); append_u8(parts, emu:read8(move + 2)); append_u8(parts, emu:read8(move + 3)); append_u8(parts, emu:read8(move + 4)); append_u8(parts, emu:read8(move + 5)); append_u16(parts, emu:read16(move + 6)); append_u8(parts, emu:read8(move + 8)); append_u8(parts, emu:read8(move + 10)); append_u8(parts, emu:read8(move + 11))
+        append_u16(parts, emu:read16(move)); append_u8(parts, emu:read8(move + 2)); append_u8(parts, emu:read8(move + 3)); append_u8(parts, emu:read8(move + 4)); append_u8(parts, emu:read8(move + 5)); append_u16(parts, emu:read16(move + 6)); append_u8(parts, emu:read8(move + 8)); append_u8(parts, emu:read8(move + 10)); append_u8(parts, emu:read8(move + 11)); append_u8(parts, 0)
     end
 end
 
@@ -211,6 +211,10 @@ local function send_request(header)
         for field = 0, 5 do append_u8(payload, emu:read8(action + field)) end
     end
     local payload_bytes = table.concat(payload)
+    if #payload_bytes ~= REQUEST_PAYLOAD_SIZE then
+        disconnect_client("request assembly has invalid size: " .. #payload_bytes)
+        return false
+    end
     local request_frame = "BAGB" .. string.char(VERSION, 1, REQUEST_PAYLOAD_SIZE % 256, math.floor(REQUEST_PAYLOAD_SIZE / 256)) .. payload_bytes
     local ok_send, send_result, send_error = pcall(client_socket.send, client_socket, request_frame)
     if not ok_send or send_result == nil or send_result ~= #request_frame then

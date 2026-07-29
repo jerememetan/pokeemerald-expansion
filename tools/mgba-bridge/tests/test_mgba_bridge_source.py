@@ -40,6 +40,11 @@ class LuaBridgeV2SourceTests(unittest.TestCase):
         self.assertIn("if #receive_buffer < RESPONSE_FRAME_SIZE then", SOURCE)
         self.assertIn("response.action_index < header.action_count", SOURCE)
 
+    def test_request_assembly_includes_each_move_reserved_byte_and_checks_payload_size(self) -> None:
+        move_serialization = SOURCE[SOURCE.index("for slot = 0, 3 do"):SOURCE.index("end\nend\n\nlocal function send_request")]
+        self.assertIn("append_u8(parts, 0)", move_serialization)
+        self.assertIn("if #payload_bytes ~= REQUEST_PAYLOAD_SIZE then", SOURCE)
+
 
 if __name__ == "__main__":
     unittest.main()
