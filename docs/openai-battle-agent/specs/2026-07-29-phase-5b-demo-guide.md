@@ -70,8 +70,10 @@ second service connection to test that listener.
 
 ## Failure and fallback behavior
 
-- Documentation must distinguish a normal first-turn cold-model fallback from
-  a bridge failure and recommend warming Ollama before a demo.
+- Documentation must describe a first-turn cold-model fallback as a likely
+  latency cause, not a conclusive diagnosis. It must recommend warming Ollama
+  before a demo and use the service/Lua logs to distinguish known bridge
+  disconnection or rejection from a no-response fallback.
 - If the model/service fails, the guide must say that no response is normal
   and the ROM's existing saved vanilla trainer AI continues after its unchanged
   timeout; it must not instruct the user to restart the ROM during that wait.
@@ -79,6 +81,9 @@ second service connection to test that listener.
   previous mGBA/Lua listener before loading the script again.
 - If `generated/mailbox_address.lua` is stale after a rebuild, the guide must
   direct regeneration from the fresh ELF before launching mGBA.
+- The guide must state that starting the service before mGBA is intentional:
+  it prints `connecting to mGBA` and retries silently until Lua later logs
+  `listener ready`; only then should both sides report a bridge connection.
 - No recovery step may require changing a port, editing generated files,
   disabling fallback, or sending a manual mailbox response.
 
