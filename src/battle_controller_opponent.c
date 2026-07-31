@@ -1,5 +1,6 @@
 #include "global.h"
 #include "battle.h"
+#include "battle_agent.h"
 #include "battle_ai_main.h"
 #include "battle_ai_util.h"
 #include "constants/battle_ai.h"
@@ -512,7 +513,8 @@ static void OpponentHandlePrintString(u32 battler)
 
 static void OpponentHandleChooseAction(u32 battler)
 {
-    AI_TrySwitchOrUseItem(battler);
+    if (!BattleAgent_TryEmitAcceptedAction(battler))
+        AI_TrySwitchOrUseItem(battler);
     OpponentBufferExecCompleted(battler);
 }
 

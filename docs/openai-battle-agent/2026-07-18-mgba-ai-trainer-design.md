@@ -114,8 +114,8 @@ Instrument local-agent latency, tool calls, selections, rejected responses, fall
 ### Phase 5A: In-battle thinking status
 
 Add a presentation-only status to the normal lower battle message window while
-the ROM waits for an external trainer action. It displays `AI is thinking` with
-an animated ellipsis and clears before either an accepted response resumes
+the ROM waits for an external trainer action. It displays the fixed, instant
+`AI is thinking..` text and clears before either an accepted response resumes
 action selection or the existing timeout uses vanilla fallback. This is a
 separate vertical slice from Phase 5 diagnostics: it does not change the
 mailbox, bridge, service, action authority, or deadline.
@@ -129,15 +129,31 @@ fallback, while battle behavior remains unchanged.
 [implementation plan](plans/2026-07-29-phase-5a-thinking-status.md), and
 [verification evidence](reviews/2026-07-29-phase-5a-thinking-status-evidence.md).
 
-### Phase 6: Broaden trainer coverage
+### Phase 6A: Voluntary trainer switching
+
+Upgrade the single-battle mailbox to BAGB/3 and allow an opted-in agent to
+choose a ROM-validated move or a ROM-validated voluntary switch. The agent may
+inspect only the opponent trainer's six-slot party through a read-only tool;
+it still returns only an action index. Battle items remain out of scope.
+
+**Status:** Automated verification, a fresh playable ROM build, and a
+connected live voluntary switch are recorded. The final absent-service V3
+smoke test remains pending; see the [verification
+evidence](reviews/2026-07-29-phase-6a-voluntary-switching-evidence.md).
+[Specification](specs/2026-07-29-phase-6a-voluntary-switching.md),
+[flow review](reviews/2026-07-29-phase-6a-voluntary-switching-flow-review.md),
+and [implementation plan](plans/2026-07-29-phase-6a-voluntary-switching.md).
+
+### Phase 6B: Broaden trainer coverage
 
 Add a debug/global enable mode and then opt-in trainer configuration. Keep the same mailbox protocol version unless an additive, backward-compatible extension is needed.
 
 **Exit criterion:** Multiple configured trainers can use the service independently without affecting unconfigured battles.
 
-### Phase 7: Switching and battle items
+### Phase 7: Battle items (deferred)
 
-Extend the legal-action list to switch actions first, then battle items if wanted. Treat each action family as a separate protocol and test expansion; the model never invents a party index or item.
+If wanted later, extend the legal-action list to battle items as a separately
+specified action family; the model must never invent an item or target.
 
 **Exit criterion:** Switching/item choices are fully legality-validated and have individual fallback tests.
 

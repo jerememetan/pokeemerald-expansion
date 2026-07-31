@@ -14,8 +14,8 @@
 
 Make the existing external-AI response wait visibly intentional in a playable
 trainer-single battle. While the ROM is waiting for a legal external action, the
-normal lower battle message window displays `AI is thinking` with an animated
-ellipsis. The status disappears as soon as the response is accepted or the
+ normal lower battle message window displays the fixed, instantly rendered text
+ `AI is thinking..`. The status disappears as soon as the response is accepted or the
 saved vanilla trainer-AI fallback is used.
 
 ## Scope
@@ -29,8 +29,8 @@ saved vanilla trainer-AI fallback is used.
 - Use the standard lower battle message window, the same UI region used for
   trainer dialogue and battle text. It has no input prompt or red continue
   triangle.
-- Animate the ellipsis at a fixed ROM-frame cadence while the external wait is
-  active, without sending any new bridge or service messages.
+- Render the complete fixed status atomically, without sending any new bridge
+  or service messages or starting a character-by-character text printer.
 - Stop the status before normal battle action processing resumes after either:
   - `BattleAgent_TryConsumeResponse` accepts the response; or
   - `BattleAgent_IsWaitExpired` causes `BattleAgent_UseVanillaFallback`.
@@ -74,9 +74,7 @@ AI is thinking..
 AI is thinking...
 ```
 
-The initial state is `AI is thinking...`. After 30 rendered frames it rotates
-to no dot, then one dot, two dots, and back to three dots every 30 rendered
-frames (about twice per second at 60 FPS). The status has no input cursor and
+The status is always `AI is thinking..`. It has no input cursor and
 does not require a button press. When the wait ends, the helper clears only a
 window it previously claimed. The normal battle controller/battle script may
 then write the next standard message.
@@ -111,10 +109,10 @@ interactive player menu.
 
 Add ROM-facing tests that prove:
 
-1. A successful external request starts the status with the initial ellipsis.
+1. A successful external request starts the fixed two-dot status.
 2. A request made while the player menu is open does not replace that menu; the
    status starts only after the player action is confirmed.
-3. The ellipsis changes only every 30 rendered frames while waiting.
+3. The status does not change while waiting and is rendered atomically.
 4. A valid response clears the status before normal action selection continues.
 5. Timeout fallback clears the status and preserves the saved vanilla action and
    target.
@@ -129,9 +127,9 @@ move damage, targeting, turn order, or trainer AI choices solely to test UI.
 
 ## Measurable exit criteria
 
-- A Calvin battle visibly displays `AI is thinking...` in the lower message
+- A Calvin battle visibly displays `AI is thinking..` in the lower message
   window while a local service reply is pending.
-- The ellipsis animates while mGBA remains responsive.
+- The complete text remains visible while mGBA remains responsive.
 - The message clears without player input when a response is accepted and when
   the service is absent/late and the ROM uses vanilla fallback.
 - Existing full relevant battle tests and bridge-service tests pass, and a fresh

@@ -49,3 +49,5 @@ prefabs.json
 *.js
 src/data/map_group_count.h
 /tools/mgba-bridge/generated/mailbox_address.lua
+tools/mgba-bridge/__pycache__/
+tools/mgba-bridge/tests/__pycache__/

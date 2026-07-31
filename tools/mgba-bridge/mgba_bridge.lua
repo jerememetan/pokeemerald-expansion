@@ -87,7 +87,7 @@ if not ok_listen or listen_result ~= LUA_SOCKET_SUCCESS then
 end
 
 local MAGIC = 0x42414732
-local VERSION = 2
+local VERSION = 3
 local REQUEST_PENDING = 1
 local RESPONSE_READY = 1
 
@@ -99,18 +99,21 @@ local OFFSET_REQUEST_SEQUENCE = 8
 local OFFSET_REQUESTING_BATTLER = 12
 local OFFSET_BATTLE_MODE = 13
 local OFFSET_SNAPSHOT = 16
-local OFFSET_LEGAL_ACTION_COUNT = 464
-local OFFSET_LEGAL_ACTIONS = 468
-local OFFSET_RESPONSE_SEQUENCE = 500
-local OFFSET_RESPONSE_ACTION_INDEX = 504
+local OFFSET_LEGAL_ACTION_COUNT = 1064
+local OFFSET_LEGAL_ACTIONS = 1068
+local OFFSET_RESPONSE_SEQUENCE = 1148
+local OFFSET_RESPONSE_ACTION_INDEX = 1152
 
-local REQUEST_PAYLOAD_SIZE = 417
+local REQUEST_PAYLOAD_SIZE = 1049
 local RESPONSE_PAYLOAD_SIZE = 5
-local REQUEST_FRAME_SIZE = 425
+local REQUEST_FRAME_SIZE = 1057
 local RESPONSE_FRAME_SIZE = 13
 local BATTLER_SIZE = 48
 local MOVE_SIZE = 12
 local SNAPSHOT_BATTLER_MOVES = 240
+local SNAPSHOT_PARTY = 448
+local PARTY_SIZE = 6
+local PARTY_RECORD_SIZE = 100
 
 local TRAINER_SINGLE = 1
 local client_accepted = false
@@ -149,7 +152,7 @@ local function is_forwardable(header)
         and header.request_status == REQUEST_PENDING
         and header.requester >= 0 and header.requester <= 3
         and header.battle_mode == TRAINER_SINGLE
-        and header.action_count >= 1 and header.action_count <= 4
+        and header.action_count >= 1 and header.action_count <= 10
 end
 
 local function disconnect_client(reason)
@@ -177,8 +180,7 @@ local function append_u32(parts, value)
     append_u16(parts, math.floor(value / 65536))
 end
 
-local function append_battler(parts, battler)
-    local base = MAILBOX_ADDRESS + OFFSET_SNAPSHOT + battler * BATTLER_SIZE
+local function append_battler_record(parts, base, moves_base)
     append_u16(parts, emu:read16(base)); append_u8(parts, emu:read8(base + 20))
     for offset = 21, 23 do append_u8(parts, emu:read8(base + offset)) end
     append_u16(parts, emu:read16(base + 24)); append_u16(parts, emu:read16(base + 26))
@@ -187,9 +189,24 @@ local function append_battler(parts, battler)
     append_u32(parts, emu:read32(base + 8)); append_u32(parts, emu:read32(base + 40)); append_u32(parts, emu:read32(base + 44))
     for offset = 12, 19 do append_u8(parts, emu:read8(base + offset)) end
     for slot = 0, 3 do
-        local move = MAILBOX_ADDRESS + OFFSET_SNAPSHOT + SNAPSHOT_BATTLER_MOVES + (battler * 4 + slot) * MOVE_SIZE
+        local move = moves_base + slot * MOVE_SIZE
         append_u16(parts, emu:read16(move)); append_u8(parts, emu:read8(move + 2)); append_u8(parts, emu:read8(move + 3)); append_u8(parts, emu:read8(move + 4)); append_u8(parts, emu:read8(move + 5)); append_u16(parts, emu:read16(move + 6)); append_u8(parts, emu:read8(move + 8)); append_u8(parts, emu:read8(move + 10)); append_u8(parts, emu:read8(move + 11)); append_u8(parts, 0)
     end
+end
+
+local function append_battler(parts, battler)
+    local base = MAILBOX_ADDRESS + OFFSET_SNAPSHOT + battler * BATTLER_SIZE
+    local moves_base = MAILBOX_ADDRESS + OFFSET_SNAPSHOT + SNAPSHOT_BATTLER_MOVES + battler * 4 * MOVE_SIZE
+    append_battler_record(parts, base, moves_base)
+end
+
+local function append_party_member(parts, slot)
+    local base = MAILBOX_ADDRESS + OFFSET_SNAPSHOT + SNAPSHOT_PARTY + slot * PARTY_RECORD_SIZE
+    append_u8(parts, slot)
+    append_u8(parts, emu:read8(base + 96))
+    append_u8(parts, emu:read8(base + 97))
+    append_u8(parts, 0)
+    append_battler_record(parts, base, base + BATTLER_SIZE)
 end
 
 local function send_request(header)
@@ -205,11 +222,11 @@ local function send_request(header)
     append_u32(payload, emu:read32(MAILBOX_ADDRESS + 452))
     append_u32(payload, emu:read32(MAILBOX_ADDRESS + 456))
     append_u32(payload, emu:read32(MAILBOX_ADDRESS + 460))
+    for slot = 0, PARTY_SIZE - 1 do append_party_member(payload, slot) end
     append_u8(payload, header.action_count)
-    for index = 0, 3 do
+    for index = 0, 9 do
         local action = MAILBOX_ADDRESS + OFFSET_LEGAL_ACTIONS + index * 8
-        for field = 0, 2 do append_u8(payload, emu:read8(action + field)) end
-        for field = 4, 6 do append_u8(payload, emu:read8(action + field)) end
+        for field = 0, 7 do append_u8(payload, emu:read8(action + field)) end
     end
     local payload_bytes = table.concat(payload)
     if #payload_bytes ~= REQUEST_PAYLOAD_SIZE then
@@ -244,7 +261,7 @@ local function parse_response_frame(frame)
     end
     local sequence = string.byte(frame, 9) + string.byte(frame, 10) * 256 + string.byte(frame, 11) * 65536 + string.byte(frame, 12) * 16777216
     local action_index = string.byte(frame, 13)
-    if action_index > 3 then
+    if action_index > 9 then
         return nil
     end
 

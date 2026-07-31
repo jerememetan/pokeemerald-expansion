@@ -9,16 +9,26 @@ PROTOCOL = b"BAGB/1"
 _U32_MAX = 0xFFFFFFFF
 
 MAGIC = b"BAGB"
-VERSION = 2
+VERSION = 3
 KIND_REQUEST = 1
 KIND_RESPONSE = 2
-REQUEST_PAYLOAD_SIZE = 417
+REQUEST_PAYLOAD_SIZE = 1049
 RESPONSE_PAYLOAD_SIZE = 5
 REQUEST_FRAME_SIZE = 8 + REQUEST_PAYLOAD_SIZE
 RESPONSE_FRAME_SIZE = 8 + RESPONSE_PAYLOAD_SIZE
 _BATTLER_WIRE_SIZE = 92
-_LEGAL_ACTION_OFFSET = 393
-_LEGAL_ACTION_SIZE = 6
+_ACTIVE_BATTLERS_OFFSET = 9
+_FIELD_OFFSET = _ACTIVE_BATTLERS_OFFSET + 4 * _BATTLER_WIRE_SIZE
+_PARTY_OFFSET = _FIELD_OFFSET + 15
+_PARTY_WIRE_SIZE = 96
+_PARTY_COUNT = 6
+_LEGAL_ACTION_COUNT_OFFSET = _PARTY_OFFSET + _PARTY_COUNT * _PARTY_WIRE_SIZE
+_LEGAL_ACTION_OFFSET = _LEGAL_ACTION_COUNT_OFFSET + 1
+_LEGAL_ACTION_SIZE = 8
+MAX_LEGAL_ACTIONS = 10
+ACTION_KIND_MOVE = 0
+ACTION_KIND_SWITCH = 1
+ACTION_NONE = 0xFF
 
 
 class ProtocolError(ValueError):
@@ -40,8 +50,10 @@ class Response:
 @dataclass(frozen=True)
 class LegalAction:
     action_index: int
+    kind: int
     move_slot: int
     target_battler: int
+    party_slot: int
     type_effectiveness: int
     has_stab: int
     can_faint_target: int
@@ -136,25 +148,35 @@ def _parse_frame(frame: bytes, kind: int, payload_size: int) -> bytes:
 
 
 def parse_request_frame(frame: bytes) -> FrameRequest:
-    """Parse exactly one fixed-size BAGB/2 request frame."""
+    """Parse exactly one fixed-size BAGB/3 request frame."""
     payload = _parse_frame(frame, KIND_REQUEST, REQUEST_PAYLOAD_SIZE)
     sequence = struct.unpack_from("<I", payload, 0)[0]
     requesting_battler = payload[4]
     battle_mode = payload[5]
     turn_sequence = struct.unpack_from("<H", payload, 6)[0]
     battler_count = payload[8]
-    legal_count = payload[392]
+    legal_count = payload[_LEGAL_ACTION_COUNT_OFFSET]
     if requesting_battler > 3 or battle_mode != 1 or battler_count != 2:
         raise ProtocolError("request has unsupported battle metadata")
-    if not 1 <= legal_count <= 4:
+    if not 1 <= legal_count <= MAX_LEGAL_ACTIONS:
         raise ProtocolError("request has invalid legal action count")
+
+    for party_slot in range(_PARTY_COUNT):
+        offset = _PARTY_OFFSET + party_slot * _PARTY_WIRE_SIZE
+        if payload[offset] != party_slot or payload[offset + 1] > 1 or payload[offset + 2] > 1 or payload[offset + 3] != 0:
+            raise ProtocolError("request has invalid party metadata")
 
     actions = []
     for index in range(legal_count):
         offset = _LEGAL_ACTION_OFFSET + index * _LEGAL_ACTION_SIZE
         action = LegalAction(*payload[offset : offset + _LEGAL_ACTION_SIZE])
-        if action.action_index != index or action.move_slot > 3 or action.target_battler > 3:
+        if action.action_index != index or action.kind not in (ACTION_KIND_MOVE, ACTION_KIND_SWITCH):
             raise ProtocolError("request has invalid legal action")
+        if action.kind == ACTION_KIND_MOVE:
+            if action.move_slot > 3 or action.target_battler > 3 or action.party_slot != ACTION_NONE:
+                raise ProtocolError("request has invalid move action")
+        elif action.move_slot != ACTION_NONE or action.target_battler != ACTION_NONE or action.party_slot >= _PARTY_COUNT:
+            raise ProtocolError("request has invalid switch action")
         if action.type_effectiveness > 3 or action.has_stab > 1 or action.can_faint_target > 1:
             raise ProtocolError("request has invalid legal action analysis")
         actions.append(action)
@@ -171,8 +193,8 @@ def parse_request_frame(frame: bytes) -> FrameRequest:
 
 
 def format_response_frame(sequence: int, action_index: int) -> bytes:
-    """Return one fixed-size BAGB/2 response frame."""
+    """Return one fixed-size BAGB/3 response frame."""
     _validate_u32(sequence, "sequence")
-    if isinstance(action_index, bool) or not isinstance(action_index, int) or not 0 <= action_index <= 3:
-        raise ProtocolError("action index is outside 0..3")
+    if isinstance(action_index, bool) or not isinstance(action_index, int) or not 0 <= action_index < MAX_LEGAL_ACTIONS:
+        raise ProtocolError("action index is outside legal-action range")
     return struct.pack("<4sBBHIB", MAGIC, VERSION, KIND_RESPONSE, RESPONSE_PAYLOAD_SIZE, sequence, action_index)

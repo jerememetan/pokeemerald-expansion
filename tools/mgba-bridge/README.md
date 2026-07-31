@@ -8,8 +8,10 @@ service, and mGBA in their own windows; this guide does not start them for you.
 - Only Youngster Calvin (`TRAINER_CALVIN_1`) is configured, in a standard
   trainer single battle.
 - The agent reads battle data and may finish only by selecting one current
-  ROM-authorized action index. It cannot name moves or targets, access mGBA,
-  run commands, or use the network.
+  ROM-authorized move or voluntary-switch action index. It can inspect the
+  six-slot opposing trainer party with `get_party()`, but cannot name moves,
+  targets, or party slots; access mGBA; run commands; use the network; or use
+  battle items.
 - The ordinary trainer AI is the fallback. If no valid response arrives,
   Calvin uses the saved vanilla action after at most 900 frames (about 15 s).
 - Lua listens only on `127.0.0.1:57621`; the Python service is its one client.
@@ -112,6 +114,11 @@ BAGB service: audit #1
   speed context: battler_1_first
 ```
 
+When a usable reserve exists, `list_legal_actions` can also show an entry such
+as `2=SWITCH->party 1`. The model may call `get_party()` before selecting that
+index. The ROM revalidates the reserve and performs the normal trainer switch;
+the service never writes a party slot directly.
+
 While a response is pending, the normal lower battle-message panel shows
 `AI is thinking...`. It clears automatically when mGBA writes an accepted
 response and the normal battle action continues. The audit reports dispatched
@@ -142,6 +149,8 @@ requires mGBA restart and Lua reload.
 4. Verify the service logged `request N received`, `chose action`, and
    `audit #N`.
 5. Verify Calvin acts and the thinking message clears without a button press.
+6. If Calvin has another usable Pokémon, optionally verify an audit containing
+   `SWITCH->party N` is followed by the same Pokémon entering the battle.
 
 ### Absent-service fallback
 
@@ -172,3 +181,6 @@ make -j16
 - [Phase 5B specification](../../docs/openai-battle-agent/specs/2026-07-29-phase-5b-demo-guide.md)
 - [Phase 5B flow review](../../docs/openai-battle-agent/reviews/2026-07-29-phase-5b-demo-guide-flow-review.md)
 - [Phase 5B implementation plan](../../docs/openai-battle-agent/plans/2026-07-29-phase-5b-demo-guide.md)
+- [Phase 6A voluntary-switching specification](../../docs/openai-battle-agent/specs/2026-07-29-phase-6a-voluntary-switching.md)
+- [Phase 6A flow review](../../docs/openai-battle-agent/reviews/2026-07-29-phase-6a-voluntary-switching-flow-review.md)
+- [Phase 6A implementation plan](../../docs/openai-battle-agent/plans/2026-07-29-phase-6a-voluntary-switching.md)

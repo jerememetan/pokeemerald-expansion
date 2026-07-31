@@ -129,10 +129,11 @@ existing service deadline and tool-call cap.
 - A switch action verifies that the slot is in the opposing trainer party, is
   currently switchable under the same engine rules used by trainer AI, is not
   active/fainted/empty, and remains legal at commit time.
-- A valid switch uses a dedicated external-action commit state and writes the
-  same opponent-side `B_ACTION_SWITCH` plus `AI_monToSwitchIntoId[battler]`
-  inputs used by the existing trainer switch helper. It never encodes a switch
-  in `aiMoveOrAction`, bypasses the battle controller, or writes player data.
+- A valid switch uses a dedicated external-action commit state, stores the
+  existing `AI_CHOICE_SWITCH` value (never the controller `B_ACTION_SWITCH`
+  value) in `aiMoveOrAction`, sets `AI_monToSwitchIntoId[battler]`, and emits
+  the normal opponent-side `B_ACTION_SWITCH` controller action. It never
+  bypasses the battle controller or writes player data.
 - A stale, malformed, duplicate, illegal, or changed-state response is
   discarded. The original wait continues until a valid response or the
   unchanged 900-frame deadline.

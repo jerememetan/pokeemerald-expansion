@@ -626,11 +626,11 @@ struct ExpectedBattleAgentRequest
     bool8 setTestResponse;
     bool8 testResponseInjected;
     bool8 expectedActions[MAX_MON_MOVES];
-    struct BattleAgentLegalActionV2 legalActions[MAX_MON_MOVES];
+    struct BattleAgentLegalActionV3 legalActions[MAX_MON_MOVES];
     bool8 expectedBattlers[MAX_BATTLERS_COUNT];
-    struct BattleAgentBattlerSnapshotV2 battlers[MAX_BATTLERS_COUNT];
+    struct BattleAgentBattlerSnapshotV3 battlers[MAX_BATTLERS_COUNT];
     bool8 expectedRequesterMoves[MAX_MON_MOVES];
-    struct BattleAgentMoveSnapshotV2 requesterMoves[MAX_MON_MOVES];
+    struct BattleAgentMoveSnapshotV3 requesterMoves[MAX_MON_MOVES];
     bool8 expectedEnvironment;
     u16 weather;
     u8 terrain;
@@ -931,6 +931,7 @@ enum { TURN_CLOSED, TURN_OPEN, TURN_CLOSING };
 #define EXPECT_SWITCH(battler, partyIndex) ExpectSwitch(__LINE__, battler, partyIndex)
 #define EXPECT_AGENT_REQUEST(sequence, actionCount) ExpectBattleAgentRequest_(__LINE__, sequence, actionCount)
 #define EXPECT_AGENT_ACTION(index, moveSlot, targetBattler) ExpectBattleAgentAction_(__LINE__, index, moveSlot, targetBattler)
+#define EXPECT_AGENT_SWITCH_ACTION(index, partySlot) ExpectBattleAgentSwitchAction_(__LINE__, index, partySlot)
 #define EXPECT_AGENT_EMPTY_ACTION(index) ExpectBattleAgentEmptyAction_(__LINE__, index)
 #define EXPECT_AGENT_BATTLER(battler, species, hp, maxHp, status1) ExpectBattleAgentBattler_(__LINE__, battler, species, hp, maxHp, status1)
 #define EXPECT_AGENT_REQUESTER_MOVE(moveSlot, move, pp) ExpectBattleAgentRequesterMove_(__LINE__, moveSlot, move, pp)
@@ -1000,6 +1001,7 @@ void ExpectSendOut(u32 sourceLine, struct BattlePokemon *battler, u32 partyIndex
 void ExpectSwitch(u32 sourceLine, struct BattlePokemon *battler, u32 partyIndex);
 void ExpectBattleAgentRequest_(u32 sourceLine, u32 sequence, u8 actionCount);
 void ExpectBattleAgentAction_(u32 sourceLine, u8 actionIndex, u8 moveSlot, u8 targetBattler);
+void ExpectBattleAgentSwitchAction_(u32 sourceLine, u8 actionIndex, u8 partySlot);
 void ExpectBattleAgentEmptyAction_(u32 sourceLine, u8 actionIndex);
 void ExpectBattleAgentBattler_(u32 sourceLine, u8 battler, u16 species, u16 hp, u16 maxHp, u32 status1);
 void ExpectBattleAgentRequesterMove_(u32 sourceLine, u8 moveSlot, u16 move, u8 pp);

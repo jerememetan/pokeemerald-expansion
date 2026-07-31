@@ -1,4 +1,4 @@
-"""Local, tool-only decision helpers for the BAGB/2 trainer agent."""
+"""Local, tool-only decision helpers for the BAGB/3 trainer agent."""
 
 from __future__ import annotations
 
@@ -11,7 +11,14 @@ from dataclasses import dataclass
 from pathlib import Path
 from urllib.request import Request, urlopen
 
-from bridge_protocol import LegalAction, REQUEST_FRAME_SIZE, format_response_frame, parse_request_frame
+from bridge_protocol import (
+    ACTION_KIND_MOVE,
+    ACTION_KIND_SWITCH,
+    LegalAction,
+    REQUEST_FRAME_SIZE,
+    format_response_frame,
+    parse_request_frame,
+)
 
 
 class ToolError(ValueError):
@@ -71,6 +78,7 @@ TOOL_SCHEMAS = [
     {"type": "function", "function": {"name": "get_field_state", "description": "Read weather, terrain, and side conditions.", "parameters": {"type": "object", "properties": {}}}},
     {"type": "function", "function": {"name": "get_battler", "description": "Read one active battler.", "parameters": {"type": "object", "properties": {"battler_id": {"type": "integer"}}, "required": ["battler_id"]}}},
     {"type": "function", "function": {"name": "get_battler_moves", "description": "Read one active battler's moves.", "parameters": {"type": "object", "properties": {"battler_id": {"type": "integer"}}, "required": ["battler_id"]}}},
+    {"type": "function", "function": {"name": "get_party", "description": "Read the six-slot opponent party, including current usability. This does not itself switch a Pokémon.", "parameters": {"type": "object", "properties": {}}}},
     {"type": "function", "function": {"name": "list_legal_actions", "description": "List ROM-authorized action indexes.", "parameters": {"type": "object", "properties": {}}}},
     {"type": "function", "function": {"name": "analyze_action", "description": "Read ROM-derived facts for one legal action.", "parameters": {"type": "object", "properties": {"action_index": {"type": "integer"}}, "required": ["action_index"]}}},
     {"type": "function", "function": {"name": "compare_speed", "description": "Compare active battlers' normal speed order; move priority can override it.", "parameters": {"type": "object", "properties": {}}}},
@@ -84,15 +92,21 @@ def _battler_offset(battler_id: int) -> int:
     return 9 + battler_id * 92
 
 
-def get_battler(payload: bytes, battler_id: int) -> dict[str, int | list[int]]:
-    """Decode one active battler from the canonical V2 request payload."""
-    offset = _battler_offset(battler_id)
+def _decode_battler(payload: bytes, offset: int, battler_id: int | None = None) -> dict[str, int | list[int]]:
     species, = struct.unpack_from("<H", payload, offset)
     ability, item, hp, max_hp = struct.unpack_from("<HHHH", payload, offset + 6)
     level, type1, type2, type3 = payload[offset + 2], payload[offset + 3], payload[offset + 4], payload[offset + 5]
     attack, defense, speed, sp_attack, sp_defense = struct.unpack_from("<HHHHH", payload, offset + 14)
     status1, status2, status3 = struct.unpack_from("<III", payload, offset + 24)
-    return {"battler_id": battler_id, "species": species, "species_name": _label("species", species), "level": level, "types": [type1, type2, type3], "ability": ability, "ability_name": _label("abilities", ability), "item": item, "item_name": _label("items", item), "hp": hp, "max_hp": max_hp, "attack": attack, "defense": defense, "speed": speed, "sp_attack": sp_attack, "sp_defense": sp_defense, "status1": status1, "status2": status2, "status3": status3, "stat_stages": list(payload[offset + 36 : offset + 44])}
+    result: dict[str, int | list[int]] = {"species": species, "species_name": _label("species", species), "level": level, "types": [type1, type2, type3], "ability": ability, "ability_name": _label("abilities", ability), "item": item, "item_name": _label("items", item), "hp": hp, "max_hp": max_hp, "attack": attack, "defense": defense, "speed": speed, "sp_attack": sp_attack, "sp_defense": sp_defense, "status1": status1, "status2": status2, "status3": status3, "stat_stages": list(payload[offset + 36 : offset + 44])}
+    if battler_id is not None:
+        result["battler_id"] = battler_id
+    return result
+
+
+def get_battler(payload: bytes, battler_id: int) -> dict[str, int | list[int]]:
+    """Decode one active battler from the canonical V3 request payload."""
+    return _decode_battler(payload, _battler_offset(battler_id), battler_id)
 
 
 def get_battler_moves(payload: bytes, battler_id: int) -> list[dict[str, int]]:
@@ -106,10 +120,21 @@ def get_battler_moves(payload: bytes, battler_id: int) -> list[dict[str, int]]:
 
 
 def get_field_state(payload: bytes) -> dict[str, int | list[int]]:
-    """Decode field and side status data from the canonical V2 payload."""
+    """Decode field and side status data from the canonical V3 payload."""
     weather, = struct.unpack_from("<H", payload, 377)
     field_statuses, player_side, opponent_side = struct.unpack_from("<III", payload, 380)
     return {"weather": weather, "terrain": payload[379], "field_statuses": field_statuses, "side_statuses": [player_side, opponent_side]}
+
+
+def get_party(payload: bytes) -> list[dict[str, int | bool | list[int]]]:
+    """Decode all six opponent-party records from the read-only V3 snapshot."""
+    party = []
+    for party_slot in range(6):
+        offset = 392 + party_slot * 96
+        member = _decode_battler(payload, offset + 4)
+        member.update({"party_slot": payload[offset], "is_active": bool(payload[offset + 1]), "is_usable": bool(payload[offset + 2])})
+        party.append(member)
+    return party
 
 
 def get_battle_state(*, sequence: int, turn_sequence: int, requesting_battler: int, payload: bytes) -> dict[str, object]:
@@ -124,7 +149,15 @@ def get_battle_state(*, sequence: int, turn_sequence: int, requesting_battler: i
 
 def list_legal_actions(actions: tuple[LegalAction, ...]) -> list[dict[str, int]]:
     """Expose ROM-authorized action indexes without granting move/target authority."""
-    return [{"action_index": action.action_index, "move_slot": action.move_slot, "target_battler": action.target_battler} for action in actions]
+    result = []
+    for action in actions:
+        entry = {"action_index": action.action_index, "kind": "move" if action.kind == ACTION_KIND_MOVE else "switch"}
+        if action.kind == ACTION_KIND_MOVE:
+            entry.update({"move_slot": action.move_slot, "target_battler": action.target_battler})
+        else:
+            entry["party_slot"] = action.party_slot
+        result.append(entry)
+    return result
 
 
 def choose_action(actions: tuple[LegalAction, ...], action_index: int) -> int:
@@ -140,15 +173,12 @@ def analyze_action(actions: tuple[LegalAction, ...], action_index: int, requeste
     """Expose the ROM's deterministic analysis for one legal action."""
     for action in actions:
         if action.action_index == action_index:
-            result: dict[str, int | bool | str] = {
-                "action_index": action.action_index,
-                "move_slot": action.move_slot,
-                "target_battler": action.target_battler,
-                "type_effectiveness": action.type_effectiveness,
-                "has_stab": bool(action.has_stab),
-                "can_faint_target": bool(action.can_faint_target),
-            }
-            if requester_moves is not None:
+            result: dict[str, int | bool | str] = {"action_index": action.action_index, "kind": "move" if action.kind == ACTION_KIND_MOVE else "switch"}
+            if action.kind == ACTION_KIND_SWITCH:
+                result["party_slot"] = action.party_slot
+                return result
+            result.update({"move_slot": action.move_slot, "target_battler": action.target_battler, "type_effectiveness": action.type_effectiveness, "has_stab": bool(action.has_stab), "can_faint_target": bool(action.can_faint_target)})
+            if requester_moves is not None and action.move_slot < len(requester_moves):
                 result.update(requester_moves[action.move_slot])
             return result
     raise ToolError("action_index is not legal for this request")
@@ -174,6 +204,8 @@ def compare_speed(payload: bytes) -> dict[str, int | str]:
 
 def format_legal_action(action: LegalAction, requester_moves: list[dict[str, int]]) -> str:
     """Format one ROM-authorized action without attributing it to the model."""
+    if action.kind == ACTION_KIND_SWITCH:
+        return f"{action.action_index}=SWITCH->party {action.party_slot}"
     if action.move_slot >= len(requester_moves):
         raise ToolError("legal action references an unavailable requester move")
     return f"{action.action_index}={requester_moves[action.move_slot]['move_name']}->battler {action.target_battler}"
@@ -185,26 +217,26 @@ def format_decision_audit(sequence: int, requesting_battler: int, decision: Agen
     selected = next((action for action in actions if action.action_index == decision.action_index), None)
     if selected is None:
         raise ToolError("decision references an unavailable legal action")
-    selected_facts = analyze_action(actions, decision.action_index, requester_moves)
-    effectiveness = EFFECTIVENESS_LABELS.get(selected_facts["type_effectiveness"])
-    if effectiveness is None:
-        raise ToolError("decision has an unknown effectiveness category")
     speed_context = compare_speed(payload)["normal_order"]
     tools_used = ", ".join(decision.tools_used) if decision.tools_used else "none"
     legal_actions = "; ".join(format_legal_action(action, requester_moves) for action in actions)
     selected_action = format_legal_action(selected, requester_moves)
-    return "\n".join((
+    lines = [
         f"audit #{sequence}",
         f"  tools used: {tools_used}",
         f"  legal actions: {legal_actions}",
         f"  selected: {selected_action}",
-        "  selected ROM facts: "
-        f"STAB={'yes' if selected_facts['has_stab'] else 'no'}, "
-        f"effectiveness={effectiveness}, "
-        f"KO={'yes' if selected_facts['can_faint_target'] else 'no'}, "
-        f"priority={selected_facts['priority']}",
-        f"  speed context: {speed_context}",
-    ))
+    ]
+    if selected.kind == ACTION_KIND_MOVE:
+        selected_facts = analyze_action(actions, decision.action_index, requester_moves)
+        effectiveness = EFFECTIVENESS_LABELS.get(selected_facts["type_effectiveness"])
+        if effectiveness is None:
+            raise ToolError("decision has an unknown effectiveness category")
+        lines.append("  selected ROM facts: " + f"STAB={'yes' if selected_facts['has_stab'] else 'no'}, effectiveness={effectiveness}, KO={'yes' if selected_facts['can_faint_target'] else 'no'}, priority={selected_facts['priority']}")
+    else:
+        lines.append(f"  selected ROM facts: switch_to_party_slot={selected.party_slot}")
+    lines.append(f"  speed context: {speed_context}")
+    return "\n".join(lines)
 
 
 def request_ollama(messages: list[dict[str, object]]) -> dict[str, object]:
@@ -274,6 +306,8 @@ def run_tool_agent(sequence: int, turn_sequence: int, requesting_battler: int, a
                 result = get_battler(payload, arguments["battler_id"])
             elif name == "get_battler_moves" and set(arguments) == {"battler_id"}:
                 result = get_battler_moves(payload, arguments["battler_id"])
+            elif name == "get_party" and not arguments:
+                result = get_party(payload)
             elif name == "list_legal_actions" and not arguments:
                 result = list_legal_actions(actions)
             elif name == "analyze_action" and set(arguments) == {"action_index"}:

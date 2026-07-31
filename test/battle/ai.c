@@ -700,7 +700,7 @@ TEST("External AI thinking status waits for player action confirmation")
     EXPECT_EQ(BattleAgent_TestGetThinkingStatus(B_POSITION_OPPONENT_LEFT), BATTLE_AGENT_THINKING_HIDDEN);
 
     BattleAgent_TestUpdateThinkingStatus(B_POSITION_OPPONENT_LEFT, TRUE, TRUE);
-    EXPECT_EQ(BattleAgent_TestGetThinkingStatus(B_POSITION_OPPONENT_LEFT), BATTLE_AGENT_THINKING_THREE_DOTS);
+    EXPECT_EQ(BattleAgent_TestGetThinkingStatus(B_POSITION_OPPONENT_LEFT), BATTLE_AGENT_THINKING_TWO_DOTS);
     EXPECT_EQ(BattleAgent_TestGetThinkingStatusFrames(B_POSITION_OPPONENT_LEFT), 0);
 }
 
@@ -713,25 +713,20 @@ TEST("External AI thinking status waits for an idle message window")
     EXPECT_EQ(BattleAgent_TestGetThinkingStatus(B_POSITION_OPPONENT_LEFT), BATTLE_AGENT_THINKING_HIDDEN);
 
     BattleAgent_TestUpdateThinkingStatus(B_POSITION_OPPONENT_LEFT, TRUE, TRUE);
-    EXPECT_EQ(BattleAgent_TestGetThinkingStatus(B_POSITION_OPPONENT_LEFT), BATTLE_AGENT_THINKING_THREE_DOTS);
+    EXPECT_EQ(BattleAgent_TestGetThinkingStatus(B_POSITION_OPPONENT_LEFT), BATTLE_AGENT_THINKING_TWO_DOTS);
 }
 
-TEST("External AI thinking status advances dots every thirty frames")
+TEST("External AI thinking status keeps a fixed two-dot message")
 {
     u32 frame;
 
     BattleAgent_ResetMailbox();
     BattleAgent_TestStartThinkingStatus(B_POSITION_OPPONENT_LEFT);
     BattleAgent_TestUpdateThinkingStatus(B_POSITION_OPPONENT_LEFT, TRUE, TRUE);
-    for (frame = 0; frame < BATTLE_AGENT_THINKING_DOT_INTERVAL - 1; frame++)
+    for (frame = 0; frame < BATTLE_AGENT_THINKING_DOT_INTERVAL * 2; frame++)
         BattleAgent_TestUpdateThinkingStatus(B_POSITION_OPPONENT_LEFT, TRUE, TRUE);
-    EXPECT_EQ(BattleAgent_TestGetThinkingStatus(B_POSITION_OPPONENT_LEFT), BATTLE_AGENT_THINKING_THREE_DOTS);
-
-    BattleAgent_TestUpdateThinkingStatus(B_POSITION_OPPONENT_LEFT, TRUE, TRUE);
-    EXPECT_EQ(BattleAgent_TestGetThinkingStatus(B_POSITION_OPPONENT_LEFT), BATTLE_AGENT_THINKING_NO_DOTS);
-    for (frame = 0; frame < BATTLE_AGENT_THINKING_DOT_INTERVAL; frame++)
-        BattleAgent_TestUpdateThinkingStatus(B_POSITION_OPPONENT_LEFT, TRUE, TRUE);
-    EXPECT_EQ(BattleAgent_TestGetThinkingStatus(B_POSITION_OPPONENT_LEFT), BATTLE_AGENT_THINKING_ONE_DOT);
+    EXPECT_EQ(BattleAgent_TestGetThinkingStatus(B_POSITION_OPPONENT_LEFT), BATTLE_AGENT_THINKING_TWO_DOTS);
+    EXPECT_EQ(BattleAgent_TestGetThinkingStatusFrames(B_POSITION_OPPONENT_LEFT), 0);
 }
 
 TEST("External AI thinking status cleanup resets a completed wait")
@@ -756,7 +751,7 @@ TEST("External AI thinking status starts fresh after a previous wait")
     BattleAgent_TestStartThinkingStatus(B_POSITION_OPPONENT_LEFT);
     BattleAgent_TestUpdateThinkingStatus(B_POSITION_OPPONENT_LEFT, TRUE, TRUE);
 
-    EXPECT_EQ(BattleAgent_TestGetThinkingStatus(B_POSITION_OPPONENT_LEFT), BATTLE_AGENT_THINKING_THREE_DOTS);
+    EXPECT_EQ(BattleAgent_TestGetThinkingStatus(B_POSITION_OPPONENT_LEFT), BATTLE_AGENT_THINKING_TWO_DOTS);
     EXPECT_EQ(BattleAgent_TestGetThinkingStatusFrames(B_POSITION_OPPONENT_LEFT), 0);
 }
 
@@ -792,9 +787,106 @@ AI_SINGLE_BATTLE_TEST("External AI mock accepts Calvin's legal move slot")
     }
 }
 
-TEST("External AI mailbox uses protocol V2")
+TEST("External AI is enabled for a formerly untagged trainer")
 {
-    EXPECT(BATTLE_AGENT_PROTOCOL_VERSION == 2);
+    EXPECT_EQ(gTrainers[TRAINER_RICKY_1].externalAi, TRUE);
+}
+
+TEST("External AI mailbox uses protocol V3")
+{
+    EXPECT(BATTLE_AGENT_PROTOCOL_VERSION == 3);
+}
+
+AI_SINGLE_BATTLE_TEST("External AI V3 publishes party data and applies a legal voluntary switch")
+{
+    GIVEN {
+        RESET_EXTERNAL_AI_MOCK();
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE);
+        TRAINER_OPPONENT(TRAINER_CALVIN_1);
+        PLAYER(SPECIES_GASTLY) { Moves(MOVE_GROWL); }
+        OPPONENT(SPECIES_LILLIPUP) { MaxHP(100); HP(80); Moves(MOVE_LEER); }
+        OPPONENT(SPECIES_POOCHYENA) { MaxHP(80); HP(70); Moves(MOVE_TACKLE); }
+    } WHEN {
+        TURN {
+            MOVE(player, MOVE_GROWL);
+            EXPECT_AGENT_REQUEST(1, 2);
+            EXPECT_AGENT_ACTION(0, 0, B_POSITION_PLAYER_LEFT);
+            EXPECT_AGENT_SWITCH_ACTION(1, 1);
+            SET_AGENT_TEST_RESPONSE(1, 1);
+            EXPECT_SWITCH(opponent, 1);
+        }
+    } THEN {
+        EXPECT_EQ(gBattleAgentMailbox.snapshot.party[0].battler.species, SPECIES_LILLIPUP);
+        EXPECT_EQ(gBattleAgentMailbox.snapshot.party[0].battler.hp, GetMonData(&gEnemyParty[0], MON_DATA_HP));
+        EXPECT_EQ(gBattleAgentMailbox.snapshot.party[1].battler.species, SPECIES_POOCHYENA);
+        EXPECT_EQ(gBattleAgentMailbox.snapshot.party[1].battler.hp, GetMonData(&gEnemyParty[1], MON_DATA_HP));
+        EXPECT_EQ(gBattleAgentMailbox.snapshot.party[1].isUsable, TRUE);
+    }
+}
+
+AI_SINGLE_BATTLE_TEST("External AI V3 does not publish a voluntary action while locked")
+{
+    u8 originalMoveOrAction;
+
+    GIVEN {
+        RESET_EXTERNAL_AI_MOCK();
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE);
+        TRAINER_OPPONENT(TRAINER_CALVIN_1);
+        PLAYER(SPECIES_GASTLY) { Moves(MOVE_GROWL); }
+        OPPONENT(SPECIES_LILLIPUP) { Moves(MOVE_LEER); }
+        OPPONENT(SPECIES_POOCHYENA) { Moves(MOVE_TACKLE); }
+    } WHEN {
+        TURN { MOVE(player, MOVE_GROWL); EXPECT_MOVE(opponent, MOVE_LEER); }
+    } THEN {
+        originalMoveOrAction = gBattleStruct->aiMoveOrAction[B_POSITION_OPPONENT_LEFT];
+        BattleAgent_ResetMailbox();
+        gBattleMons[B_POSITION_OPPONENT_LEFT].status2 |= STATUS2_RECHARGE;
+        gBattleStruct->aiMoveOrAction[B_POSITION_OPPONENT_LEFT] = 0;
+        EXPECT_EQ(BattleAgent_TryPublishRequest(B_POSITION_OPPONENT_LEFT), FALSE);
+        EXPECT_EQ(gBattleAgentMailbox.requestStatus, BATTLE_AGENT_REQUEST_IDLE);
+        gBattleMons[B_POSITION_OPPONENT_LEFT].status2 &= ~STATUS2_RECHARGE;
+        gBattleStruct->aiMoveOrAction[B_POSITION_OPPONENT_LEFT] = originalMoveOrAction;
+    }
+}
+
+AI_SINGLE_BATTLE_TEST("External AI V3 rejects a reserve that faints while it waits")
+{
+    u16 originalReserveHp;
+    u16 zero = 0;
+    u32 originalMoveOrAction;
+    u32 originalTarget;
+    u32 requestSequence;
+
+    GIVEN {
+        RESET_EXTERNAL_AI_MOCK();
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE);
+        TRAINER_OPPONENT(TRAINER_CALVIN_1);
+        PLAYER(SPECIES_GASTLY) { Moves(MOVE_GROWL); }
+        OPPONENT(SPECIES_LILLIPUP) { Moves(MOVE_LEER); }
+        OPPONENT(SPECIES_POOCHYENA) { Moves(MOVE_TACKLE); }
+    } WHEN {
+        TURN { MOVE(player, MOVE_GROWL); EXPECT_MOVE(opponent, MOVE_LEER); }
+    } THEN {
+        originalMoveOrAction = gBattleStruct->aiMoveOrAction[B_POSITION_OPPONENT_LEFT];
+        originalTarget = gBattleStruct->aiChosenTarget[B_POSITION_OPPONENT_LEFT];
+        originalReserveHp = GetMonData(&gEnemyParty[1], MON_DATA_HP);
+        BattleAgent_ResetMailbox();
+        gBattleStruct->aiMoveOrAction[B_POSITION_OPPONENT_LEFT] = 0;
+        gBattleStruct->AI_monToSwitchIntoId[B_POSITION_OPPONENT_LEFT] = PARTY_SIZE;
+        EXPECT_EQ(BattleAgent_BeginExternalWait(B_POSITION_OPPONENT_LEFT), TRUE);
+        requestSequence = gBattleAgentMailbox.requestSequence;
+        SetMonData(&gEnemyParty[1], MON_DATA_HP, &zero);
+        gBattleAgentMailbox.responseSequence = requestSequence;
+        gBattleAgentMailbox.responseLegalActionIndex = 1;
+        gBattleAgentMailbox.responseStatus = BATTLE_AGENT_RESPONSE_READY;
+        EXPECT_EQ(BattleAgent_TryConsumeResponse(B_POSITION_OPPONENT_LEFT), FALSE);
+        EXPECT_EQ(gBattleStruct->AI_monToSwitchIntoId[B_POSITION_OPPONENT_LEFT], PARTY_SIZE);
+        BattleAgent_UseVanillaFallback(B_POSITION_OPPONENT_LEFT);
+        EXPECT_EQ(gBattleStruct->aiMoveOrAction[B_POSITION_OPPONENT_LEFT], 0);
+        SetMonData(&gEnemyParty[1], MON_DATA_HP, &originalReserveHp);
+        gBattleStruct->aiMoveOrAction[B_POSITION_OPPONENT_LEFT] = originalMoveOrAction;
+        gBattleStruct->aiChosenTarget[B_POSITION_OPPONENT_LEFT] = originalTarget;
+    }
 }
 
 AI_SINGLE_BATTLE_TEST("External AI Calvin without a response keeps vanilla move")
