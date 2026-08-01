@@ -6,7 +6,7 @@
 
 **Flow review:** [Phase 7A flow review](../reviews/2026-08-02-phase-7a-single-trainer-doubles-flow-review.md)
 
-**Implementation plan:** Pending flow-review approval
+**Implementation plan:** [Phase 7A plan](../plans/2026-08-02-phase-7a-single-trainer-doubles.md)
 
 **Prerequisite:** Phase 6B trainer singles have fresh External AI, Python, ROM
 build, and connected-service smoke-test evidence.

@@ -2,7 +2,7 @@
 
 **Specification reviewed:** [Phase 7A one-trainer doubles](../specs/2026-08-02-phase-7a-single-trainer-doubles.md)
 
-**Implementation plan:** Pending resolution and plan creation
+**Implementation plan:** [Phase 7A plan](../plans/2026-08-02-phase-7a-single-trainer-doubles.md)
 
 ## Codebase grounding
 
