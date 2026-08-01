@@ -787,9 +787,24 @@ AI_SINGLE_BATTLE_TEST("External AI mock accepts Calvin's legal move slot")
     }
 }
 
-TEST("External AI is enabled for a formerly untagged trainer")
+AI_SINGLE_BATTLE_TEST("External AI publishes and applies a response for a formerly untagged trainer")
 {
-    EXPECT_EQ(gTrainers[TRAINER_RICKY_1].externalAi, TRUE);
+    GIVEN {
+        RESET_EXTERNAL_AI_MOCK();
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE);
+        TRAINER_OPPONENT(TRAINER_RICKY_1);
+        EXTERNAL_AI_MOCK_MOVE(1);
+        PLAYER(SPECIES_GASTLY) { Moves(MOVE_MEAN_LOOK); }
+        OPPONENT(SPECIES_LILLIPUP) { Moves(MOVE_LEER, MOVE_TACKLE); }
+    } WHEN {
+        TURN {
+            MOVE(player, MOVE_MEAN_LOOK);
+            EXPECT_AGENT_REQUEST(1, 2);
+            EXPECT_AGENT_ACTION(0, 0, B_POSITION_PLAYER_LEFT);
+            EXPECT_AGENT_ACTION(1, 1, B_POSITION_PLAYER_LEFT);
+            EXPECT_MOVE(opponent, MOVE_TACKLE, target:player);
+        }
+    }
 }
 
 TEST("External AI mailbox uses protocol V3")
@@ -1062,23 +1077,6 @@ AI_SINGLE_BATTLE_TEST("External AI snapshot publishes an empty legal list for a 
     }
 }
 
-AI_SINGLE_BATTLE_TEST("External AI snapshot does not construct a candidate for an unflagged trainer")
-{
-    GIVEN {
-        RESET_EXTERNAL_AI_MOCK();
-        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE);
-        TRAINER_OPPONENT(TRAINER_BILLY);
-        PLAYER(SPECIES_GASTLY) { Moves(MOVE_MEAN_LOOK); }
-        OPPONENT(SPECIES_LILLIPUP) { Moves(MOVE_LEER, MOVE_TACKLE); }
-    } WHEN {
-        TURN {
-            MOVE(player, MOVE_MEAN_LOOK);
-            EXPECT_AGENT_REQUEST(0, 0);
-            EXPECT_MOVE(opponent, MOVE_LEER);
-        }
-    }
-}
-
 AI_SINGLE_BATTLE_TEST("External AI snapshot preserves a pending request in excluded battles")
 {
     u32 excludedIndex;
@@ -1229,20 +1227,6 @@ AI_SINGLE_BATTLE_TEST("External AI Calvin rejects a self-targeting mock move")
         EXTERNAL_AI_MOCK_MOVE(1);
         PLAYER(SPECIES_GASTLY) { Moves(MOVE_MEAN_LOOK); }
         OPPONENT(SPECIES_LILLIPUP) { Moves(MOVE_LEER, MOVE_REST); }
-    } WHEN {
-        TURN { MOVE(player, MOVE_MEAN_LOOK); EXPECT_MOVE(opponent, MOVE_LEER); }
-    }
-}
-
-AI_SINGLE_BATTLE_TEST("External AI mock does not affect an unflagged trainer")
-{
-    GIVEN {
-        RESET_EXTERNAL_AI_MOCK();
-        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE);
-        TRAINER_OPPONENT(TRAINER_BILLY);
-        EXTERNAL_AI_MOCK_MOVE(1);
-        PLAYER(SPECIES_GASTLY) { Moves(MOVE_MEAN_LOOK); }
-        OPPONENT(SPECIES_LILLIPUP) { Moves(MOVE_LEER, MOVE_TACKLE); }
     } WHEN {
         TURN { MOVE(player, MOVE_MEAN_LOOK); EXPECT_MOVE(opponent, MOVE_LEER); }
     }
