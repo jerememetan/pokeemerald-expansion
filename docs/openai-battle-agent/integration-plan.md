@@ -16,10 +16,11 @@
 | 3 | Pinned mGBA Lua bridge | Local mGBA demo | Map-address resolution; loopback connection; bridge absence/disconnect does not stop battle. |
 | 4 | Deterministic local Python service | One demo trainer | Service completes a battle through the mailbox; malformed replies fall back. |
 | 5 | Model-backed decision adapter | One demo trainer | Structured response validation, latency metrics, connected/disconnected demo. |
-| 6 | Configured trainer expansion | Multiple opt-in trainers | Unconfigured trainers retain ordinary AI; independent requests remain sequenced. |
-| 7 | Switching and battle items | Opt-in trainers | ROM validates party/item actions; fallback covers each action family. |
-| 8 | Double battles | Opt-in double trainers | Turn-level legal actions cover ally, enemy, self, spread, absent, and fainted targets. |
-| 9 | Packaging and demo handoff | New developer path | Pinned mGBA build, launch guide, smoke test, reproducible fallback demonstration. |
+| 6A | Voluntary switching | Trainer singles | ROM validates party actions; no items; fallback covers moves and switches. |
+| 6B | Global trainer-single enablement | All eligible trainer singles | Every trainer is tagged; unsupported modes remain vanilla. |
+| 7A | One-trainer double battles | Intentional trainer doubles | One atomic two-action agent plan covers ally, enemy, self, spread, move/switch, and double-switch choices. |
+| 7B | Two-trainer double battles | Two trainers that spot the player together | Each action and reserve party remains owned by its originating trainer. |
+| 8 | Packaging and demo handoff | New developer path | Pinned mGBA build, launch guide, smoke test, reproducible fallback demonstration. |
 
 ## Evidence matrix
 
@@ -35,7 +36,8 @@
 | Service disconnect | 3 | Lua connection loss causes fallback without an emulator freeze. |
 | Map/version mismatch | 3 | Lua magic/version check disables the bridge. |
 | Switching/item preservation | 1 | Existing `AI_TrySwitchOrUseItem` action remains available for an opt-in trainer. |
-| Double-battle target coverage | 8 | Battle tests include ally, enemy, self, spread, absent, and fainted targets. |
+| One-trainer double-battle target coverage | 7A | Battle tests include ally, enemy, self, spread, absent, and fainted targets. |
+| Two-trainer-double party ownership | 7B | No action can select the other trainer's reserve party. |
 
 ## Documentation rule for every phase
 
