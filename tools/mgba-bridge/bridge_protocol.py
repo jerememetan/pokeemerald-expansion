@@ -9,23 +9,27 @@ PROTOCOL = b"BAGB/1"
 _U32_MAX = 0xFFFFFFFF
 
 MAGIC = b"BAGB"
-VERSION = 3
+VERSION = 5
 KIND_REQUEST = 1
 KIND_RESPONSE = 2
-REQUEST_PAYLOAD_SIZE = 1049
-RESPONSE_PAYLOAD_SIZE = 5
+REQUEST_PAYLOAD_SIZE = 1369
+RESPONSE_PAYLOAD_SIZE = 9
 REQUEST_FRAME_SIZE = 8 + REQUEST_PAYLOAD_SIZE
 RESPONSE_FRAME_SIZE = 8 + RESPONSE_PAYLOAD_SIZE
 _BATTLER_WIRE_SIZE = 92
-_ACTIVE_BATTLERS_OFFSET = 9
+_ACTIVE_BATTLERS_OFFSET = 14
 _FIELD_OFFSET = _ACTIVE_BATTLERS_OFFSET + 4 * _BATTLER_WIRE_SIZE
 _PARTY_OFFSET = _FIELD_OFFSET + 15
 _PARTY_WIRE_SIZE = 96
 _PARTY_COUNT = 6
-_LEGAL_ACTION_COUNT_OFFSET = _PARTY_OFFSET + _PARTY_COUNT * _PARTY_WIRE_SIZE
-_LEGAL_ACTION_OFFSET = _LEGAL_ACTION_COUNT_OFFSET + 1
-_LEGAL_ACTION_SIZE = 8
-MAX_LEGAL_ACTIONS = 10
+_LEGAL_ACTION_OFFSET = _PARTY_OFFSET + _PARTY_COUNT * _PARTY_WIRE_SIZE
+ACTION_RECORD_SIZE = 9
+MAX_ACTIONS_PER_BATTLER = 22
+MAX_LEGAL_ACTIONS = MAX_ACTIONS_PER_BATTLER
+_CONTROLLED_BATTLER_COUNT = 2
+BATTLE_MODE_TRAINER_SINGLE = 1
+BATTLE_MODE_TRAINER_DOUBLE = 2
+BATTLE_MODE_TRAINER_TWO_OPPONENT_DOUBLE = 3
 ACTION_KIND_MOVE = 0
 ACTION_KIND_SWITCH = 1
 ACTION_NONE = 0xFF
@@ -57,17 +61,18 @@ class LegalAction:
     type_effectiveness: int
     has_stab: int
     can_faint_target: int
+    actor_battler: int = ACTION_NONE
 
 
 @dataclass(frozen=True)
 class FrameRequest:
     sequence: int
-    requesting_battler: int
     battle_mode: int
     turn_sequence: int
     battler_count: int
+    controlled_battlers: tuple[int, ...]
     payload: bytes
-    legal_actions: tuple[LegalAction, ...]
+    actions_by_battler: dict[int, tuple[LegalAction, ...]]
 
 
 def _split_line(line: bytes, message_type: bytes) -> tuple[bytes, bytes]:
@@ -147,54 +152,101 @@ def _parse_frame(frame: bytes, kind: int, payload_size: int) -> bytes:
     return frame[8:]
 
 
-def parse_request_frame(frame: bytes) -> FrameRequest:
-    """Parse exactly one fixed-size BAGB/3 request frame."""
-    payload = _parse_frame(frame, KIND_REQUEST, REQUEST_PAYLOAD_SIZE)
-    sequence = struct.unpack_from("<I", payload, 0)[0]
-    requesting_battler = payload[4]
-    battle_mode = payload[5]
-    turn_sequence = struct.unpack_from("<H", payload, 6)[0]
-    battler_count = payload[8]
-    legal_count = payload[_LEGAL_ACTION_COUNT_OFFSET]
-    if requesting_battler > 3 or battle_mode != 1 or battler_count != 2:
-        raise ProtocolError("request has unsupported battle metadata")
-    if not 1 <= legal_count <= MAX_LEGAL_ACTIONS:
+def _parse_actions(payload: bytes, controlled_battler: int, count: int, list_index: int) -> tuple[LegalAction, ...]:
+    if not 1 <= count <= MAX_ACTIONS_PER_BATTLER:
         raise ProtocolError("request has invalid legal action count")
 
-    for party_slot in range(_PARTY_COUNT):
-        offset = _PARTY_OFFSET + party_slot * _PARTY_WIRE_SIZE
-        if payload[offset] != party_slot or payload[offset + 1] > 1 or payload[offset + 2] > 1 or payload[offset + 3] != 0:
-            raise ProtocolError("request has invalid party metadata")
-
     actions = []
-    for index in range(legal_count):
-        offset = _LEGAL_ACTION_OFFSET + index * _LEGAL_ACTION_SIZE
-        action = LegalAction(*payload[offset : offset + _LEGAL_ACTION_SIZE])
-        if action.action_index != index or action.kind not in (ACTION_KIND_MOVE, ACTION_KIND_SWITCH):
+    base = _LEGAL_ACTION_OFFSET + list_index * MAX_ACTIONS_PER_BATTLER * ACTION_RECORD_SIZE
+    for index in range(count):
+        offset = base + index * ACTION_RECORD_SIZE
+        action = LegalAction(*payload[offset + 1 : offset + ACTION_RECORD_SIZE], actor_battler=payload[offset])
+        if action.actor_battler != controlled_battler or action.action_index != index or action.kind not in (ACTION_KIND_MOVE, ACTION_KIND_SWITCH):
             raise ProtocolError("request has invalid legal action")
         if action.kind == ACTION_KIND_MOVE:
-            if action.move_slot > 3 or action.target_battler > 3 or action.party_slot != ACTION_NONE:
+            if action.move_slot > 3 or action.party_slot != ACTION_NONE or action.target_battler not in (*range(4), ACTION_NONE):
                 raise ProtocolError("request has invalid move action")
         elif action.move_slot != ACTION_NONE or action.target_battler != ACTION_NONE or action.party_slot >= _PARTY_COUNT:
             raise ProtocolError("request has invalid switch action")
         if action.type_effectiveness > 3 or action.has_stab > 1 or action.can_faint_target > 1:
             raise ProtocolError("request has invalid legal action analysis")
         actions.append(action)
+    return tuple(actions)
+
+
+def parse_request_frame(frame: bytes) -> FrameRequest:
+    """Parse exactly one fixed-size BAGB/5 request frame."""
+    payload = _parse_frame(frame, KIND_REQUEST, REQUEST_PAYLOAD_SIZE)
+    sequence = struct.unpack_from("<I", payload, 0)[0]
+    battle_mode = payload[4]
+    controlled_count = payload[5]
+    turn_sequence = struct.unpack_from("<H", payload, 6)[0]
+    battler_count = payload[8]
+    controlled_battlers = tuple(payload[9 : 9 + controlled_count])
+    action_counts = tuple(payload[11 : 11 + controlled_count])
+    if battle_mode not in (
+        BATTLE_MODE_TRAINER_SINGLE,
+        BATTLE_MODE_TRAINER_DOUBLE,
+        BATTLE_MODE_TRAINER_TWO_OPPONENT_DOUBLE,
+    ):
+        raise ProtocolError("request has unsupported battle metadata")
+    if controlled_count not in (1, _CONTROLLED_BATTLER_COUNT) or len(controlled_battlers) != controlled_count:
+        raise ProtocolError("request has invalid controlled battlers")
+    if (
+        (battle_mode == BATTLE_MODE_TRAINER_SINGLE and (controlled_count != 1 or battler_count != 2))
+        or (
+            battle_mode in (BATTLE_MODE_TRAINER_DOUBLE, BATTLE_MODE_TRAINER_TWO_OPPONENT_DOUBLE)
+            and (controlled_count != 2 or battler_count != 4)
+        )
+    ):
+        raise ProtocolError("request has unsupported battle metadata")
+    if any(battler > 3 for battler in controlled_battlers) or len(set(controlled_battlers)) != controlled_count:
+        raise ProtocolError("request has invalid controlled battlers")
+    if payload[9 + controlled_count : 11] != bytes([ACTION_NONE]) * (2 - controlled_count):
+        raise ProtocolError("request has invalid unused controlled battler")
+    if payload[11 + controlled_count : 13] != bytes(2 - controlled_count):
+        raise ProtocolError("request has invalid unused action count")
+
+    for party_slot in range(_PARTY_COUNT):
+        offset = _PARTY_OFFSET + party_slot * _PARTY_WIRE_SIZE
+        owner_battler = payload[offset + 3]
+        if payload[offset] != party_slot or payload[offset + 1] > 1 or payload[offset + 2] > 1:
+            raise ProtocolError("request has invalid party metadata")
+        if battle_mode == BATTLE_MODE_TRAINER_TWO_OPPONENT_DOUBLE:
+            expected_owner = controlled_battlers[0] if party_slot < _PARTY_COUNT // 2 else controlled_battlers[1]
+            if owner_battler != expected_owner:
+                raise ProtocolError("request has invalid two-trainer party ownership")
+        elif owner_battler != ACTION_NONE:
+            raise ProtocolError("request has invalid shared-party ownership")
+
+    actions_by_battler = {
+        battler: _parse_actions(payload, battler, action_counts[index], index)
+        for index, battler in enumerate(controlled_battlers)
+    }
 
     return FrameRequest(
         sequence=sequence,
-        requesting_battler=requesting_battler,
         battle_mode=battle_mode,
         turn_sequence=turn_sequence,
         battler_count=battler_count,
+        controlled_battlers=controlled_battlers,
         payload=payload,
-        legal_actions=tuple(actions),
+        actions_by_battler=actions_by_battler,
     )
 
 
-def format_response_frame(sequence: int, action_index: int) -> bytes:
-    """Return one fixed-size BAGB/3 response frame."""
+def format_response_frame(sequence: int, actions: tuple[tuple[int, int], ...]) -> bytes:
+    """Return one fixed-size BAGB/5 response frame with one or two choices."""
     _validate_u32(sequence, "sequence")
-    if isinstance(action_index, bool) or not isinstance(action_index, int) or not 0 <= action_index < MAX_LEGAL_ACTIONS:
+    if not isinstance(actions, tuple) or len(actions) not in (1, _CONTROLLED_BATTLER_COUNT):
+        raise ProtocolError("response must contain one or two action selections")
+    if any(not isinstance(action, tuple) or len(action) != 2 for action in actions):
+        raise ProtocolError("response action selection has invalid shape")
+    actors = tuple(action[0] for action in actions)
+    indexes = tuple(action[1] for action in actions)
+    if any(isinstance(actor, bool) or not isinstance(actor, int) or not 0 <= actor < 4 for actor in actors) or len(set(actors)) != len(actors):
+        raise ProtocolError("response has invalid action actors")
+    if any(isinstance(index, bool) or not isinstance(index, int) or not 0 <= index < MAX_ACTIONS_PER_BATTLER for index in indexes):
         raise ProtocolError("action index is outside legal-action range")
-    return struct.pack("<4sBBHIB", MAGIC, VERSION, KIND_RESPONSE, RESPONSE_PAYLOAD_SIZE, sequence, action_index)
+    padded = tuple(actions) + ((ACTION_NONE, ACTION_NONE),) * (_CONTROLLED_BATTLER_COUNT - len(actions))
+    return struct.pack("<4sBBHIBBBBB", MAGIC, VERSION, KIND_RESPONSE, RESPONSE_PAYLOAD_SIZE, sequence, len(actions), padded[0][0], padded[0][1], padded[1][0], padded[1][1])

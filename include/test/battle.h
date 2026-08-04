@@ -503,7 +503,7 @@
 #define MAX_QUEUED_EVENTS 25
 #define MAX_EXPECTED_ACTIONS 10
 
-enum { BATTLE_TEST_SINGLES, BATTLE_TEST_DOUBLES, BATTLE_TEST_WILD, BATTLE_TEST_AI_SINGLES, BATTLE_TEST_AI_DOUBLES };
+enum { BATTLE_TEST_SINGLES, BATTLE_TEST_DOUBLES, BATTLE_TEST_WILD, BATTLE_TEST_AI_SINGLES, BATTLE_TEST_AI_DOUBLES, BATTLE_TEST_AI_TWO_OPPONENTS };
 
 typedef void (*SingleBattleTestFunction)(void *, const u32, struct BattlePokemon *, struct BattlePokemon *);
 typedef void (*DoubleBattleTestFunction)(void *, const u32, struct BattlePokemon *, struct BattlePokemon *, struct BattlePokemon *, struct BattlePokemon *);
@@ -621,12 +621,13 @@ struct ExpectedBattleAgentRequest
     u32 sequence;
     u32 testResponseSequence;
     u8 actionCount;
-    u8 testResponseLegalActionIndex;
+    u8 testResponseActionCount;
+    u8 testResponseLegalActionIndexes[BATTLE_AGENT_MAX_CONTROLLED_BATTLERS];
     bool8 expected;
     bool8 setTestResponse;
     bool8 testResponseInjected;
     bool8 expectedActions[MAX_MON_MOVES];
-    struct BattleAgentLegalActionV3 legalActions[MAX_MON_MOVES];
+    struct BattleAgentLegalActionV4 legalActions[MAX_MON_MOVES];
     bool8 expectedBattlers[MAX_BATTLERS_COUNT];
     struct BattleAgentBattlerSnapshotV3 battlers[MAX_BATTLERS_COUNT];
     bool8 expectedRequesterMoves[MAX_MON_MOVES];
@@ -812,6 +813,7 @@ extern struct BattleTestRunnerState *const gBattleTestRunnerState;
 
 #define DOUBLE_BATTLE_TEST(_name, ...) BATTLE_TEST_ARGS_DOUBLE(_name, BATTLE_TEST_DOUBLES, __VA_ARGS__)
 #define AI_DOUBLE_BATTLE_TEST(_name, ...) BATTLE_TEST_ARGS_DOUBLE(_name, BATTLE_TEST_AI_DOUBLES, __VA_ARGS__)
+#define AI_TWO_OPPONENT_BATTLE_TEST(_name, ...) BATTLE_TEST_ARGS_DOUBLE(_name, BATTLE_TEST_AI_TWO_OPPONENTS, __VA_ARGS__)
 
 /* Parametrize */
 
@@ -937,6 +939,7 @@ enum { TURN_CLOSED, TURN_OPEN, TURN_CLOSING };
 #define EXPECT_AGENT_REQUESTER_MOVE(moveSlot, move, pp) ExpectBattleAgentRequesterMove_(__LINE__, moveSlot, move, pp)
 #define EXPECT_AGENT_ENVIRONMENT(weather, terrain, fieldStatuses, playerSideStatuses, opponentSideStatuses) ExpectBattleAgentEnvironment_(__LINE__, weather, terrain, fieldStatuses, playerSideStatuses, opponentSideStatuses)
 #define SET_AGENT_TEST_RESPONSE(sequence, actionIndex) SetBattleAgentTestResponse_(__LINE__, sequence, actionIndex)
+#define SET_AGENT_TEST_DOUBLE_RESPONSE(sequence, leftAction, rightAction) SetBattleAgentTestDoubleResponse_(__LINE__, sequence, leftAction, rightAction)
 #define SCORE_EQ(battler, ...) Score(__LINE__, battler, CMP_EQUAL, FALSE, (struct TestAIScoreStruct) { APPEND_TRUE(__VA_ARGS__) } )
 #define SCORE_NE(battler, ...) Score(__LINE__, battler, CMP_NOT_EQUAL, FALSE, (struct TestAIScoreStruct) { APPEND_TRUE(__VA_ARGS__) } )
 #define SCORE_GT(battler, ...) Score(__LINE__, battler, CMP_GREATER_THAN, FALSE, (struct TestAIScoreStruct) { APPEND_TRUE(__VA_ARGS__) } )
@@ -1007,6 +1010,7 @@ void ExpectBattleAgentBattler_(u32 sourceLine, u8 battler, u16 species, u16 hp, 
 void ExpectBattleAgentRequesterMove_(u32 sourceLine, u8 moveSlot, u16 move, u8 pp);
 void ExpectBattleAgentEnvironment_(u32 sourceLine, u16 weather, u8 terrain, u32 fieldStatuses, u32 playerSideStatuses, u32 opponentSideStatuses);
 void SetBattleAgentTestResponse_(u32 sourceLine, u32 sequence, u8 actionIndex);
+void SetBattleAgentTestDoubleResponse_(u32 sourceLine, u32 sequence, u8 leftActionIndex, u8 rightActionIndex);
 void Score(u32 sourceLine, struct BattlePokemon *battler, u32 cmp, bool32 toValue, struct TestAIScoreStruct cmpCtx);
 void ForcedMove(u32 sourceLine, struct BattlePokemon *);
 void Switch(u32 sourceLine, struct BattlePokemon *, u32 partyIndex);

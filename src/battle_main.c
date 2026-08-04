@@ -4051,8 +4051,15 @@ static void HandleTurnActionSelectionState(void)
                 AI_DATA->mostSuitableMonId[battler] = GetMostSuitableMonToSwitchInto(battler, FALSE);
                 gBattleStruct->aiMoveOrAction[battler] = ComputeBattleAiScores(battler);
                 BattleAI_TryApplyExternalAiMockMove(battler);
+                if (BattleAgent_IsFirstCoordinatedDoubleBattler(battler))
+                {
+                    gBattleCommunication[battler] = STATE_WAIT_EXTERNAL_AI_RESPONSE;
+                    break;
+                }
                 if (BattleAgent_BeginExternalWait(battler))
                 {
+                    if (gBattleTypeFlags & BATTLE_TYPE_DOUBLE)
+                        gBattleCommunication[GetBattlerAtPosition(BATTLE_PARTNER(position))] = STATE_WAIT_EXTERNAL_AI_RESPONSE;
                     gBattleCommunication[battler] = STATE_WAIT_EXTERNAL_AI_RESPONSE;
                     break;
                 }
@@ -4062,6 +4069,13 @@ static void HandleTurnActionSelectionState(void)
             if (BattleAgent_IsWaitExpired(battler))
             {
                 BattleAgent_UseVanillaFallback(battler);
+                if (gBattleTypeFlags & BATTLE_TYPE_DOUBLE)
+                {
+                    u32 partner = GetBattlerAtPosition(BATTLE_PARTNER(position));
+
+                    BattleAgent_UseVanillaFallback(partner);
+                    gBattleCommunication[partner] = STATE_BEFORE_ACTION_CHOSEN;
+                }
                 gBattleCommunication[battler] = STATE_BEFORE_ACTION_CHOSEN;
             }
             else if (BattleAgent_TryConsumeResponse(battler))

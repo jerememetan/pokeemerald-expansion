@@ -87,7 +87,7 @@ if not ok_listen or listen_result ~= LUA_SOCKET_SUCCESS then
 end
 
 local MAGIC = 0x42414732
-local VERSION = 3
+local VERSION = 5
 local REQUEST_PENDING = 1
 local RESPONSE_READY = 1
 
@@ -96,18 +96,23 @@ local OFFSET_VERSION = 4
 local OFFSET_REQUEST_STATUS = 6
 local OFFSET_RESPONSE_STATUS = 7
 local OFFSET_REQUEST_SEQUENCE = 8
-local OFFSET_REQUESTING_BATTLER = 12
-local OFFSET_BATTLE_MODE = 13
-local OFFSET_SNAPSHOT = 16
-local OFFSET_LEGAL_ACTION_COUNT = 1064
-local OFFSET_LEGAL_ACTIONS = 1068
-local OFFSET_RESPONSE_SEQUENCE = 1148
-local OFFSET_RESPONSE_ACTION_INDEX = 1152
+local OFFSET_BATTLE_MODE = 12
+local OFFSET_CONTROLLED_COUNT = 13
+local OFFSET_TURN_SEQUENCE = 14
+local OFFSET_BATTLER_COUNT = 16
+local OFFSET_CONTROLLED_BATTLERS = 17
+local OFFSET_LEGAL_ACTION_COUNTS = 19
+local OFFSET_SNAPSHOT = 24
+local OFFSET_LEGAL_ACTIONS = 1072
+local OFFSET_RESPONSE_SEQUENCE = 1468
+local OFFSET_RESPONSE_ACTION_COUNT = 1472
+local OFFSET_RESPONSE_BATTLERS = 1473
+local OFFSET_RESPONSE_ACTION_INDEXES = 1475
 
-local REQUEST_PAYLOAD_SIZE = 1049
-local RESPONSE_PAYLOAD_SIZE = 5
-local REQUEST_FRAME_SIZE = 1057
-local RESPONSE_FRAME_SIZE = 13
+local REQUEST_PAYLOAD_SIZE = 1369
+local RESPONSE_PAYLOAD_SIZE = 9
+local REQUEST_FRAME_SIZE = 1377
+local RESPONSE_FRAME_SIZE = 17
 local BATTLER_SIZE = 48
 local MOVE_SIZE = 12
 local SNAPSHOT_BATTLER_MOVES = 240
@@ -116,6 +121,10 @@ local PARTY_SIZE = 6
 local PARTY_RECORD_SIZE = 100
 
 local TRAINER_SINGLE = 1
+local TRAINER_DOUBLE = 2
+local TRAINER_TWO_OPPONENT_DOUBLE = 3
+local MAX_ACTIONS_PER_BATTLER = 22
+local ACTION_RECORD_SIZE = 9
 local client_accepted = false
 local client_socket = nil
 local client_disconnected = false
@@ -136,9 +145,17 @@ local function read_mailbox_header()
         version = version,
         request_status = emu:read8(MAILBOX_ADDRESS + OFFSET_REQUEST_STATUS),
         sequence = emu:read32(MAILBOX_ADDRESS + OFFSET_REQUEST_SEQUENCE),
-        requester = emu:read8(MAILBOX_ADDRESS + OFFSET_REQUESTING_BATTLER),
         battle_mode = emu:read8(MAILBOX_ADDRESS + OFFSET_BATTLE_MODE),
-        action_count = emu:read8(MAILBOX_ADDRESS + OFFSET_LEGAL_ACTION_COUNT),
+        controlled_count = emu:read8(MAILBOX_ADDRESS + OFFSET_CONTROLLED_COUNT),
+        battler_count = emu:read8(MAILBOX_ADDRESS + OFFSET_BATTLER_COUNT),
+        controlled = {
+            emu:read8(MAILBOX_ADDRESS + OFFSET_CONTROLLED_BATTLERS),
+            emu:read8(MAILBOX_ADDRESS + OFFSET_CONTROLLED_BATTLERS + 1),
+        },
+        action_counts = {
+            emu:read8(MAILBOX_ADDRESS + OFFSET_LEGAL_ACTION_COUNTS),
+            emu:read8(MAILBOX_ADDRESS + OFFSET_LEGAL_ACTION_COUNTS + 1),
+        },
     }
 end
 
@@ -150,9 +167,14 @@ local function is_forwardable(header)
     return header.magic == MAGIC
         and header.version == VERSION
         and header.request_status == REQUEST_PENDING
-        and header.requester >= 0 and header.requester <= 3
-        and header.battle_mode == TRAINER_SINGLE
-        and header.action_count >= 1 and header.action_count <= 10
+        and (header.battle_mode == TRAINER_SINGLE
+            or header.battle_mode == TRAINER_DOUBLE
+            or header.battle_mode == TRAINER_TWO_OPPONENT_DOUBLE)
+        and header.controlled_count >= 1 and header.controlled_count <= 2
+        and header.battler_count >= 2 and header.battler_count <= 4
+        and header.controlled[1] >= 0 and header.controlled[1] <= 3
+        and header.action_counts[1] >= 1 and header.action_counts[1] <= MAX_ACTIONS_PER_BATTLER
+        and (header.controlled_count == 1 or (header.controlled[2] >= 0 and header.controlled[2] <= 3 and header.controlled[1] ~= header.controlled[2] and header.action_counts[2] >= 1 and header.action_counts[2] <= MAX_ACTIONS_PER_BATTLER))
 end
 
 local function disconnect_client(reason)
@@ -205,28 +227,34 @@ local function append_party_member(parts, slot)
     append_u8(parts, slot)
     append_u8(parts, emu:read8(base + 96))
     append_u8(parts, emu:read8(base + 97))
-    append_u8(parts, 0)
+    append_u8(parts, emu:read8(base + 98))
     append_battler_record(parts, base, base + BATTLER_SIZE)
 end
 
 local function send_request(header)
     local payload = {}
     append_u32(payload, header.sequence)
-    append_u8(payload, header.requester)
     append_u8(payload, header.battle_mode)
-    append_u16(payload, emu:read16(MAILBOX_ADDRESS + 14))
-    append_u8(payload, 2)
+    append_u8(payload, header.controlled_count)
+    append_u16(payload, emu:read16(MAILBOX_ADDRESS + OFFSET_TURN_SEQUENCE))
+    append_u8(payload, header.battler_count)
+    append_u8(payload, header.controlled[1])
+    append_u8(payload, header.controlled[2])
+    append_u8(payload, header.action_counts[1])
+    append_u8(payload, header.action_counts[2])
+    append_u8(payload, 0)
     for battler = 0, 3 do append_battler(payload, battler) end
-    append_u16(payload, emu:read16(MAILBOX_ADDRESS + 448))
-    append_u8(payload, emu:read8(MAILBOX_ADDRESS + 450))
-    append_u32(payload, emu:read32(MAILBOX_ADDRESS + 452))
-    append_u32(payload, emu:read32(MAILBOX_ADDRESS + 456))
-    append_u32(payload, emu:read32(MAILBOX_ADDRESS + 460))
+    append_u16(payload, emu:read16(MAILBOX_ADDRESS + OFFSET_SNAPSHOT + 432))
+    append_u8(payload, emu:read8(MAILBOX_ADDRESS + OFFSET_SNAPSHOT + 434))
+    append_u32(payload, emu:read32(MAILBOX_ADDRESS + OFFSET_SNAPSHOT + 436))
+    append_u32(payload, emu:read32(MAILBOX_ADDRESS + OFFSET_SNAPSHOT + 440))
+    append_u32(payload, emu:read32(MAILBOX_ADDRESS + OFFSET_SNAPSHOT + 444))
     for slot = 0, PARTY_SIZE - 1 do append_party_member(payload, slot) end
-    append_u8(payload, header.action_count)
-    for index = 0, 9 do
-        local action = MAILBOX_ADDRESS + OFFSET_LEGAL_ACTIONS + index * 8
-        for field = 0, 7 do append_u8(payload, emu:read8(action + field)) end
+    for list = 0, 1 do
+        for index = 0, MAX_ACTIONS_PER_BATTLER - 1 do
+            local action = MAILBOX_ADDRESS + OFFSET_LEGAL_ACTIONS + (list * MAX_ACTIONS_PER_BATTLER + index) * ACTION_RECORD_SIZE
+            for field = 0, ACTION_RECORD_SIZE - 1 do append_u8(payload, emu:read8(action + field)) end
+        end
     end
     local payload_bytes = table.concat(payload)
     if #payload_bytes ~= REQUEST_PAYLOAD_SIZE then
@@ -260,14 +288,22 @@ local function parse_response_frame(frame)
         return nil
     end
     local sequence = string.byte(frame, 9) + string.byte(frame, 10) * 256 + string.byte(frame, 11) * 65536 + string.byte(frame, 12) * 16777216
-    local action_index = string.byte(frame, 13)
-    if action_index > 9 then
+    local action_count = string.byte(frame, 13)
+    local battler_one = string.byte(frame, 14)
+    local action_one = string.byte(frame, 15)
+    local battler_two = string.byte(frame, 16)
+    local action_two = string.byte(frame, 17)
+    if action_count < 1 or action_count > 2 or battler_one > 3 or action_one >= MAX_ACTIONS_PER_BATTLER
+     or (action_count == 1 and (battler_two ~= 255 or action_two ~= 255))
+     or (action_count == 2 and (battler_two > 3 or action_two >= MAX_ACTIONS_PER_BATTLER or battler_one == battler_two)) then
         return nil
     end
 
     return {
         sequence = sequence,
-        action_index = action_index,
+        action_count = action_count,
+        battlers = {battler_one, battler_two},
+        action_indexes = {action_one, action_two},
     }
 end
 
@@ -277,7 +313,10 @@ local function response_matches_current(response)
         and forwarded_sequence == response.sequence
         and committed_sequence ~= response.sequence
         and header.sequence == response.sequence
-        and response.action_index < header.action_count
+        and response.action_count == header.controlled_count
+        and response.battlers[1] == header.controlled[1]
+        and response.action_indexes[1] < header.action_counts[1]
+        and (response.action_count == 1 or (response.battlers[2] == header.controlled[2] and response.action_indexes[2] < header.action_counts[2]))
 end
 
 local function commit_response(response)
@@ -287,7 +326,11 @@ local function commit_response(response)
     end
 
     emu:write32(MAILBOX_ADDRESS + OFFSET_RESPONSE_SEQUENCE, response.sequence)
-    emu:write8(MAILBOX_ADDRESS + OFFSET_RESPONSE_ACTION_INDEX, response.action_index)
+    emu:write8(MAILBOX_ADDRESS + OFFSET_RESPONSE_ACTION_COUNT, response.action_count)
+    emu:write8(MAILBOX_ADDRESS + OFFSET_RESPONSE_BATTLERS, response.battlers[1])
+    emu:write8(MAILBOX_ADDRESS + OFFSET_RESPONSE_BATTLERS + 1, response.battlers[2])
+    emu:write8(MAILBOX_ADDRESS + OFFSET_RESPONSE_ACTION_INDEXES, response.action_indexes[1])
+    emu:write8(MAILBOX_ADDRESS + OFFSET_RESPONSE_ACTION_INDEXES + 1, response.action_indexes[2])
     emu:write8(MAILBOX_ADDRESS + OFFSET_RESPONSE_STATUS, RESPONSE_READY)
     committed_sequence = response.sequence
     log("BAGB response written: " .. response.sequence)
@@ -365,7 +408,7 @@ local function on_frame()
     end
 
     if #receive_buffer >= RESPONSE_FRAME_SIZE then
-        disconnect_client("response frame exceeded 13 bytes")
+        disconnect_client("response frame exceeded 17 bytes")
         return
     end
 

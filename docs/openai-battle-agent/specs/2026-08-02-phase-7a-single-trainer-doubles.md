@@ -8,6 +8,8 @@
 
 **Implementation plan:** [Phase 7A plan](../plans/2026-08-02-phase-7a-single-trainer-doubles.md)
 
+**Implementation evidence:** [Phase 7A evidence](../reviews/2026-08-02-phase-7a-single-trainer-doubles-evidence.md)
+
 **Prerequisite:** Phase 6B trainer singles have fresh External AI, Python, ROM
 build, and connected-service smoke-test evidence.
 
@@ -142,6 +144,9 @@ the tools in any order within the existing bounded call and time limits.
   and does not switch a Pokémon.
 - `list_legal_actions()` returns the two actor-keyed action lists. It is the
   source of truth for which targets and switches are selectable this turn.
+  Every move action also includes its move identity and the same ROM-derived
+  PP, type, power, accuracy, priority, STAB, effectiveness, and KO facts that
+  `analyze_action` can return for that action.
 - `analyze_action(actor_battler, action_index)` returns ROM-derived facts for
   that exact action. It never estimates an unlisted action or makes a choice.
 - `compare_speed()` exposes the normal active-battler speed context; the agent
@@ -152,6 +157,17 @@ the tools in any order within the existing bounded call and time limits.
 
 The system prompt directs the model to inspect tools as needed and finish
 exactly once with `choose_actions`; it produces no player-facing battle text.
+For the configured local Qwen model, the service also accepts its equivalent
+single-call JSON serialization: a scoped `list_legal_actions({"battler_id"})`
+query and a bare terminal action list are normalized to the documented tool
+contract before validation. The service still accepts only one tool call at a
+time, exposes no additional information, and validates every normalized actor
+and action index against the ROM-published list.
+For latency, the model is directed to use `get_battle_state`, then the enriched
+`list_legal_actions`, then `choose_actions` for ordinary move turns. It may
+call `get_party` when evaluating a voluntary switch or another read-only tool
+when necessary, but it must not repeatedly call `analyze_action` for facts
+already present in the legal-action list.
 
 ## Validation, commit, and fallback
 
@@ -165,7 +181,9 @@ If both actions are switches, their party slots must differ. A requested
 reserve cannot equal either currently active party slot. If any response field
 is missing, duplicated, stale, malformed, out of range, changed-state, or
 illegal, the ROM accepts neither action. It leaves the request pending until a
-valid complete pair arrives or the existing 900-frame deadline expires.
+valid complete pair arrives or the 1,800-frame deadline expires. This permits
+the configured local model to complete its bounded read-only tool exchange on
+the user's unthrottled mGBA setup while retaining a finite vanilla fallback.
 
 On an accepted pair, the ROM writes the two ordinary `aiMoveOrAction`, target,
 and/or `AI_monToSwitchIntoId` values and uses the existing opponent controller
@@ -176,6 +194,9 @@ turn.
 On timeout, service absence/disconnect, protocol mismatch, or no valid pair,
 the ROM restores both pre-wait vanilla move/target choices, clears every
 external wait/response state, clears the thinking message, and continues the
+turn. Timeout also marks the mailbox request idle before the controller
+continues, so Lua rejects a late service response instead of reporting a write
+that the ROM can no longer consume.
 turn. A late reply cannot modify a later request.
 
 ## Tests

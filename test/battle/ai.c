@@ -807,12 +807,158 @@ AI_SINGLE_BATTLE_TEST("External AI publishes and applies a response for a former
     }
 }
 
-TEST("External AI mailbox uses protocol V3")
+TEST("External AI mailbox uses protocol V5")
 {
-    EXPECT(BATTLE_AGENT_PROTOCOL_VERSION == 3);
+    EXPECT(BATTLE_AGENT_PROTOCOL_VERSION == 5);
 }
 
-AI_SINGLE_BATTLE_TEST("External AI V3 publishes party data and applies a legal voluntary switch")
+AI_DOUBLE_BATTLE_TEST("External AI applies one atomic action pair in a trainer double battle")
+{
+    GIVEN {
+        RESET_EXTERNAL_AI_MOCK();
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE);
+        TRAINER_OPPONENT(TRAINER_CALVIN_1);
+        EXTERNAL_AI_MOCK_MOVE(1);
+        PLAYER(SPECIES_GASTLY) { Moves(MOVE_MEAN_LOOK); }
+        PLAYER(SPECIES_ZUBAT) { Moves(MOVE_GROWL); }
+        OPPONENT(SPECIES_LILLIPUP) { Moves(MOVE_LEER, MOVE_TACKLE); }
+        OPPONENT(SPECIES_POOCHYENA) { Moves(MOVE_HOWL, MOVE_TACKLE); }
+    } WHEN {
+        TURN {
+            MOVE(playerLeft, MOVE_MEAN_LOOK);
+            MOVE(playerRight, MOVE_GROWL);
+            EXPECT_AGENT_REQUEST(1, 3);
+            EXPECT_AGENT_ACTION(0, 0, BATTLE_AGENT_ACTION_NONE);
+            EXPECT_AGENT_ACTION(1, 1, B_POSITION_PLAYER_LEFT);
+            EXPECT_AGENT_ACTION(2, 1, B_POSITION_PLAYER_RIGHT);
+            SET_AGENT_TEST_DOUBLE_RESPONSE(1, 1, 2);
+            EXPECT_MOVE(opponentLeft, MOVE_TACKLE, target:playerLeft);
+        }
+    } SCENE {
+        MESSAGE("Foe Poochyena used Tackle!");
+    }
+}
+
+AI_DOUBLE_BATTLE_TEST("External AI applies an atomic double switch to distinct shared-party reserves")
+{
+    GIVEN {
+        RESET_EXTERNAL_AI_MOCK();
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE);
+        TRAINER_OPPONENT(TRAINER_CALVIN_1);
+        EXTERNAL_AI_MOCK_MOVE(1);
+        PLAYER(SPECIES_GASTLY) { Moves(MOVE_MEAN_LOOK); }
+        PLAYER(SPECIES_ZUBAT) { Moves(MOVE_GROWL); }
+        OPPONENT(SPECIES_LILLIPUP) { Moves(MOVE_LEER, MOVE_TACKLE); }
+        OPPONENT(SPECIES_POOCHYENA) { Moves(MOVE_HOWL, MOVE_TACKLE); }
+        OPPONENT(SPECIES_ZIGZAGOON) { Moves(MOVE_TACKLE); }
+        OPPONENT(SPECIES_WURMPLE) { Moves(MOVE_TACKLE); }
+    } WHEN {
+        TURN {
+            MOVE(playerLeft, MOVE_MEAN_LOOK);
+            MOVE(playerRight, MOVE_GROWL);
+            EXPECT_AGENT_REQUEST(1, 5);
+            EXPECT_AGENT_ACTION(0, 0, BATTLE_AGENT_ACTION_NONE);
+            EXPECT_AGENT_ACTION(1, 1, B_POSITION_PLAYER_LEFT);
+            EXPECT_AGENT_ACTION(2, 1, B_POSITION_PLAYER_RIGHT);
+            SET_AGENT_TEST_DOUBLE_RESPONSE(1, 3, 4);
+            EXPECT_SWITCH(opponentLeft, 2);
+            EXPECT_SWITCH(opponentRight, 3);
+        }
+    }
+}
+
+AI_TWO_OPPONENT_BATTLE_TEST("External AI publishes one atomic request for two trainer opponents")
+{
+    GIVEN {
+        RESET_EXTERNAL_AI_MOCK();
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE);
+        PLAYER(SPECIES_ZIGZAGOON) { Moves(MOVE_GROWL); }
+        PLAYER(SPECIES_WURMPLE) { Moves(MOVE_GROWL); }
+        OPPONENT(SPECIES_LILLIPUP) { Moves(MOVE_TACKLE); }
+        OPPONENT(SPECIES_ZIGZAGOON) { Moves(MOVE_TACKLE); }
+        OPPONENT(SPECIES_WURMPLE) { Moves(MOVE_TACKLE); }
+        OPPONENT(SPECIES_POOCHYENA) { Moves(MOVE_TACKLE); }
+        OPPONENT(SPECIES_TAILLOW) { Moves(MOVE_TACKLE); }
+        OPPONENT(SPECIES_WINGULL) { Moves(MOVE_WATER_GUN); }
+    } WHEN {
+        TURN {
+            MOVE(playerLeft, MOVE_GROWL);
+            MOVE(playerRight, MOVE_GROWL);
+            EXPECT_AGENT_REQUEST(1, 4);
+            EXPECT_AGENT_ACTION(0, 0, B_POSITION_PLAYER_LEFT);
+            EXPECT_AGENT_ACTION(1, 0, B_POSITION_PLAYER_RIGHT);
+            EXPECT_AGENT_SWITCH_ACTION(2, 1);
+            EXPECT_AGENT_SWITCH_ACTION(3, 2);
+            SET_AGENT_TEST_DOUBLE_RESPONSE(1, 0, 0);
+            EXPECT_MOVE(opponentLeft, MOVE_TACKLE, target:playerLeft);
+            EXPECT_MOVE(opponentRight, MOVE_TACKLE, target:playerLeft);
+        }
+    } THEN {
+        EXPECT_EQ(gBattleAgentMailbox.battleMode, BATTLE_AGENT_BATTLE_MODE_TRAINER_TWO_OPPONENT_DOUBLE);
+        EXPECT_EQ(gBattleAgentMailbox.controlledBattlerCount, 2);
+        EXPECT_EQ(gBattleAgentMailbox.controlledBattlers[0], B_POSITION_OPPONENT_LEFT);
+        EXPECT_EQ(gBattleAgentMailbox.controlledBattlers[1], B_POSITION_OPPONENT_RIGHT);
+        EXPECT_EQ(gBattleAgentMailbox.snapshot.party[0].ownerBattler, B_POSITION_OPPONENT_LEFT);
+        EXPECT_EQ(gBattleAgentMailbox.snapshot.party[2].ownerBattler, B_POSITION_OPPONENT_LEFT);
+        EXPECT_EQ(gBattleAgentMailbox.snapshot.party[3].ownerBattler, B_POSITION_OPPONENT_RIGHT);
+        EXPECT_EQ(gBattleAgentMailbox.snapshot.party[5].ownerBattler, B_POSITION_OPPONENT_RIGHT);
+    }
+}
+
+AI_TWO_OPPONENT_BATTLE_TEST("External AI applies a move and an owner-correct switch in a two-trainer double")
+{
+    GIVEN {
+        RESET_EXTERNAL_AI_MOCK();
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE);
+        PLAYER(SPECIES_ZIGZAGOON) { Moves(MOVE_GROWL); }
+        PLAYER(SPECIES_WURMPLE) { Moves(MOVE_GROWL); }
+        OPPONENT(SPECIES_LILLIPUP) { Moves(MOVE_TACKLE); }
+        OPPONENT(SPECIES_ZIGZAGOON) { Moves(MOVE_TACKLE); }
+        OPPONENT(SPECIES_WURMPLE) { Moves(MOVE_TACKLE); }
+        OPPONENT(SPECIES_POOCHYENA) { Moves(MOVE_TACKLE); }
+        OPPONENT(SPECIES_TAILLOW) { Moves(MOVE_TACKLE); }
+        OPPONENT(SPECIES_WINGULL) { Moves(MOVE_WATER_GUN); }
+    } WHEN {
+        TURN {
+            MOVE(playerLeft, MOVE_GROWL);
+            MOVE(playerRight, MOVE_GROWL);
+            EXPECT_AGENT_REQUEST(1, 4);
+            EXPECT_AGENT_SWITCH_ACTION(2, 1);
+            SET_AGENT_TEST_DOUBLE_RESPONSE(1, 0, 2);
+            EXPECT_MOVE(opponentLeft, MOVE_TACKLE, target:playerLeft);
+            EXPECT_SWITCH(opponentRight, 4);
+        }
+    }
+}
+
+AI_TWO_OPPONENT_BATTLE_TEST("External AI applies two owner-correct switches in a two-trainer double")
+{
+    GIVEN {
+        RESET_EXTERNAL_AI_MOCK();
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE);
+        PLAYER(SPECIES_ZIGZAGOON) { Moves(MOVE_GROWL); }
+        PLAYER(SPECIES_WURMPLE) { Moves(MOVE_GROWL); }
+        OPPONENT(SPECIES_LILLIPUP) { Moves(MOVE_TACKLE); }
+        OPPONENT(SPECIES_ZIGZAGOON) { Moves(MOVE_TACKLE); }
+        OPPONENT(SPECIES_WURMPLE) { Moves(MOVE_TACKLE); }
+        OPPONENT(SPECIES_POOCHYENA) { Moves(MOVE_TACKLE); }
+        OPPONENT(SPECIES_TAILLOW) { Moves(MOVE_TACKLE); }
+        OPPONENT(SPECIES_WINGULL) { Moves(MOVE_WATER_GUN); }
+    } WHEN {
+        TURN {
+            MOVE(playerLeft, MOVE_GROWL);
+            MOVE(playerRight, MOVE_GROWL);
+            EXPECT_AGENT_REQUEST(1, 4);
+            EXPECT_AGENT_SWITCH_ACTION(2, 1);
+            EXPECT_AGENT_SWITCH_ACTION(3, 2);
+            SET_AGENT_TEST_DOUBLE_RESPONSE(1, 2, 3);
+            EXPECT_SWITCH(opponentLeft, 1);
+            EXPECT_SWITCH(opponentRight, 5);
+        }
+    }
+}
+
+AI_SINGLE_BATTLE_TEST("External AI V4 publishes party data and applies a legal voluntary switch")
 {
     GIVEN {
         RESET_EXTERNAL_AI_MOCK();
@@ -839,7 +985,7 @@ AI_SINGLE_BATTLE_TEST("External AI V3 publishes party data and applies a legal v
     }
 }
 
-AI_SINGLE_BATTLE_TEST("External AI V3 does not publish a voluntary action while locked")
+AI_SINGLE_BATTLE_TEST("External AI V4 does not publish a voluntary action while locked")
 {
     u8 originalMoveOrAction;
 
@@ -864,7 +1010,7 @@ AI_SINGLE_BATTLE_TEST("External AI V3 does not publish a voluntary action while 
     }
 }
 
-AI_SINGLE_BATTLE_TEST("External AI V3 rejects a reserve that faints while it waits")
+AI_SINGLE_BATTLE_TEST("External AI V4 rejects a reserve that faints while it waits")
 {
     u16 originalReserveHp;
     u16 zero = 0;
@@ -892,11 +1038,14 @@ AI_SINGLE_BATTLE_TEST("External AI V3 rejects a reserve that faints while it wai
         requestSequence = gBattleAgentMailbox.requestSequence;
         SetMonData(&gEnemyParty[1], MON_DATA_HP, &zero);
         gBattleAgentMailbox.responseSequence = requestSequence;
-        gBattleAgentMailbox.responseLegalActionIndex = 1;
+        gBattleAgentMailbox.responseActionCount = 1;
+        gBattleAgentMailbox.responseBattlers[0] = B_POSITION_OPPONENT_LEFT;
+        gBattleAgentMailbox.responseActionIndexes[0] = 1;
         gBattleAgentMailbox.responseStatus = BATTLE_AGENT_RESPONSE_READY;
         EXPECT_EQ(BattleAgent_TryConsumeResponse(B_POSITION_OPPONENT_LEFT), FALSE);
         EXPECT_EQ(gBattleStruct->AI_monToSwitchIntoId[B_POSITION_OPPONENT_LEFT], PARTY_SIZE);
         BattleAgent_UseVanillaFallback(B_POSITION_OPPONENT_LEFT);
+        EXPECT_EQ(gBattleAgentMailbox.requestStatus, BATTLE_AGENT_REQUEST_IDLE);
         EXPECT_EQ(gBattleStruct->aiMoveOrAction[B_POSITION_OPPONENT_LEFT], 0);
         SetMonData(&gEnemyParty[1], MON_DATA_HP, &originalReserveHp);
         gBattleStruct->aiMoveOrAction[B_POSITION_OPPONENT_LEFT] = originalMoveOrAction;
@@ -1105,10 +1254,11 @@ AI_SINGLE_BATTLE_TEST("External AI snapshot preserves a pending request in exclu
             BattleAgent_ResetMailbox();
             gBattleAgentMailbox.requestStatus = BATTLE_AGENT_REQUEST_PENDING;
             gBattleAgentMailbox.requestSequence = 7;
-            gBattleAgentMailbox.requestingBattler = B_POSITION_OPPONENT_LEFT;
             gBattleAgentMailbox.battleMode = BATTLE_AGENT_BATTLE_MODE_TRAINER_SINGLE;
             gBattleAgentMailbox.turnSequence = 7;
-            gBattleAgentMailbox.legalActionCount = 1;
+            gBattleAgentMailbox.controlledBattlerCount = 1;
+            gBattleAgentMailbox.controlledBattlers[0] = B_POSITION_OPPONENT_LEFT;
+            gBattleAgentMailbox.legalActionCounts[0] = 1;
             gBattleTypeFlags = battleTypeFlags | sExcludedFlags[excludedIndex];
             EXPECT_EQ(BattleAgent_TryPublishRequest(B_POSITION_OPPONENT_LEFT), FALSE);
             EXPECT_EQ(gBattleAgentMailbox.requestStatus, BATTLE_AGENT_REQUEST_PENDING);
@@ -1136,10 +1286,11 @@ AI_SINGLE_BATTLE_TEST("External AI snapshot preserves a pending request for a no
         BattleAgent_ResetMailbox();
         gBattleAgentMailbox.requestStatus = BATTLE_AGENT_REQUEST_PENDING;
         gBattleAgentMailbox.requestSequence = 7;
-        gBattleAgentMailbox.requestingBattler = B_POSITION_OPPONENT_LEFT;
         gBattleAgentMailbox.battleMode = BATTLE_AGENT_BATTLE_MODE_TRAINER_SINGLE;
         gBattleAgentMailbox.turnSequence = 7;
-        gBattleAgentMailbox.legalActionCount = 1;
+        gBattleAgentMailbox.controlledBattlerCount = 1;
+        gBattleAgentMailbox.controlledBattlers[0] = B_POSITION_OPPONENT_LEFT;
+        gBattleAgentMailbox.legalActionCounts[0] = 1;
         gBattleStruct->aiMoveOrAction[B_POSITION_OPPONENT_LEFT] = AI_CHOICE_SWITCH;
         EXPECT_EQ(BattleAgent_TryPublishRequest(B_POSITION_OPPONENT_LEFT), FALSE);
         EXPECT_EQ(gBattleAgentMailbox.requestStatus, BATTLE_AGENT_REQUEST_PENDING);

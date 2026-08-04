@@ -3,6 +3,7 @@
 #include "battle_ai_main.h"
 #include "battle_ai_switch_items.h"
 #include "battle_ai_util.h"
+#include "battle_anim.h"
 #include "battle_controllers.h"
 #include "battle_message.h"
 #include "battle_setup.h"
@@ -18,7 +19,7 @@
 #include "test_runner.h"
 #endif
 
-EWRAM_DATA struct BattleAgentMailboxV3 gBattleAgentMailbox;
+EWRAM_DATA struct BattleAgentMailboxV4 gBattleAgentMailbox;
 
 struct BattleAgentWaitState
 {
@@ -45,10 +46,15 @@ static const u8 sText_AiThinkingTwoDots[] = _("AI is thinking..");
 static const u8 sThinkingStatusTextColors[] = {1, 15, 6};
 
 static bool32 BattleAgent_IsEligible(u32 battler);
+static bool32 BattleAgent_IsBaseEligible(u32 battler);
+static bool32 BattleAgent_IsTwoTrainerBattlerConfigured(u32 battler);
+static bool32 BattleAgent_IsTwoTrainerBattlerEligible(u32 battler);
+static bool32 BattleAgent_IsCoordinatedDoubleBattle(void);
+static u32 BattleAgent_GetDoublePartner(u32 battler);
 static bool32 BattleAgent_NormalizeSingleTarget(u32 requester, u16 move, u8 *target);
 static bool32 BattleAgent_IsLegalSwitch(u32 requester, u8 partySlot);
 static void BattleAgent_CopySnapshot(u32 requester);
-static void BattleAgent_BuildLegalActions(u32 requester);
+static void BattleAgent_BuildLegalActions(u32 requester, u8 actionListIndex, bool32 isDouble);
 static void BattleAgent_CopyMoveSnapshot(struct BattleAgentMoveSnapshotV3 *snapshotMove, u16 move, u8 pp);
 static void BattleAgent_BeginRequest(void);
 static void BattleAgent_CommitRequest(void);
@@ -112,17 +118,17 @@ static bool32 BattleAgent_UpdateThinkingStatusState(u32 battler, bool32 playerAc
     return FALSE;
 }
 
-static bool32 BattleAgent_IsEligible(u32 battler)
+static bool32 BattleAgent_IsBaseEligible(u32 battler)
 {
     if (battler >= gBattlersCount
      || !BattlerHasAi(battler)
      || GetBattlerSide(battler) != B_SIDE_OPPONENT
      || !(gBattleTypeFlags & BATTLE_TYPE_TRAINER)
-     || (gBattleTypeFlags & (BATTLE_TYPE_DOUBLE | BATTLE_TYPE_MULTI | BATTLE_TYPE_LINK
+     || (gBattleTypeFlags & (BATTLE_TYPE_MULTI | BATTLE_TYPE_LINK
                            | BATTLE_TYPE_SAFARI | BATTLE_TYPE_PALACE
                            | BATTLE_TYPE_FRONTIER | BATTLE_TYPE_EREADER_TRAINER
                            | BATTLE_TYPE_TRAINER_HILL | BATTLE_TYPE_SECRET_BASE
-                           | BATTLE_TYPE_TWO_OPPONENTS))
+                           | BATTLE_TYPE_TWO_OPPONENTS | BATTLE_TYPE_INGAME_PARTNER))
      || !gTrainers[gTrainerBattleOpponent_A].externalAi
      || gBattleMons[battler].status2 & (STATUS2_MULTIPLETURNS | STATUS2_RECHARGE)
      || gBattleStruct->aiMoveOrAction[battler] >= MAX_MON_MOVES)
@@ -139,11 +145,106 @@ static bool32 BattleAgent_IsEligible(u32 battler)
     return TRUE;
 }
 
+static bool32 BattleAgent_IsTwoTrainerBattlerConfigured(u32 battler)
+{
+    if (battler >= gBattlersCount
+     || !BattlerHasAi(battler)
+     || GetBattlerSide(battler) != B_SIDE_OPPONENT
+     || !(gBattleTypeFlags & BATTLE_TYPE_TRAINER)
+     || !(gBattleTypeFlags & BATTLE_TYPE_TWO_OPPONENTS)
+     || (gBattleTypeFlags & (BATTLE_TYPE_MULTI | BATTLE_TYPE_LINK
+                           | BATTLE_TYPE_SAFARI | BATTLE_TYPE_PALACE
+                           | BATTLE_TYPE_FRONTIER | BATTLE_TYPE_EREADER_TRAINER
+                           | BATTLE_TYPE_TRAINER_HILL | BATTLE_TYPE_SECRET_BASE
+                           | BATTLE_TYPE_INGAME_PARTNER))
+     || !gTrainers[gTrainerBattleOpponent_A].externalAi
+     || !gTrainers[gTrainerBattleOpponent_B].externalAi)
+        return FALSE;
+
+#if TESTING
+    if ((gBattleTypeFlags & BATTLE_TYPE_RECORDED) && !gTestRunnerEnabled)
+        return FALSE;
+#else
+    if (gBattleTypeFlags & BATTLE_TYPE_RECORDED)
+        return FALSE;
+#endif
+
+    return TRUE;
+}
+
+static bool32 BattleAgent_IsTwoTrainerBattlerEligible(u32 battler)
+{
+    return BattleAgent_IsTwoTrainerBattlerConfigured(battler)
+        && !(gBattleMons[battler].status2 & (STATUS2_MULTIPLETURNS | STATUS2_RECHARGE))
+        && gBattleStruct->aiMoveOrAction[battler] < MAX_MON_MOVES;
+}
+
+static bool32 BattleAgent_IsEligible(u32 battler)
+{
+    return BattleAgent_IsBaseEligible(battler)
+        && !(gBattleTypeFlags & BATTLE_TYPE_DOUBLE);
+}
+
+static u32 BattleAgent_GetDoublePartner(u32 battler)
+{
+    return GetBattlerAtPosition(BATTLE_PARTNER(GetBattlerPosition(battler)));
+}
+
+static bool32 BattleAgent_IsCoordinatedDoubleBattle(void)
+{
+    u32 left = GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT);
+    u32 right = GetBattlerAtPosition(B_POSITION_OPPONENT_RIGHT);
+
+    if (!(gBattleTypeFlags & BATTLE_TYPE_DOUBLE)
+     || gBattlersCount != MAX_BATTLERS_COUNT
+     || gBattleTypeFlags & BATTLE_TYPE_INGAME_PARTNER
+     || left >= gBattlersCount
+     || right >= gBattlersCount
+     || !IsBattlerAlive(left)
+     || !IsBattlerAlive(right))
+        return FALSE;
+
+    if (gBattleTypeFlags & BATTLE_TYPE_TWO_OPPONENTS)
+        return BattleAgent_IsTwoTrainerBattlerEligible(left)
+            && BattleAgent_IsTwoTrainerBattlerEligible(right);
+
+    return BattleAgent_IsBaseEligible(left)
+        && BattleAgent_IsBaseEligible(right);
+}
+
+bool32 BattleAgent_IsFirstCoordinatedDoubleBattler(u32 battler)
+{
+    u32 left = GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT);
+    u32 right = GetBattlerAtPosition(B_POSITION_OPPONENT_RIGHT);
+
+    if (battler != left)
+        return FALSE;
+
+    // The battle loop evaluates the left opponent before calculating the right
+    // opponent's vanilla action. Hold the left side here so the right side can
+    // publish one atomic request after both actions are available.
+    if (gBattleTypeFlags & BATTLE_TYPE_TWO_OPPONENTS)
+    {
+        return (gBattleTypeFlags & BATTLE_TYPE_DOUBLE)
+            && gBattlersCount == MAX_BATTLERS_COUNT
+            && !(gBattleTypeFlags & BATTLE_TYPE_INGAME_PARTNER)
+            && left < gBattlersCount
+            && right < gBattlersCount
+            && IsBattlerAlive(left)
+            && IsBattlerAlive(right)
+            && BattleAgent_IsTwoTrainerBattlerConfigured(left)
+            && BattleAgent_IsTwoTrainerBattlerConfigured(right);
+    }
+
+    return BattleAgent_IsCoordinatedDoubleBattle();
+}
+
 static bool32 BattleAgent_IsLegalSwitch(u32 requester, u8 partySlot)
 {
     struct Pokemon *party;
     s32 firstPartySlot;
     s32 lastPartySlot;
+    u32 partner;
 
     if (requester >= gBattlersCount
      || partySlot >= PARTY_SIZE
@@ -155,8 +256,11 @@ static bool32 BattleAgent_IsLegalSwitch(u32 requester, u8 partySlot)
     if (partySlot < firstPartySlot || partySlot >= lastPartySlot)
         return FALSE;
 
+    partner = BattleAgent_GetDoublePartner(requester);
     party = GetBattlerParty(requester);
-    return partySlot != gBattlerPartyIndexes[requester] && IsValidForBattle(&party[partySlot]);
+    return partySlot != gBattlerPartyIndexes[requester]
+        && (!(gBattleTypeFlags & BATTLE_TYPE_DOUBLE) || partner >= gBattlersCount || partySlot != gBattlerPartyIndexes[partner])
+        && IsValidForBattle(&party[partySlot]);
 }
 
 static void BattleAgent_CopyMoveSnapshot(struct BattleAgentMoveSnapshotV3 *snapshotMove, u16 move, u8 pp)
@@ -296,7 +400,20 @@ static void BattleAgent_CopySnapshot(u32 requester)
         snapshotParty->battler.speed = GetMonData(mon, MON_DATA_SPEED);
         snapshotParty->battler.spAttack = GetMonData(mon, MON_DATA_SPATK);
         snapshotParty->battler.spDefense = GetMonData(mon, MON_DATA_SPDEF);
-        snapshotParty->isActive = battler == gBattlerPartyIndexes[requester];
+        if (gBattleTypeFlags & BATTLE_TYPE_TWO_OPPONENTS)
+        {
+            u32 ownerBattler = battler < PARTY_SIZE / 2
+                ? GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT)
+                : GetBattlerAtPosition(B_POSITION_OPPONENT_RIGHT);
+
+            snapshotParty->isActive = battler == gBattlerPartyIndexes[ownerBattler];
+            snapshotParty->ownerBattler = ownerBattler;
+        }
+        else
+        {
+            snapshotParty->isActive = battler == gBattlerPartyIndexes[requester];
+            snapshotParty->ownerBattler = BATTLE_AGENT_ACTION_NONE;
+        }
         snapshotParty->isUsable = IsValidForBattle(mon);
         for (moveSlot = 0; moveSlot < MAX_MON_MOVES; moveSlot++)
             BattleAgent_CopyMoveSnapshot(&snapshotParty->moves[moveSlot], GetMonData(mon, MON_DATA_MOVE1 + moveSlot), GetMonData(mon, MON_DATA_PP1 + moveSlot));
@@ -308,55 +425,98 @@ static void BattleAgent_CopySnapshot(u32 requester)
     memcpy(snapshot->sideStatuses, gSideStatuses, sizeof(snapshot->sideStatuses));
 }
 
-static void BattleAgent_BuildLegalActions(u32 requester)
+static bool32 BattleAgent_AddMoveAction(u32 requester, u8 actionListIndex, u16 move, u8 moveSlot, u8 target)
+{
+    struct BattleAgentLegalActionV4 *action;
+    u8 *actionCount = &gBattleAgentMailbox.legalActionCounts[actionListIndex];
+
+    if (*actionCount >= BATTLE_AGENT_MAX_ACTIONS_PER_BATTLER)
+        return FALSE;
+
+    action = &gBattleAgentMailbox.legalActions[actionListIndex][*actionCount];
+    action->actorBattler = requester;
+    action->actionIndex = *actionCount;
+    action->kind = BATTLE_AGENT_ACTION_KIND_MOVE;
+    action->moveSlot = moveSlot;
+    action->targetBattler = target;
+    action->partySlot = BATTLE_AGENT_ACTION_NONE;
+    if (target == BATTLE_AGENT_ACTION_NONE)
+    {
+        action->typeEffectiveness = 2;
+        action->hasStab = IS_BATTLER_OF_TYPE(requester, gBattleMoves[move].type);
+        action->canFaintTarget = FALSE;
+    }
+    else
+    {
+        action->typeEffectiveness = BattleAgent_GetEffectivenessCategory(AI_DATA->effectiveness[requester][target][moveSlot]);
+        action->hasStab = IS_BATTLER_OF_TYPE(requester, gBattleMoves[move].type);
+        action->canFaintTarget = CanIndexMoveFaintTarget(requester, target, moveSlot, 0);
+    }
+    (*actionCount)++;
+    return TRUE;
+}
+
+static void BattleAgent_BuildLegalActions(u32 requester, u8 actionListIndex, bool32 isDouble)
 {
     u32 moveSlot;
     u8 moveLimitations;
 
-    gBattleAgentMailbox.legalActionCount = 0;
-    memset(gBattleAgentMailbox.legalActions, 0, sizeof(gBattleAgentMailbox.legalActions));
+    gBattleAgentMailbox.legalActionCounts[actionListIndex] = 0;
+    memset(gBattleAgentMailbox.legalActions[actionListIndex], 0, sizeof(gBattleAgentMailbox.legalActions[actionListIndex]));
     moveLimitations = CheckMoveLimitations(requester, 0, MOVE_LIMITATIONS_ALL);
 
     for (moveSlot = 0; moveSlot < MAX_MON_MOVES; moveSlot++)
     {
-        struct BattleAgentLegalActionV3 *action;
         u16 move = gBattleMons[requester].moves[moveSlot];
         u8 target;
 
-        if (move == MOVE_NONE
-         || (moveLimitations & gBitTable[moveSlot])
-         || !BattleAgent_NormalizeSingleTarget(requester, move, &target))
+        if (move == MOVE_NONE || (moveLimitations & gBitTable[moveSlot]))
             continue;
 
-        if (gBattleAgentMailbox.legalActionCount >= BATTLE_AGENT_MAX_LEGAL_ACTIONS)
-            break;
+        if (!isDouble)
+        {
+            if (BattleAgent_NormalizeSingleTarget(requester, move, &target))
+                BattleAgent_AddMoveAction(requester, actionListIndex, move, moveSlot, target);
+        }
+        else
+        {
+            u32 targetBattler;
+            u32 moveTarget = GetBattlerMoveTargetType(requester, move);
 
-        action = &gBattleAgentMailbox.legalActions[gBattleAgentMailbox.legalActionCount];
-        action->actionIndex = gBattleAgentMailbox.legalActionCount;
-        action->kind = BATTLE_AGENT_ACTION_KIND_MOVE;
-        action->moveSlot = moveSlot;
-        action->targetBattler = target;
-        action->partySlot = BATTLE_AGENT_ACTION_NONE;
-        action->typeEffectiveness = BattleAgent_GetEffectivenessCategory(AI_DATA->effectiveness[requester][target][moveSlot]);
-        action->hasStab = IS_BATTLER_OF_TYPE(requester, gBattleMoves[move].type);
-        action->canFaintTarget = CanIndexMoveFaintTarget(requester, target, moveSlot, 0);
-        gBattleAgentMailbox.legalActionCount++;
+            if (moveTarget == MOVE_TARGET_USER || moveTarget == MOVE_TARGET_USER_OR_SELECTED)
+                BattleAgent_AddMoveAction(requester, actionListIndex, move, moveSlot, requester);
+            else if (moveTarget == MOVE_TARGET_ALLY)
+                BattleAgent_AddMoveAction(requester, actionListIndex, move, moveSlot, BattleAgent_GetDoublePartner(requester));
+            else if (moveTarget == MOVE_TARGET_SELECTED || moveTarget == MOVE_TARGET_DEPENDS || moveTarget == MOVE_TARGET_RANDOM)
+            {
+                for (targetBattler = 0; targetBattler < gBattlersCount; targetBattler++)
+                {
+                    if (GetBattlerSide(targetBattler) != GetBattlerSide(requester) && IsBattlerAlive(targetBattler))
+                        BattleAgent_AddMoveAction(requester, actionListIndex, move, moveSlot, targetBattler);
+                }
+            }
+            else
+            {
+                BattleAgent_AddMoveAction(requester, actionListIndex, move, moveSlot, BATTLE_AGENT_ACTION_NONE);
+            }
+        }
     }
 
-    for (moveSlot = 0; moveSlot < PARTY_SIZE && gBattleAgentMailbox.legalActionCount < BATTLE_AGENT_MAX_LEGAL_ACTIONS; moveSlot++)
+    for (moveSlot = 0; moveSlot < PARTY_SIZE && gBattleAgentMailbox.legalActionCounts[actionListIndex] < BATTLE_AGENT_MAX_ACTIONS_PER_BATTLER; moveSlot++)
     {
-        struct BattleAgentLegalActionV3 *action;
+        struct BattleAgentLegalActionV4 *action;
 
         if (!BattleAgent_IsLegalSwitch(requester, moveSlot))
             continue;
 
-        action = &gBattleAgentMailbox.legalActions[gBattleAgentMailbox.legalActionCount];
-        action->actionIndex = gBattleAgentMailbox.legalActionCount;
+        action = &gBattleAgentMailbox.legalActions[actionListIndex][gBattleAgentMailbox.legalActionCounts[actionListIndex]];
+        action->actorBattler = requester;
+        action->actionIndex = gBattleAgentMailbox.legalActionCounts[actionListIndex];
         action->kind = BATTLE_AGENT_ACTION_KIND_SWITCH;
         action->moveSlot = BATTLE_AGENT_ACTION_NONE;
         action->targetBattler = BATTLE_AGENT_ACTION_NONE;
         action->partySlot = moveSlot;
-        gBattleAgentMailbox.legalActionCount++;
+        gBattleAgentMailbox.legalActionCounts[actionListIndex]++;
     }
 }
 
@@ -377,7 +537,11 @@ static void BattleAgent_ClearResponse(void)
 {
     gBattleAgentMailbox.responseStatus = BATTLE_AGENT_RESPONSE_NONE;
     gBattleAgentMailbox.responseSequence = 0;
-    gBattleAgentMailbox.responseLegalActionIndex = 0;
+    gBattleAgentMailbox.responseActionCount = 0;
+    gBattleAgentMailbox.responseBattlers[0] = BATTLE_AGENT_ACTION_NONE;
+    gBattleAgentMailbox.responseBattlers[1] = BATTLE_AGENT_ACTION_NONE;
+    gBattleAgentMailbox.responseActionIndexes[0] = BATTLE_AGENT_ACTION_NONE;
+    gBattleAgentMailbox.responseActionIndexes[1] = BATTLE_AGENT_ACTION_NONE;
 }
 
 void BattleAgent_ResetMailbox(void)
@@ -396,7 +560,8 @@ void BattleAgent_ResetMailbox(void)
 
 bool32 BattleAgent_TryPublishRequest(u32 battler)
 {
-    if (!BattleAgent_IsEligible(battler))
+    if (!BattleAgent_IsEligible(battler)
+     && (!BattleAgent_IsCoordinatedDoubleBattle() || GetBattlerSide(battler) != B_SIDE_OPPONENT))
         return FALSE;
 
     if (gBattleAgentMailbox.magic != BATTLE_AGENT_PROTOCOL_MAGIC
@@ -408,14 +573,36 @@ bool32 BattleAgent_TryPublishRequest(u32 battler)
     BattleAgent_BeginRequest();
     BattleAgent_ClearResponse();
     BattleAgent_CopySnapshot(battler);
-    BattleAgent_BuildLegalActions(battler);
 
     gBattleAgentMailbox.requestSequence++;
     if (gBattleAgentMailbox.requestSequence == 0)
         gBattleAgentMailbox.requestSequence = 1;
 
-    gBattleAgentMailbox.requestingBattler = battler;
-    gBattleAgentMailbox.battleMode = BATTLE_AGENT_BATTLE_MODE_TRAINER_SINGLE;
+    if (BattleAgent_IsCoordinatedDoubleBattle())
+    {
+        u32 left = GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT);
+        u32 right = GetBattlerAtPosition(B_POSITION_OPPONENT_RIGHT);
+
+        gBattleAgentMailbox.battleMode = (gBattleTypeFlags & BATTLE_TYPE_TWO_OPPONENTS)
+            ? BATTLE_AGENT_BATTLE_MODE_TRAINER_TWO_OPPONENT_DOUBLE
+            : BATTLE_AGENT_BATTLE_MODE_TRAINER_DOUBLE;
+        gBattleAgentMailbox.controlledBattlerCount = 2;
+        gBattleAgentMailbox.battlerCount = MAX_BATTLERS_COUNT;
+        gBattleAgentMailbox.controlledBattlers[0] = left;
+        gBattleAgentMailbox.controlledBattlers[1] = right;
+        BattleAgent_BuildLegalActions(left, 0, TRUE);
+        BattleAgent_BuildLegalActions(right, 1, TRUE);
+    }
+    else
+    {
+        gBattleAgentMailbox.battleMode = BATTLE_AGENT_BATTLE_MODE_TRAINER_SINGLE;
+        gBattleAgentMailbox.controlledBattlerCount = 1;
+        gBattleAgentMailbox.battlerCount = 2;
+        gBattleAgentMailbox.controlledBattlers[0] = battler;
+        gBattleAgentMailbox.controlledBattlers[1] = BATTLE_AGENT_ACTION_NONE;
+        BattleAgent_BuildLegalActions(battler, 0, FALSE);
+        gBattleAgentMailbox.legalActionCounts[1] = 0;
+    }
     gBattleAgentMailbox.turnSequence++;
     if (gBattleAgentMailbox.turnSequence == 0)
         gBattleAgentMailbox.turnSequence = 1;
@@ -427,16 +614,26 @@ bool32 BattleAgent_TryPublishRequest(u32 battler)
 bool32 BattleAgent_BeginExternalWait(u32 battler)
 {
     struct BattleAgentWaitState *waitState;
+    u32 controlledIndex;
 
-    if (battler >= MAX_BATTLERS_COUNT || !BattleAgent_TryPublishRequest(battler) || gBattleAgentMailbox.legalActionCount == 0)
+    if (battler >= MAX_BATTLERS_COUNT || !BattleAgent_TryPublishRequest(battler))
         return FALSE;
 
-    waitState = &sBattleAgentWaitStates[battler];
-    waitState->sequence = gBattleAgentMailbox.requestSequence;
-    waitState->frames = 0;
-    waitState->fallbackMoveOrAction = gBattleStruct->aiMoveOrAction[battler];
-    waitState->fallbackTarget = gBattleStruct->aiChosenTarget[battler];
-    waitState->active = TRUE;
+    for (controlledIndex = 0; controlledIndex < gBattleAgentMailbox.controlledBattlerCount; controlledIndex++)
+    {
+        u32 controlledBattler = gBattleAgentMailbox.controlledBattlers[controlledIndex];
+
+        if (gBattleAgentMailbox.legalActionCounts[controlledIndex] == 0)
+            return FALSE;
+        waitState = &sBattleAgentWaitStates[controlledBattler];
+        waitState->sequence = gBattleAgentMailbox.requestSequence;
+        waitState->frames = 0;
+        waitState->fallbackMoveOrAction = gBattleStruct->aiMoveOrAction[controlledBattler];
+        waitState->fallbackTarget = gBattleStruct->aiChosenTarget[controlledBattler];
+        waitState->active = TRUE;
+        waitState->hasAcceptedAction = FALSE;
+    }
+
 #if TESTING
     TestRunner_Battle_InjectBattleAgentResponse(battler);
 #endif
@@ -469,72 +666,138 @@ void BattleAgent_ClearThinkingStatus(u32 battler)
 bool32 BattleAgent_TryConsumeResponse(u32 battler)
 {
     struct BattleAgentWaitState *waitState;
-    struct BattleAgentLegalActionV3 *action;
-    u8 target;
-    u16 move;
-    u8 moveLimitations;
+    u8 selectedActionIndexes[BATTLE_AGENT_MAX_CONTROLLED_BATTLERS];
+    u32 controlledIndex;
+    u32 responseIndex;
 
     if (battler >= MAX_BATTLERS_COUNT)
         return FALSE;
 
     waitState = &sBattleAgentWaitStates[battler];
+    if (waitState->hasAcceptedAction)
+        return TRUE;
+
     if (!waitState->active || gBattleAgentMailbox.responseStatus != BATTLE_AGENT_RESPONSE_READY)
         return FALSE;
 
     if (gBattleAgentMailbox.requestStatus != BATTLE_AGENT_REQUEST_PENDING
      || gBattleAgentMailbox.responseSequence != waitState->sequence
-     || gBattleAgentMailbox.responseLegalActionIndex >= gBattleAgentMailbox.legalActionCount)
+     || gBattleAgentMailbox.responseActionCount != gBattleAgentMailbox.controlledBattlerCount)
     {
         BattleAgent_ClearResponse();
         return FALSE;
     }
 
-    action = &gBattleAgentMailbox.legalActions[gBattleAgentMailbox.responseLegalActionIndex];
-    if (action->kind == BATTLE_AGENT_ACTION_KIND_MOVE)
+    for (controlledIndex = 0; controlledIndex < gBattleAgentMailbox.controlledBattlerCount; controlledIndex++)
     {
-        if (action->moveSlot >= MAX_MON_MOVES
-         || action->partySlot != BATTLE_AGENT_ACTION_NONE)
+        bool32 found = FALSE;
+
+        for (responseIndex = 0; responseIndex < gBattleAgentMailbox.responseActionCount; responseIndex++)
+        {
+            if (gBattleAgentMailbox.responseBattlers[responseIndex] == gBattleAgentMailbox.controlledBattlers[controlledIndex])
+            {
+                if (found || gBattleAgentMailbox.responseActionIndexes[responseIndex] >= gBattleAgentMailbox.legalActionCounts[controlledIndex])
+                {
+                    BattleAgent_ClearResponse();
+                    return FALSE;
+                }
+                selectedActionIndexes[controlledIndex] = gBattleAgentMailbox.responseActionIndexes[responseIndex];
+                found = TRUE;
+            }
+        }
+        if (!found)
+        {
+            BattleAgent_ClearResponse();
+            return FALSE;
+        }
+    }
+
+    for (controlledIndex = 0; controlledIndex < gBattleAgentMailbox.controlledBattlerCount; controlledIndex++)
+    {
+        u32 controlledBattler = gBattleAgentMailbox.controlledBattlers[controlledIndex];
+        struct BattleAgentLegalActionV4 *action = &gBattleAgentMailbox.legalActions[controlledIndex][selectedActionIndexes[controlledIndex]];
+        u16 move;
+        u8 target;
+        u8 moveLimitations;
+
+        if (action->actorBattler != controlledBattler)
         {
             BattleAgent_ClearResponse();
             return FALSE;
         }
 
-        move = gBattleMons[battler].moves[action->moveSlot];
-        moveLimitations = CheckMoveLimitations(battler, 0, MOVE_LIMITATIONS_ALL);
-        if (move == MOVE_NONE
-         || (moveLimitations & gBitTable[action->moveSlot])
-         || !BattleAgent_NormalizeSingleTarget(battler, move, &target)
-         || target != action->targetBattler)
+        if (action->kind == BATTLE_AGENT_ACTION_KIND_MOVE)
+        {
+            if (action->moveSlot >= MAX_MON_MOVES || action->partySlot != BATTLE_AGENT_ACTION_NONE)
+            {
+                BattleAgent_ClearResponse();
+                return FALSE;
+            }
+            move = gBattleMons[controlledBattler].moves[action->moveSlot];
+            moveLimitations = CheckMoveLimitations(controlledBattler, 0, MOVE_LIMITATIONS_ALL);
+            if (move == MOVE_NONE || (moveLimitations & gBitTable[action->moveSlot]))
+            {
+                BattleAgent_ClearResponse();
+                return FALSE;
+            }
+            if (gBattleAgentMailbox.battleMode == BATTLE_AGENT_BATTLE_MODE_TRAINER_SINGLE)
+            {
+                if (!BattleAgent_NormalizeSingleTarget(controlledBattler, move, &target) || target != action->targetBattler)
+                {
+                    BattleAgent_ClearResponse();
+                    return FALSE;
+                }
+                gBattleStruct->aiChosenTarget[controlledBattler] = target;
+            }
+            else if (action->targetBattler != BATTLE_AGENT_ACTION_NONE)
+            {
+                u32 moveTarget = GetBattlerMoveTargetType(controlledBattler, move);
+                if (action->targetBattler >= gBattlersCount || !IsBattlerAlive(action->targetBattler)
+                 || ((moveTarget == MOVE_TARGET_USER || moveTarget == MOVE_TARGET_USER_OR_SELECTED) && action->targetBattler != controlledBattler)
+                 || (moveTarget == MOVE_TARGET_ALLY && action->targetBattler != BattleAgent_GetDoublePartner(controlledBattler))
+                 || (moveTarget != MOVE_TARGET_USER && moveTarget != MOVE_TARGET_USER_OR_SELECTED && moveTarget != MOVE_TARGET_ALLY && GetBattlerSide(action->targetBattler) == GetBattlerSide(controlledBattler)))
+                {
+                    BattleAgent_ClearResponse();
+                    return FALSE;
+                }
+                gBattleStruct->aiChosenTarget[controlledBattler] = action->targetBattler;
+            }
+            gBattleStruct->aiMoveOrAction[controlledBattler] = action->moveSlot;
+        }
+        else if (action->kind == BATTLE_AGENT_ACTION_KIND_SWITCH)
+        {
+            u32 otherIndex;
+            if (action->moveSlot != BATTLE_AGENT_ACTION_NONE || action->targetBattler != BATTLE_AGENT_ACTION_NONE || !BattleAgent_IsLegalSwitch(controlledBattler, action->partySlot))
+            {
+                BattleAgent_ClearResponse();
+                return FALSE;
+            }
+            for (otherIndex = 0; otherIndex < controlledIndex; otherIndex++)
+            {
+                struct BattleAgentLegalActionV4 *otherAction = &gBattleAgentMailbox.legalActions[otherIndex][selectedActionIndexes[otherIndex]];
+                if (otherAction->kind == BATTLE_AGENT_ACTION_KIND_SWITCH && otherAction->partySlot == action->partySlot)
+                {
+                    BattleAgent_ClearResponse();
+                    return FALSE;
+                }
+            }
+            gBattleStruct->aiMoveOrAction[controlledBattler] = AI_CHOICE_SWITCH;
+            gBattleStruct->AI_monToSwitchIntoId[controlledBattler] = action->partySlot;
+        }
+        else
         {
             BattleAgent_ClearResponse();
             return FALSE;
         }
-
-        gBattleStruct->aiMoveOrAction[battler] = action->moveSlot;
-        gBattleStruct->aiChosenTarget[battler] = target;
     }
-    else if (action->kind == BATTLE_AGENT_ACTION_KIND_SWITCH)
+
+    for (controlledIndex = 0; controlledIndex < gBattleAgentMailbox.controlledBattlerCount; controlledIndex++)
     {
-        if (action->moveSlot != BATTLE_AGENT_ACTION_NONE
-         || action->targetBattler != BATTLE_AGENT_ACTION_NONE
-         || !BattleAgent_IsLegalSwitch(battler, action->partySlot))
-        {
-            BattleAgent_ClearResponse();
-            return FALSE;
-        }
-
-        gBattleStruct->aiMoveOrAction[battler] = AI_CHOICE_SWITCH;
-        gBattleStruct->AI_monToSwitchIntoId[battler] = action->partySlot;
+        u32 controlledBattler = gBattleAgentMailbox.controlledBattlers[controlledIndex];
+        sBattleAgentWaitStates[controlledBattler].active = FALSE;
+        sBattleAgentWaitStates[controlledBattler].hasAcceptedAction = TRUE;
+        BattleAgent_ClearThinkingStatus(controlledBattler);
     }
-    else
-    {
-        BattleAgent_ClearResponse();
-        return FALSE;
-    }
-
-    waitState->active = FALSE;
-    waitState->hasAcceptedAction = TRUE;
-    BattleAgent_ClearThinkingStatus(battler);
     BattleAgent_ClearResponse();
     return TRUE;
 }
@@ -564,6 +827,7 @@ void BattleAgent_UseVanillaFallback(u32 battler)
     waitState->hasAcceptedAction = FALSE;
     BattleAgent_ClearThinkingStatus(battler);
     BattleAgent_ClearResponse();
+    BattleAgent_BeginRequest();
 }
 
 bool32 BattleAgent_TryEmitAcceptedAction(u32 battler)

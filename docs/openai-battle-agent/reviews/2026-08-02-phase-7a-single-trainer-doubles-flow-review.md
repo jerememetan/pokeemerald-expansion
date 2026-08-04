@@ -107,6 +107,10 @@ opponent positions.
 2. The model selects exactly two actor/index entries as a single terminal
    response. A direct choice without other tools is allowed, but no tool grants
    write authority besides `choose_actions`.
+   The service gives the local Qwen model an explicit one-tool-call-per-reply
+   instruction and normalizes only its scoped legal-action query and bare
+   `choose_actions` list form. Both are read-only/shape compatibility changes;
+   the existing complete actor/index validation remains the authority.
 3. A failure in either half rejects the entire pair; both original vanilla
    choices are restored only at the unchanged timeout.
 4. Player reserves and trainer items remain unavailable. Forced replacements

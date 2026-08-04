@@ -20,6 +20,8 @@ Python 3 standard-library service/tests, local Ollama tool calling.
 
 **Flow review:** [Phase 7A flow review](../reviews/2026-08-02-phase-7a-single-trainer-doubles-flow-review.md)
 
+**Implementation evidence:** [Phase 7A evidence](../reviews/2026-08-02-phase-7a-single-trainer-doubles-evidence.md)
+
 ---
 
 ## Files
@@ -258,6 +260,10 @@ Python 3 standard-library service/tests, local Ollama tool calling.
   after the pair validates against request actors. Emit an audit line for each
   selected action plus the pair-level tool list. Do not add items or player
   reserve tools.
+  Give the configured local Qwen model an explicit one-tool-call-per-reply
+  prompt. Accept its scoped `list_legal_actions` query and bare terminal action
+  list only by normalizing them to the documented actor-keyed contract before
+  the same strict validation; add focused service tests for both forms.
 
 - [ ] **Step 4: Re-run focused Python tests.**
 

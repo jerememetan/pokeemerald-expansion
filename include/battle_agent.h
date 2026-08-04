@@ -7,10 +7,17 @@
 #include "battle.h"
 
 #define BATTLE_AGENT_PROTOCOL_MAGIC   0x42414732 // "BAG2"
-#define BATTLE_AGENT_PROTOCOL_VERSION 3
+#define BATTLE_AGENT_PROTOCOL_VERSION 5
 #define BATTLE_AGENT_BATTLE_MODE_TRAINER_SINGLE 1
+#define BATTLE_AGENT_BATTLE_MODE_TRAINER_DOUBLE 2
+#define BATTLE_AGENT_BATTLE_MODE_TRAINER_TWO_OPPONENT_DOUBLE 3
+#if TESTING
 #define BATTLE_AGENT_RESPONSE_TIMEOUT_FRAMES 900
-#define BATTLE_AGENT_MAX_LEGAL_ACTIONS (MAX_MON_MOVES + PARTY_SIZE)
+#else
+#define BATTLE_AGENT_RESPONSE_TIMEOUT_FRAMES 1800
+#endif
+#define BATTLE_AGENT_MAX_ACTIONS_PER_BATTLER 22
+#define BATTLE_AGENT_MAX_CONTROLLED_BATTLERS 2
 #define BATTLE_AGENT_ACTION_NONE 0xFF
 
 enum BattleAgentRequestStatus
@@ -83,7 +90,8 @@ struct BattleAgentPartySnapshotV3
     struct BattleAgentMoveSnapshotV3 moves[MAX_MON_MOVES];
     u8 isActive;
     u8 isUsable;
-    u16 reserved;
+    u8 ownerBattler;
+    u8 reserved;
 };
 
 struct BattleAgentSnapshotV3
@@ -98,8 +106,9 @@ struct BattleAgentSnapshotV3
     struct BattleAgentPartySnapshotV3 party[PARTY_SIZE];
 };
 
-struct BattleAgentLegalActionV3
+struct BattleAgentLegalActionV4
 {
+    u8 actorBattler;
     u8 actionIndex;
     u8 kind;
     u8 moveSlot;
@@ -108,56 +117,67 @@ struct BattleAgentLegalActionV3
     u8 typeEffectiveness;
     u8 hasStab;
     u8 canFaintTarget;
-};
+} __attribute__((packed));
 
-struct BattleAgentMailboxV3
+struct BattleAgentMailboxV4
 {
     u32 magic;
     u16 protocolVersion;
     u8 requestStatus;
     u8 responseStatus;
     u32 requestSequence;
-    u8 requestingBattler;
     u8 battleMode;
+    u8 controlledBattlerCount;
     u16 turnSequence;
+    u8 battlerCount;
+    u8 controlledBattlers[BATTLE_AGENT_MAX_CONTROLLED_BATTLERS];
+    u8 legalActionCounts[BATTLE_AGENT_MAX_CONTROLLED_BATTLERS];
+    u8 reserved[2];
     struct BattleAgentSnapshotV3 snapshot;
-    u8 legalActionCount;
-    struct BattleAgentLegalActionV3 legalActions[BATTLE_AGENT_MAX_LEGAL_ACTIONS];
+    struct BattleAgentLegalActionV4 legalActions[BATTLE_AGENT_MAX_CONTROLLED_BATTLERS][BATTLE_AGENT_MAX_ACTIONS_PER_BATTLER];
     u32 responseSequence;
-    u8 responseLegalActionIndex;
+    u8 responseActionCount;
+    u8 responseBattlers[BATTLE_AGENT_MAX_CONTROLLED_BATTLERS];
+    u8 responseActionIndexes[BATTLE_AGENT_MAX_CONTROLLED_BATTLERS];
 };
 
-STATIC_ASSERT(BATTLE_AGENT_PROTOCOL_VERSION == 3, battleAgentProtocolVersionIsV3);
+STATIC_ASSERT(BATTLE_AGENT_PROTOCOL_VERSION == 5, battleAgentProtocolVersionIsV5);
 STATIC_ASSERT(sizeof(struct BattleAgentBattlerSnapshotV3) == 48, battleAgentBattlerSnapshotSize);
 STATIC_ASSERT(sizeof(struct BattleAgentMoveSnapshotV3) == 12, battleAgentMoveSnapshotSize);
 STATIC_ASSERT(sizeof(struct BattleAgentPartySnapshotV3) == 100, battleAgentPartySnapshotSize);
+STATIC_ASSERT(offsetof(struct BattleAgentPartySnapshotV3, ownerBattler) == 98, battleAgentPartyOwnerBattlerOffset);
 STATIC_ASSERT(sizeof(struct BattleAgentSnapshotV3) == 1048, battleAgentSnapshotSize);
-STATIC_ASSERT(sizeof(struct BattleAgentLegalActionV3) == 8, battleAgentLegalActionSize);
-STATIC_ASSERT(sizeof(struct BattleAgentMailboxV3) == 1156, battleAgentMailboxSize);
-STATIC_ASSERT(offsetof(struct BattleAgentMailboxV3, magic) == 0, battleAgentMailboxMagicOffset);
-STATIC_ASSERT(offsetof(struct BattleAgentMailboxV3, protocolVersion) == 4, battleAgentMailboxProtocolVersionOffset);
-STATIC_ASSERT(offsetof(struct BattleAgentMailboxV3, requestStatus) == 6, battleAgentMailboxRequestStatusOffset);
-STATIC_ASSERT(offsetof(struct BattleAgentMailboxV3, responseStatus) == 7, battleAgentMailboxResponseStatusOffset);
-STATIC_ASSERT(offsetof(struct BattleAgentMailboxV3, requestSequence) == 8, battleAgentMailboxRequestSequenceOffset);
-STATIC_ASSERT(offsetof(struct BattleAgentMailboxV3, requestingBattler) == 12, battleAgentMailboxRequestingBattlerOffset);
-STATIC_ASSERT(offsetof(struct BattleAgentMailboxV3, battleMode) == 13, battleAgentMailboxBattleModeOffset);
-STATIC_ASSERT(offsetof(struct BattleAgentMailboxV3, turnSequence) == 14, battleAgentMailboxTurnSequenceOffset);
-STATIC_ASSERT(offsetof(struct BattleAgentMailboxV3, snapshot) == 16, battleAgentMailboxSnapshotOffset);
+STATIC_ASSERT(sizeof(struct BattleAgentLegalActionV4) == 9, battleAgentLegalActionSize);
+STATIC_ASSERT(sizeof(struct BattleAgentMailboxV4) == 1480, battleAgentMailboxSize);
+STATIC_ASSERT(offsetof(struct BattleAgentMailboxV4, magic) == 0, battleAgentMailboxMagicOffset);
+STATIC_ASSERT(offsetof(struct BattleAgentMailboxV4, protocolVersion) == 4, battleAgentMailboxProtocolVersionOffset);
+STATIC_ASSERT(offsetof(struct BattleAgentMailboxV4, requestStatus) == 6, battleAgentMailboxRequestStatusOffset);
+STATIC_ASSERT(offsetof(struct BattleAgentMailboxV4, responseStatus) == 7, battleAgentMailboxResponseStatusOffset);
+STATIC_ASSERT(offsetof(struct BattleAgentMailboxV4, requestSequence) == 8, battleAgentMailboxRequestSequenceOffset);
+STATIC_ASSERT(offsetof(struct BattleAgentMailboxV4, battleMode) == 12, battleAgentMailboxBattleModeOffset);
+STATIC_ASSERT(offsetof(struct BattleAgentMailboxV4, controlledBattlerCount) == 13, battleAgentMailboxControlledCountOffset);
+STATIC_ASSERT(offsetof(struct BattleAgentMailboxV4, turnSequence) == 14, battleAgentMailboxTurnSequenceOffset);
+STATIC_ASSERT(offsetof(struct BattleAgentMailboxV4, battlerCount) == 16, battleAgentMailboxBattlerCountOffset);
+STATIC_ASSERT(offsetof(struct BattleAgentMailboxV4, controlledBattlers) == 17, battleAgentMailboxControlledBattlersOffset);
+STATIC_ASSERT(offsetof(struct BattleAgentMailboxV4, legalActionCounts) == 19, battleAgentMailboxLegalActionCountsOffset);
+STATIC_ASSERT(offsetof(struct BattleAgentMailboxV4, snapshot) == 24, battleAgentMailboxSnapshotOffset);
 STATIC_ASSERT(offsetof(struct BattleAgentSnapshotV3, battlerMoves) == 240, battleAgentBattlerMovesOffset);
 STATIC_ASSERT(offsetof(struct BattleAgentSnapshotV3, weather) == 432, battleAgentWeatherOffset);
 STATIC_ASSERT(offsetof(struct BattleAgentSnapshotV3, terrain) == 434, battleAgentTerrainOffset);
 STATIC_ASSERT(offsetof(struct BattleAgentSnapshotV3, fieldStatuses) == 436, battleAgentFieldStatusesOffset);
 STATIC_ASSERT(offsetof(struct BattleAgentSnapshotV3, sideStatuses) == 440, battleAgentSideStatusesOffset);
 STATIC_ASSERT(offsetof(struct BattleAgentSnapshotV3, party) == 448, battleAgentPartyOffset);
-STATIC_ASSERT(offsetof(struct BattleAgentMailboxV3, legalActionCount) == 1064, battleAgentLegalActionCountOffset);
-STATIC_ASSERT(offsetof(struct BattleAgentMailboxV3, legalActions) == 1068, battleAgentLegalActionsOffset);
-STATIC_ASSERT(offsetof(struct BattleAgentMailboxV3, responseSequence) == 1148, battleAgentResponseSequenceOffset);
-STATIC_ASSERT(offsetof(struct BattleAgentMailboxV3, responseLegalActionIndex) == 1152, battleAgentResponseActionOffset);
+STATIC_ASSERT(offsetof(struct BattleAgentMailboxV4, legalActions) == 1072, battleAgentLegalActionsOffset);
+STATIC_ASSERT(offsetof(struct BattleAgentMailboxV4, responseSequence) == 1468, battleAgentResponseSequenceOffset);
+STATIC_ASSERT(offsetof(struct BattleAgentMailboxV4, responseActionCount) == 1472, battleAgentMailboxResponseActionCountOffset);
+STATIC_ASSERT(offsetof(struct BattleAgentMailboxV4, responseBattlers) == 1473, battleAgentMailboxResponseBattlersOffset);
+STATIC_ASSERT(offsetof(struct BattleAgentMailboxV4, responseActionIndexes) == 1475, battleAgentMailboxResponseActionIndexesOffset);
 
-extern struct BattleAgentMailboxV3 gBattleAgentMailbox;
+extern struct BattleAgentMailboxV4 gBattleAgentMailbox;
 
 void BattleAgent_ResetMailbox(void);
 bool32 BattleAgent_TryPublishRequest(u32 battler);
+bool32 BattleAgent_IsFirstCoordinatedDoubleBattler(u32 battler);
 bool32 BattleAgent_BeginExternalWait(u32 battler);
 bool32 BattleAgent_TryConsumeResponse(u32 battler);
 bool32 BattleAgent_IsWaitExpired(u32 battler);

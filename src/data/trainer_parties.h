@@ -9923,10 +9923,12 @@ static const struct TrainerMon sParty_Rick[] = {
     {
     .lvl = 7,
     .species = SPECIES_WEEDLE,
+    .moves = {MOVE_BUG_BITE, MOVE_STRING_SHOT, MOVE_POISON_STING, MOVE_NONE}
     },
     {
     .lvl = 7,
     .species = SPECIES_SCATTERBUG,
+    .moves = {MOVE_STRUGGLE_BUG, MOVE_STRING_SHOT, MOVE_STUN_SPORE, MOVE_NONE}
     }
 };
 

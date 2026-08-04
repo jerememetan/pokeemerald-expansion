@@ -114,6 +114,7 @@ static void InvokeTestFunction(const struct BattleTest *test)
         break;
     case BATTLE_TEST_DOUBLES:
     case BATTLE_TEST_AI_DOUBLES:
+    case BATTLE_TEST_AI_TWO_OPPONENTS:
         InvokeDoubleTestFunctionWithStack(STATE->results, STATE->runParameter, &gBattleMons[B_POSITION_PLAYER_LEFT], &gBattleMons[B_POSITION_OPPONENT_LEFT], &gBattleMons[B_POSITION_PLAYER_RIGHT], &gBattleMons[B_POSITION_OPPONENT_RIGHT], test->function.singles, &DATA.stack[BATTLE_TEST_STACK_SIZE]);
         break;
     }
@@ -131,6 +132,7 @@ static bool32 IsAITest(void)
     {
     case BATTLE_TEST_AI_SINGLES:
     case BATTLE_TEST_AI_DOUBLES:
+    case BATTLE_TEST_AI_TWO_OPPONENTS:
         return TRUE;
     }
     return FALSE;
@@ -189,6 +191,7 @@ static void BattleTest_SetUp(void *data)
         break;
     case BATTLE_TEST_DOUBLES:
     case BATTLE_TEST_AI_DOUBLES:
+    case BATTLE_TEST_AI_TWO_OPPONENTS:
         STATE->battlersCount = 4;
         break;
     }
@@ -285,6 +288,12 @@ static void BattleTest_Run(void *data)
         DATA.recordedBattle.opponentB = TRAINER_RED;
         DATA.hasAI = TRUE;
         break;
+    case BATTLE_TEST_AI_TWO_OPPONENTS:
+        DATA.recordedBattle.battleFlags = BATTLE_TYPE_IS_MASTER | BATTLE_TYPE_TRAINER | BATTLE_TYPE_DOUBLE | BATTLE_TYPE_TWO_OPPONENTS;
+        DATA.recordedBattle.opponentA = TRAINER_LEAF;
+        DATA.recordedBattle.opponentB = TRAINER_RED;
+        DATA.hasAI = TRUE;
+        break;
     case BATTLE_TEST_SINGLES:
         DATA.recordedBattle.battleFlags = BATTLE_TYPE_IS_MASTER | BATTLE_TYPE_RECORDED_IS_MASTER | BATTLE_TYPE_RECORDED_LINK | BATTLE_TYPE_TRAINER;
         DATA.recordedBattle.opponentA = TRAINER_LINK_OPPONENT;
@@ -305,6 +314,8 @@ static void BattleTest_Run(void *data)
 
         DATA.currentMonIndexes[i] = (i & BIT_FLANK) == B_FLANK_LEFT ? 0 : 1;
     }
+    if (test->type == BATTLE_TEST_AI_TWO_OPPONENTS)
+        DATA.currentMonIndexes[B_POSITION_OPPONENT_RIGHT] = PARTY_SIZE / 2;
 
     STATE->runRandomly = TRUE;
     STATE->runGiven = TRUE;
@@ -859,7 +870,7 @@ static void CheckBattleAgentRequest(u32 battlerId)
 {
     u32 i;
     struct ExpectedBattleAgentRequest *expected = &DATA.expectedBattleAgentRequests[DATA.aiActionsPlayed[battlerId]];
-    const struct BattleAgentMailboxV3 *mailbox = &gBattleAgentMailbox;
+    const struct BattleAgentMailboxV4 *mailbox = &gBattleAgentMailbox;
 
     if (!BattlerHasAi(battlerId))
         return;
@@ -876,8 +887,8 @@ static void CheckBattleAgentRequest(u32 battlerId)
     if (mailbox->requestSequence != expected->sequence
      || mailbox->responseStatus != BATTLE_AGENT_RESPONSE_NONE
      || mailbox->responseSequence != 0
-     || mailbox->responseLegalActionIndex != 0
-     || mailbox->legalActionCount != expected->actionCount)
+     || mailbox->responseActionCount != 0
+     || mailbox->legalActionCounts[0] != expected->actionCount)
     {
         Test_ExitWithResult(TEST_RESULT_FAIL, "%s:%d: Expected battle-agent request sequence %d with %d actions", gTestRunnerState.test->filename, expected->sourceLine, expected->sequence, expected->actionCount);
     }
@@ -886,22 +897,29 @@ static void CheckBattleAgentRequest(u32 battlerId)
     {
         if (mailbox->requestStatus != BATTLE_AGENT_REQUEST_IDLE
          || mailbox->responseSequence != 0
-         || mailbox->requestingBattler != 0
          || mailbox->battleMode != 0
          || mailbox->turnSequence != 0
-         || mailbox->responseLegalActionIndex != 0
+         || mailbox->responseActionCount != 0
          || memcmp(&mailbox->snapshot, &(struct BattleAgentSnapshotV3){0}, sizeof(mailbox->snapshot)) != 0
-         || memcmp(mailbox->legalActions, (struct BattleAgentLegalActionV3[BATTLE_AGENT_MAX_LEGAL_ACTIONS]){0}, sizeof(mailbox->legalActions)) != 0)
+         || memcmp(mailbox->legalActions, (struct BattleAgentLegalActionV4[BATTLE_AGENT_MAX_CONTROLLED_BATTLERS][BATTLE_AGENT_MAX_ACTIONS_PER_BATTLER]){0}, sizeof(mailbox->legalActions)) != 0)
         {
             Test_ExitWithResult(TEST_RESULT_FAIL, "%s:%d: Battle-agent mailbox is not canonically IDLE and zeroed", gTestRunnerState.test->filename, expected->sourceLine);
         }
     }
-    else if (mailbox->requestStatus != BATTLE_AGENT_REQUEST_PENDING)
+    else if (mailbox->requestStatus != BATTLE_AGENT_REQUEST_PENDING
+          && mailbox->requestStatus != BATTLE_AGENT_REQUEST_IDLE)
     {
-        Test_ExitWithResult(TEST_RESULT_FAIL, "%s:%d: Expected battle-agent request to be pending", gTestRunnerState.test->filename, expected->sourceLine);
+        Test_ExitWithResult(TEST_RESULT_FAIL, "%s:%d: Expected battle-agent request to be pending or expired without a test response", gTestRunnerState.test->filename, expected->sourceLine);
     }
-    else if (mailbox->requestingBattler != battlerId
-          || mailbox->battleMode != BATTLE_AGENT_BATTLE_MODE_TRAINER_SINGLE
+    else if ((mailbox->battleMode == BATTLE_AGENT_BATTLE_MODE_TRAINER_SINGLE
+              && (mailbox->controlledBattlerCount != 1 || mailbox->controlledBattlers[0] != battlerId))
+          || (mailbox->battleMode == BATTLE_AGENT_BATTLE_MODE_TRAINER_DOUBLE
+              && mailbox->controlledBattlerCount != 2)
+          || (mailbox->battleMode == BATTLE_AGENT_BATTLE_MODE_TRAINER_TWO_OPPONENT_DOUBLE
+              && mailbox->controlledBattlerCount != 2)
+          || (mailbox->battleMode != BATTLE_AGENT_BATTLE_MODE_TRAINER_SINGLE
+              && mailbox->battleMode != BATTLE_AGENT_BATTLE_MODE_TRAINER_DOUBLE
+              && mailbox->battleMode != BATTLE_AGENT_BATTLE_MODE_TRAINER_TWO_OPPONENT_DOUBLE)
           || mailbox->turnSequence != expected->sequence)
     {
         Test_ExitWithResult(TEST_RESULT_FAIL, "%s:%d: Battle-agent request header metadata is invalid", gTestRunnerState.test->filename, expected->sourceLine);
@@ -910,11 +928,11 @@ static void CheckBattleAgentRequest(u32 battlerId)
     for (i = 0; i < MAX_MON_MOVES; i++)
     {
         if (expected->expectedActions[i]
-         && (mailbox->legalActions[i].actionIndex != expected->legalActions[i].actionIndex
-          || mailbox->legalActions[i].kind != expected->legalActions[i].kind
-          || mailbox->legalActions[i].moveSlot != expected->legalActions[i].moveSlot
-          || mailbox->legalActions[i].targetBattler != expected->legalActions[i].targetBattler
-          || mailbox->legalActions[i].partySlot != expected->legalActions[i].partySlot))
+         && (mailbox->legalActions[0][i].actionIndex != expected->legalActions[i].actionIndex
+          || mailbox->legalActions[0][i].kind != expected->legalActions[i].kind
+          || mailbox->legalActions[0][i].moveSlot != expected->legalActions[i].moveSlot
+          || mailbox->legalActions[0][i].targetBattler != expected->legalActions[i].targetBattler
+          || mailbox->legalActions[0][i].partySlot != expected->legalActions[i].partySlot))
             Test_ExitWithResult(TEST_RESULT_FAIL, "%s:%d: Battle-agent legal action %d differs from the published expectation", gTestRunnerState.test->filename, expected->sourceLine, i);
     }
     for (i = 0; i < MAX_MON_MOVES; i++)
@@ -946,7 +964,14 @@ static void CheckBattleAgentRequest(u32 battlerId)
     {
         gBattleAgentMailbox.responseStatus = BATTLE_AGENT_RESPONSE_READY;
         gBattleAgentMailbox.responseSequence = expected->testResponseSequence;
-        gBattleAgentMailbox.responseLegalActionIndex = expected->testResponseLegalActionIndex;
+        u32 responseIndex;
+
+        gBattleAgentMailbox.responseActionCount = expected->testResponseActionCount;
+        for (responseIndex = 0; responseIndex < expected->testResponseActionCount; responseIndex++)
+        {
+            gBattleAgentMailbox.responseBattlers[responseIndex] = gBattleAgentMailbox.controlledBattlers[responseIndex];
+            gBattleAgentMailbox.responseActionIndexes[responseIndex] = expected->testResponseLegalActionIndexes[responseIndex];
+        }
         expected->testResponseInjected = TRUE;
     }
 }
@@ -1872,6 +1897,7 @@ static const char *BattlerIdentifier(s32 battlerId)
         return sBattlerIdentifiersSingles[battlerId];
     case BATTLE_TEST_DOUBLES:
     case BATTLE_TEST_AI_DOUBLES:
+    case BATTLE_TEST_AI_TWO_OPPONENTS:
         return sBattlerIdentifiersDoubles[battlerId];
     }
     return "<unknown>";
@@ -2043,7 +2069,8 @@ s32 MoveGetTarget(s32 battlerId, u32 moveId, struct MoveContext *ctx, u32 source
         else if (move->target == MOVE_TARGET_SELECTED)
         {
             // In AI Doubles not specified target allows any target for EXPECT_MOVE.
-            if (GetBattleTest()->type != BATTLE_TEST_AI_DOUBLES)
+            if (GetBattleTest()->type != BATTLE_TEST_AI_DOUBLES
+             && GetBattleTest()->type != BATTLE_TEST_AI_TWO_OPPONENTS)
             {
                 INVALID_IF(STATE->battlersCount > 2, "%S requires explicit target", gMoveNames[moveId]);
             }
@@ -2061,7 +2088,8 @@ s32 MoveGetTarget(s32 battlerId, u32 moveId, struct MoveContext *ctx, u32 source
         else
         {
             // In AI Doubles not specified target allows any target for EXPECT_MOVE.
-            if (GetBattleTest()->type != BATTLE_TEST_AI_DOUBLES)
+            if (GetBattleTest()->type != BATTLE_TEST_AI_DOUBLES
+             && GetBattleTest()->type != BATTLE_TEST_AI_TWO_OPPONENTS)
             {
                 INVALID("%S requires explicit target", gMoveNames[moveId]);
             }
@@ -2230,7 +2258,7 @@ void ExpectBattleAgentAction_(u32 sourceLine, u8 actionIndex, u8 moveSlot, u8 ta
     INVALID_IF(DATA.turnState == TURN_CLOSED, "EXPECT_AGENT_ACTION outside TURN");
     INVALID_IF(!expected->expected, "EXPECT_AGENT_ACTION must follow EXPECT_AGENT_REQUEST in TURN");
     INVALID_IF(actionIndex >= MAX_MON_MOVES, "Illegal EXPECT_AGENT_ACTION index");
-    expected->legalActions[actionIndex] = (struct BattleAgentLegalActionV3){ .actionIndex = actionIndex, .kind = BATTLE_AGENT_ACTION_KIND_MOVE, .moveSlot = moveSlot, .targetBattler = targetBattler, .partySlot = BATTLE_AGENT_ACTION_NONE };
+    expected->legalActions[actionIndex] = (struct BattleAgentLegalActionV4){ .actionIndex = actionIndex, .kind = BATTLE_AGENT_ACTION_KIND_MOVE, .moveSlot = moveSlot, .targetBattler = targetBattler, .partySlot = BATTLE_AGENT_ACTION_NONE };
     expected->expectedActions[actionIndex] = TRUE;
 }
 
@@ -2240,7 +2268,7 @@ void ExpectBattleAgentSwitchAction_(u32 sourceLine, u8 actionIndex, u8 partySlot
 
     INVALID_IF(DATA.turnState == TURN_CLOSED, "EXPECT_AGENT_SWITCH_ACTION outside TURN");
     INVALID_IF(!expected->expected || actionIndex >= MAX_MON_MOVES || partySlot >= PARTY_SIZE, "Illegal EXPECT_AGENT_SWITCH_ACTION");
-    expected->legalActions[actionIndex] = (struct BattleAgentLegalActionV3){ .actionIndex = actionIndex, .kind = BATTLE_AGENT_ACTION_KIND_SWITCH, .moveSlot = BATTLE_AGENT_ACTION_NONE, .targetBattler = BATTLE_AGENT_ACTION_NONE, .partySlot = partySlot };
+    expected->legalActions[actionIndex] = (struct BattleAgentLegalActionV4){ .actionIndex = actionIndex, .kind = BATTLE_AGENT_ACTION_KIND_SWITCH, .moveSlot = BATTLE_AGENT_ACTION_NONE, .targetBattler = BATTLE_AGENT_ACTION_NONE, .partySlot = partySlot };
     expected->expectedActions[actionIndex] = TRUE;
 }
 
@@ -2296,7 +2324,27 @@ void SetBattleAgentTestResponse_(u32 sourceLine, u32 sequence, u8 actionIndex)
     INVALID_IF(expected->setTestResponse, "More than one SET_AGENT_TEST_RESPONSE in TURN");
 
     expected->testResponseSequence = sequence;
-    expected->testResponseLegalActionIndex = actionIndex;
+    expected->testResponseActionCount = 1;
+    expected->testResponseLegalActionIndexes[0] = actionIndex;
+    expected->setTestResponse = TRUE;
+}
+
+void SetBattleAgentTestDoubleResponse_(u32 sourceLine, u32 sequence, u8 leftActionIndex, u8 rightActionIndex)
+{
+    struct ExpectedBattleAgentRequest *expected;
+
+    INVALID_IF(DATA.turnState == TURN_CLOSED, "SET_AGENT_TEST_DOUBLE_RESPONSE outside TURN");
+    INVALID_IF(!IsAITest(), "SET_AGENT_TEST_DOUBLE_RESPONSE is usable only in AI_SINGLE_BATTLE_TEST & AI_DOUBLE_BATTLE_TEST");
+    INVALID_IF(leftActionIndex >= BATTLE_AGENT_MAX_ACTIONS_PER_BATTLER || rightActionIndex >= BATTLE_AGENT_MAX_ACTIONS_PER_BATTLER, "Illegal double battle-agent response action");
+
+    expected = &DATA.expectedBattleAgentRequests[DATA.turns];
+    INVALID_IF(!expected->expected, "SET_AGENT_TEST_DOUBLE_RESPONSE must follow EXPECT_AGENT_REQUEST in TURN");
+    INVALID_IF(expected->setTestResponse, "More than one battle-agent test response in TURN");
+
+    expected->testResponseSequence = sequence;
+    expected->testResponseActionCount = 2;
+    expected->testResponseLegalActionIndexes[0] = leftActionIndex;
+    expected->testResponseLegalActionIndexes[1] = rightActionIndex;
     expected->setTestResponse = TRUE;
 }
 

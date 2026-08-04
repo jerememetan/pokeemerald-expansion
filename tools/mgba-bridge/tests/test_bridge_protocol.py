@@ -30,6 +30,9 @@ from bridge_protocol import (  # noqa: E402
 from bridge_protocol import (  # noqa: E402
     REQUEST_FRAME_SIZE,
     RESPONSE_FRAME_SIZE,
+    ACTION_RECORD_SIZE,
+    BATTLE_MODE_TRAINER_DOUBLE,
+    MAX_ACTIONS_PER_BATTLER,
     VERSION,
     format_response_frame,
     parse_request_frame,
@@ -73,85 +76,158 @@ class FakeSocket:
 
 class BridgeProtocolTests(unittest.TestCase):
     @staticmethod
-    def _v3_payload() -> bytearray:
-        payload = bytearray(1049)
+    def _v4_double_payload() -> bytearray:
+        payload = bytearray(1369)
+        party_offset = 397
+        legal_action_offset = 973
         for party_slot in range(6):
-            payload[392 + party_slot * 96] = party_slot
+            payload[party_offset + party_slot * 96] = party_slot
+            payload[party_offset + party_slot * 96 + 3] = ACTION_NONE
+        payload[0:4] = (7).to_bytes(4, "little")
+        payload[4] = BATTLE_MODE_TRAINER_DOUBLE
+        payload[5] = 2
+        payload[6:8] = (3).to_bytes(2, "little")
+        payload[8] = 4
+        payload[9:13] = bytes((1, 3, 2, 2))
+        payload[legal_action_offset : legal_action_offset + ACTION_RECORD_SIZE] = bytes(
+            (1, 0, ACTION_KIND_MOVE, 0, 3, ACTION_NONE, 2, 1, 0)
+        )
+        payload[
+            legal_action_offset + ACTION_RECORD_SIZE : legal_action_offset + 2 * ACTION_RECORD_SIZE
+        ] = bytes((1, 1, ACTION_KIND_SWITCH, ACTION_NONE, ACTION_NONE, 4, 0, 0, 0))
+        right_offset = legal_action_offset + MAX_ACTIONS_PER_BATTLER * ACTION_RECORD_SIZE
+        payload[right_offset : right_offset + ACTION_RECORD_SIZE] = bytes(
+            (3, 0, ACTION_KIND_MOVE, 1, 0, ACTION_NONE, 3, 1, 1)
+        )
+        payload[right_offset + ACTION_RECORD_SIZE : right_offset + 2 * ACTION_RECORD_SIZE] = bytes(
+            (3, 1, ACTION_KIND_SWITCH, ACTION_NONE, ACTION_NONE, 5, 0, 0, 0)
+        )
         return payload
 
-    def test_external_switching_uses_protocol_v3(self) -> None:
-        self.assertEqual(VERSION, 3)
+    def test_v4_double_request_frame_has_two_actor_keyed_action_lists(self) -> None:
+        payload = self._v4_double_payload()
+        frame = b"BAGB" + bytes((VERSION, 1)) + len(payload).to_bytes(2, "little") + bytes(payload)
 
-    def test_v3_request_frame_parses_move_and_switch_actions(self) -> None:
-        payload = self._v3_payload()
+        request = parse_request_frame(frame)
+
+        self.assertEqual(request.sequence, 7)
+        self.assertEqual(request.battle_mode, BATTLE_MODE_TRAINER_DOUBLE)
+        self.assertEqual(request.controlled_battlers, (1, 3))
+        self.assertEqual(request.battler_count, 4)
+        self.assertEqual(request.actions_by_battler[1][0].target_battler, 3)
+        self.assertEqual(request.actions_by_battler[1][1].party_slot, 4)
+        self.assertEqual(request.actions_by_battler[3][0].target_battler, 0)
+        self.assertEqual(request.actions_by_battler[3][1].party_slot, 5)
+
+    def test_v5_two_trainer_double_requires_owner_labelled_party_metadata(self) -> None:
+        payload = self._v4_double_payload()
+        payload[4] = 3
+        for party_slot in range(6):
+            payload[397 + party_slot * 96 + 3] = 1 if party_slot < 3 else 3
+        frame = b"BAGB" + bytes((5, 1)) + len(payload).to_bytes(2, "little") + bytes(payload)
+
+        try:
+            request = parse_request_frame(frame)
+        except ProtocolError as error:
+            self.fail(f"BAGB/5 two-trainer frame was rejected: {error}")
+
+        self.assertEqual(request.battle_mode, 3)
+        self.assertEqual(
+            [request.payload[397 + party_slot * 96 + 3] for party_slot in range(6)],
+            [1, 1, 1, 3, 3, 3],
+        )
+
+        v4_frame = b"BAGB" + bytes((4, 1)) + len(payload).to_bytes(2, "little") + bytes(payload)
+        with self.assertRaises(ProtocolError):
+            parse_request_frame(v4_frame)
+
+    def test_v4_double_response_frame_contains_an_atomic_action_pair(self) -> None:
+        frame = format_response_frame(7, ((1, 0), (3, 1)))
+
+        self.assertEqual(len(frame), RESPONSE_FRAME_SIZE)
+        self.assertEqual(frame, b"BAGB" + bytes((VERSION, 2, 9, 0, 7, 0, 0, 0, 2, 1, 0, 3, 1)))
+
+    def test_v4_pair_response_rejects_a_duplicate_or_excess_actor(self) -> None:
+        for actions in (((1, 0), (1, 1)), ((1, 0), (3, 1), (2, 0))):
+            with self.subTest(actions=actions):
+                with self.assertRaises(ProtocolError):
+                    format_response_frame(7, actions)
+
+    @staticmethod
+    def _v4_single_payload() -> bytearray:
+        payload = bytearray(1369)
+        for party_slot in range(6):
+            payload[397 + party_slot * 96] = party_slot
+            payload[397 + party_slot * 96 + 3] = ACTION_NONE
+        payload[4:13] = bytes((1, 1, 3, 0, 2, 1, ACTION_NONE, 0, 0))
+        return payload
+
+    def test_external_switching_uses_protocol_v5(self) -> None:
+        self.assertEqual(VERSION, 5)
+
+    def test_v4_single_request_frame_parses_move_and_switch_actions(self) -> None:
+        payload = self._v4_single_payload()
         payload[0:4] = (7).to_bytes(4, "little")
-        payload[4] = 1
-        payload[5] = 1
-        payload[6:8] = (3).to_bytes(2, "little")
-        payload[8] = 2
-        payload[968] = 2
-        payload[969:977] = bytes((0, ACTION_KIND_MOVE, 1, 0, ACTION_NONE, 2, 1, 0))
-        payload[977:985] = bytes((1, ACTION_KIND_SWITCH, ACTION_NONE, ACTION_NONE, 4, 0, 0, 0))
-        frame = b"BAGB" + bytes((3, 1)) + len(payload).to_bytes(2, "little") + bytes(payload)
+        payload[11] = 2
+        payload[973:982] = bytes((1, 0, ACTION_KIND_MOVE, 1, 0, ACTION_NONE, 2, 1, 0))
+        payload[982:991] = bytes((1, 1, ACTION_KIND_SWITCH, ACTION_NONE, ACTION_NONE, 4, 0, 0, 0))
+        frame = b"BAGB" + bytes((VERSION, 1)) + len(payload).to_bytes(2, "little") + bytes(payload)
 
         request = parse_request_frame(frame)
 
         self.assertEqual(len(frame), REQUEST_FRAME_SIZE)
         self.assertEqual(request.sequence, 7)
-        self.assertEqual(request.requesting_battler, 1)
+        self.assertEqual(request.controlled_battlers, (1,))
         self.assertEqual(request.turn_sequence, 3)
         self.assertEqual(request.battler_count, 2)
-        self.assertEqual(request.legal_actions[0].action_index, 0)
-        self.assertEqual(request.legal_actions[0].move_slot, 1)
-        self.assertEqual(request.legal_actions[1].kind, ACTION_KIND_SWITCH)
-        self.assertEqual(request.legal_actions[1].party_slot, 4)
+        self.assertEqual(request.actions_by_battler[1][0].action_index, 0)
+        self.assertEqual(request.actions_by_battler[1][0].move_slot, 1)
+        self.assertEqual(request.actions_by_battler[1][1].kind, ACTION_KIND_SWITCH)
+        self.assertEqual(request.actions_by_battler[1][1].party_slot, 4)
 
-    def test_v3_request_frame_rejects_wrong_or_extra_bytes(self) -> None:
-        valid = b"BAGB" + bytes((3, 1)) + (1049).to_bytes(2, "little") + bytes(1049)
-        for frame in (valid[:-1], valid + b"x", b"BAGB" + bytes((1, 1)) + valid[6:]):
+    def test_v4_request_frame_rejects_wrong_or_extra_bytes(self) -> None:
+        valid = b"BAGB" + bytes((VERSION, 1)) + (1369).to_bytes(2, "little") + bytes(1369)
+        for frame in (valid[:-1], valid + b"x", b"BAGB" + bytes((3, 1)) + valid[6:]):
             with self.subTest(frame_length=len(frame)):
                 with self.assertRaises(ProtocolError):
                     parse_request_frame(frame)
 
-    def test_v3_response_frame_has_fixed_binary_shape(self) -> None:
-        frame = format_response_frame(7, 9)
+    def test_v4_single_response_frame_has_fixed_binary_shape(self) -> None:
+        frame = format_response_frame(7, ((1, 9),))
 
         self.assertEqual(len(frame), RESPONSE_FRAME_SIZE)
-        self.assertEqual(frame, b"BAGB\x03\x02\x05\x00\x07\x00\x00\x00\x09")
+        self.assertEqual(frame, b"BAGB" + bytes((VERSION, 2, 9, 0, 7, 0, 0, 0, 1, 1, 9, 255, 255)))
 
-    def test_v3_request_rejects_a_malformed_switch_action(self) -> None:
-        payload = self._v3_payload()
-        payload[4:9] = bytes((1, 1, 3, 0, 2))
-        payload[968] = 1
-        payload[969:977] = bytes((0, ACTION_KIND_SWITCH, 0, ACTION_NONE, 2, 0, 0, 0))
-        frame = b"BAGB" + bytes((3, 1)) + len(payload).to_bytes(2, "little") + bytes(payload)
-
-        with self.assertRaises(ProtocolError):
-            parse_request_frame(frame)
-
-    def test_v3_request_rejects_noncontiguous_action_indexes(self) -> None:
-        payload = self._v3_payload()
-        payload[4:9] = bytes((1, 1, 3, 0, 2))
-        payload[968] = 1
-        payload[969:977] = bytes((1, ACTION_KIND_MOVE, 0, 0, ACTION_NONE, 2, 1, 0))
-        frame = b"BAGB" + bytes((3, 1)) + len(payload).to_bytes(2, "little") + bytes(payload)
+    def test_v4_request_rejects_a_malformed_switch_action(self) -> None:
+        payload = self._v4_single_payload()
+        payload[11] = 1
+        payload[973:982] = bytes((1, 0, ACTION_KIND_SWITCH, 0, ACTION_NONE, 2, 0, 0, 0))
+        frame = b"BAGB" + bytes((VERSION, 1)) + len(payload).to_bytes(2, "little") + bytes(payload)
 
         with self.assertRaises(ProtocolError):
             parse_request_frame(frame)
 
-    def test_v3_request_rejects_invalid_party_metadata(self) -> None:
-        payload = self._v3_payload()
-        payload[4:9] = bytes((1, 1, 3, 0, 2))
-        payload[392:396] = bytes((2, 0, 1, 0))
-        payload[968] = 1
-        payload[969:977] = bytes((0, ACTION_KIND_MOVE, 0, 0, ACTION_NONE, 2, 1, 0))
-        frame = b"BAGB" + bytes((3, 1)) + len(payload).to_bytes(2, "little") + bytes(payload)
+    def test_v4_request_rejects_noncontiguous_action_indexes(self) -> None:
+        payload = self._v4_single_payload()
+        payload[11] = 1
+        payload[973:982] = bytes((1, 1, ACTION_KIND_MOVE, 0, 0, ACTION_NONE, 2, 1, 0))
+        frame = b"BAGB" + bytes((VERSION, 1)) + len(payload).to_bytes(2, "little") + bytes(payload)
 
         with self.assertRaises(ProtocolError):
             parse_request_frame(frame)
 
-    def test_v3_response_accepts_the_tenth_action(self) -> None:
-        self.assertEqual(format_response_frame(7, MAX_LEGAL_ACTIONS - 1)[-1], 9)
+    def test_v4_request_rejects_invalid_party_metadata(self) -> None:
+        payload = self._v4_single_payload()
+        payload[397:401] = bytes((2, 0, 1, 0))
+        payload[11] = 1
+        payload[973:982] = bytes((1, 0, ACTION_KIND_MOVE, 0, 0, ACTION_NONE, 2, 1, 0))
+        frame = b"BAGB" + bytes((VERSION, 1)) + len(payload).to_bytes(2, "little") + bytes(payload)
+
+        with self.assertRaises(ProtocolError):
+            parse_request_frame(frame)
+
+    def test_v4_response_accepts_the_last_bounded_action(self) -> None:
+        self.assertEqual(format_response_frame(7, ((1, MAX_LEGAL_ACTIONS - 1),))[14], MAX_LEGAL_ACTIONS - 1)
 
     def test_request_parses_a_valid_bounded_line(self) -> None:
         self.assertEqual(
