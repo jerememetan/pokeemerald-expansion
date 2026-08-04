@@ -1,25 +1,34 @@
 # Play the local Ollama AI-trainer demo
 
-This is the existing manual Youngster Calvin demo. Keep Ollama, the Python
-service, and mGBA in their own windows; this guide does not start them for you.
+Keep Ollama, the Python service, and mGBA in their own windows; this guide
+does not start them for you.
+
+For validated Windows/Ubuntu-WSL prerequisites, the mGBA fingerprint,
+end-to-end verification, and limitations, read the
+[Phase 8 handoff guide](../../docs/openai-battle-agent/phase-8-handoff.md).
+This README remains the operational source of truth for starting, observing,
+and recovering the bridge runtime.
 
 ## Scope and safety
 
-- Only Youngster Calvin (`TRAINER_CALVIN_1`) is configured, in a standard
-  trainer single battle.
-- The agent reads battle data and may finish only by selecting one current
-  ROM-authorized move or voluntary-switch action index. It can inspect the
-  six-slot opposing trainer party with `get_party()`, but cannot name moves,
-  targets, or party slots; access mGBA; run commands; use the network; or use
-  battle items.
-- The ordinary trainer AI is the fallback. If no valid response arrives,
-  Calvin uses the saved vanilla action after at most 900 frames (about 15 s).
+- Every opted-in ordinary trainer battle can use the external agent: trainer
+  singles, intentional one-trainer doubles, and two separate trainers that
+  spot the player together. A two-trainer double produces one decision that
+  selects both opponent actions.
+- The agent reads battle data and may finish only by selecting current
+  ROM-authorized move or voluntary-switch action indexes. It can inspect the
+  six-slot opposing party with `get_party()`, including the owner of each
+  record. It cannot name moves, targets, or party slots; access mGBA; run
+  commands; use the network; or use battle items.
+- The ordinary trainer AI is the fallback. If no valid response arrives, the
+  opponents use their saved vanilla actions after at most 1,800 frames (about
+  30 seconds).
 - Lua listens only on `127.0.0.1:57621`; the Python service is its one client.
   Do not probe that port or start another service to test it.
 - `generated/mailbox_address.lua` is ignored by Git. Regenerate it from a
   fresh ELF after every ROM rebuild; never edit it manually.
 
-## Play the Calvin demo
+## Play the local AI-trainer demo
 
 ### 1. Build the ROM and mailbox address
 
@@ -72,10 +81,10 @@ BAGB service: connecting to mGBA at 127.0.0.1:57621
 Do not restart a service waiting at that line. It retries the Lua listener
 until the next step completes.
 
-### 4. Open mGBA, load Lua, and battle Calvin
+### 4. Open mGBA, load Lua, and start a trainer battle
 
 1. Open the freshly built `pokeemerald.gba` in Windows mGBA.
-2. Choose **Tools → Scripting…** and load
+2. Choose **Tools > Scripting...** and load
    `tools\mgba-bridge\mgba_bridge.lua` exactly once.
 3. Confirm the Scripting window says:
 
@@ -90,7 +99,7 @@ until the next step completes.
    BAGB service: mGBA bridge connected
    ```
 
-5. Start Youngster Calvin's battle and choose the player's move.
+5. Start a trainer battle and choose the player's move.
 
 ## What success looks like
 
@@ -104,10 +113,10 @@ BAGB response written: 1
 Python service:
 BAGB service: request 1 received
 BAGB service: request 1 tool list_legal_actions
-BAGB service: request 1 tool choose_action
-BAGB service: request 1 chose action 0
+BAGB service: request 1 tool choose_actions
+BAGB service: request 1 chose actions ((1, 0),)
 BAGB service: audit #1
-  tools used: list_legal_actions, choose_action
+  tools used: list_legal_actions, choose_actions
   legal actions: 0=TACKLE->battler 0; 1=LEER->battler 0
   selected: 0=TACKLE->battler 0
   selected ROM facts: STAB=yes, effectiveness=neutral, KO=no, priority=0
@@ -120,7 +129,7 @@ index. The ROM revalidates the reserve and performs the normal trainer switch;
 the service never writes a party slot directly.
 
 While a response is pending, the normal lower battle-message panel shows
-`AI is thinking...`. It clears automatically when mGBA writes an accepted
+`AI is thinking..`. It clears automatically when mGBA writes an accepted
 response and the normal battle action continues. The audit reports dispatched
 tools and ROM facts; it is not hidden model reasoning or model-written prose.
 
@@ -143,24 +152,41 @@ requires mGBA restart and Lua reload.
 
 ### Connected service
 
-1. Complete the launch steps and fight Calvin.
-2. Choose the player's move and observe `AI is thinking...`.
+1. Complete the launch steps and fight any ordinary trainer.
+2. Choose the player's move and observe `AI is thinking..`.
 3. Verify matching `BAGB request forwarded: N` and `BAGB response written: N`.
 4. Verify the service logged `request N received`, `chose action`, and
    `audit #N`.
-5. Verify Calvin acts and the thinking message clears without a button press.
-6. If Calvin has another usable Pokémon, optionally verify an audit containing
-   `SWITCH->party N` is followed by the same Pokémon entering the battle.
+5. Verify the trainer acts and the thinking message clears without a button press.
+6. If the trainer has another usable Pokemon, optionally verify an audit containing
+   `SWITCH->party N` is followed by the same Pokemon entering the battle.
 
 ### Absent-service fallback
 
 1. Omit the Python service, or stop it after `BAGB request forwarded`.
-2. Choose the player's move in Calvin's battle.
-3. Observe `AI is thinking...` during the bounded wait.
-4. Verify the message clears and Calvin uses saved vanilla trainer AI without
+2. Choose the player's move in a trainer battle.
+3. Observe `AI is thinking..` during the bounded wait.
+4. Verify the message clears and the trainer uses saved vanilla AI without
    a stuck battle.
 5. Before another connected demo after a disconnect, restart mGBA and reload
    Lua.
+
+### Two-trainer double battle
+
+1. Start a map battle where two independent trainers spot the player together.
+2. Confirm one `BAGB request forwarded: N` and one service `audit #N` occur
+   for each fully voluntary opponent turn, not one request per trainer.
+3. Confirm the audit contains a selected action for both `battler 1` and
+   `battler 3`.
+4. If the agent calls `get_party`, confirm slots 0–2 say `opponent-left` and
+   slots 3–5 say `opponent-right`. Only `list_legal_actions` determines
+   selectable switches.
+5. If a switch is selected, confirm the entering Pokemon belongs to the
+   trainer whose action selected it. Stop the service on another voluntary
+   turn to confirm both opponents fall back to vanilla AI and the battle
+   remains playable.
+6. After this check, smoke-test one normal trainer single and one intentional
+   one-trainer double using the same Lua bridge and service.
 
 ## Automated checks
 
@@ -184,3 +210,7 @@ make -j16
 - [Phase 6A voluntary-switching specification](../../docs/openai-battle-agent/specs/2026-07-29-phase-6a-voluntary-switching.md)
 - [Phase 6A flow review](../../docs/openai-battle-agent/reviews/2026-07-29-phase-6a-voluntary-switching-flow-review.md)
 - [Phase 6A implementation plan](../../docs/openai-battle-agent/plans/2026-07-29-phase-6a-voluntary-switching.md)
+- [Phase 7A evidence](../../docs/openai-battle-agent/reviews/2026-08-02-phase-7a-single-trainer-doubles-evidence.md)
+- [Phase 7B specification](../../docs/openai-battle-agent/specs/2026-08-03-phase-7b-two-trainer-doubles.md)
+- [Phase 7B flow review](../../docs/openai-battle-agent/reviews/2026-08-03-phase-7b-two-trainer-doubles-flow-review.md)
+- [Phase 7B implementation plan](../../docs/openai-battle-agent/plans/2026-08-04-phase-7b-two-trainer-doubles.md)

@@ -18,9 +18,9 @@
 | 5 | Model-backed decision adapter | One demo trainer | Structured response validation, latency metrics, connected/disconnected demo. |
 | 6A | Voluntary switching | Trainer singles | ROM validates party actions; no items; fallback covers moves and switches. |
 | 6B | Global trainer-single enablement | All eligible trainer singles | Every trainer is tagged; unsupported modes remain vanilla. |
-| 7A | One-trainer double battles | Intentional trainer doubles | One atomic two-action agent plan covers ally, enemy, self, spread, move/switch, and double-switch choices. |
-| 7B | Two-trainer double battles | Two trainers that spot the player together | Each action and reserve party remains owned by its originating trainer. |
-| 8 | Packaging and demo handoff | New developer path | Pinned mGBA build, launch guide, smoke test, reproducible fallback demonstration. |
+| 7A | One-trainer double battles | Intentional trainer doubles | One atomic two-action agent plan covers ally, enemy, self, spread, move/switch, and double-switch choices. [Evidence](reviews/2026-08-02-phase-7a-single-trainer-doubles-evidence.md) recorded 2026-08-03. |
+| 7B | Two-trainer double battles | Two trainers that spot the player together | One atomic agent decision controls both opponents, while each action and reserve party remains owned by its originating trainer. [Evidence](reviews/2026-08-04-phase-7b-two-trainer-doubles-evidence.md) recorded 2026-08-04. |
+| 8 | Packaging and demo handoff | New developer path | Pinned mGBA build, launch guide, smoke test, reproducible fallback demonstration. [Specification](specs/2026-08-04-phase-8-packaging-and-handoff.md), [flow review](reviews/2026-08-04-phase-8-packaging-and-handoff-flow-review.md), [implementation plan](plans/2026-08-04-phase-8-packaging-and-handoff.md), and [evidence](reviews/2026-08-04-phase-8-packaging-and-handoff-evidence.md). |
 
 ## Evidence matrix
 
