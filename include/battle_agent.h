@@ -192,6 +192,7 @@ void BattleAgent_TestStartThinkingStatus(u32 battler);
 void BattleAgent_TestUpdateThinkingStatus(u32 battler, bool32 playerActionConfirmed, bool32 messageWindowIdle);
 u8 BattleAgent_TestGetThinkingStatus(u32 battler);
 u8 BattleAgent_TestGetThinkingStatusFrames(u32 battler);
+bool32 BattleAgent_TestArePlayerActionsConfirmed(bool32 leftActive, bool32 leftConfirmed, bool32 rightActive, bool32 rightConfirmed);
 #endif
 
 #endif // GUARD_BATTLE_AGENT_H

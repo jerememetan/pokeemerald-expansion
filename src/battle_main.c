@@ -4022,13 +4022,39 @@ enum
     STATE_SELECTION_SCRIPT_MAY_RUN
 };
 
+static bool32 IsPlayerActionConfirmedState(u8 state)
+{
+    return state == STATE_WAIT_ACTION_CONFIRMED
+        || state == STATE_WAIT_ACTION_CONFIRMED_STANDBY;
+}
+
+static bool32 ArePlayerActionsConfirmedForExternalAiStatus(bool32 leftActive, bool32 leftConfirmed, bool32 rightActive, bool32 rightConfirmed)
+{
+    return (leftActive || rightActive)
+        && (!leftActive || leftConfirmed)
+        && (!rightActive || rightConfirmed);
+}
+
 static bool32 IsPlayerActionConfirmedForExternalAiStatus(void)
 {
-    u32 playerBattler = GetBattlerAtPosition(B_POSITION_PLAYER_LEFT);
+    u32 playerLeft = GetBattlerAtPosition(B_POSITION_PLAYER_LEFT);
+    u32 playerRight = GetBattlerAtPosition(B_POSITION_PLAYER_RIGHT);
+    bool32 leftActive = playerLeft < gBattlersCount && !(gAbsentBattlerFlags & gBitTable[playerLeft]);
+    bool32 rightActive = (gBattleTypeFlags & BATTLE_TYPE_DOUBLE)
+        && playerRight < gBattlersCount
+        && !(gAbsentBattlerFlags & gBitTable[playerRight]);
+    bool32 leftConfirmed = leftActive && IsPlayerActionConfirmedState(gBattleCommunication[playerLeft]);
+    bool32 rightConfirmed = rightActive && IsPlayerActionConfirmedState(gBattleCommunication[playerRight]);
 
-    return gBattleCommunication[playerBattler] == STATE_WAIT_ACTION_CONFIRMED
-        || gBattleCommunication[playerBattler] == STATE_WAIT_ACTION_CONFIRMED_STANDBY;
+    return ArePlayerActionsConfirmedForExternalAiStatus(leftActive, leftConfirmed, rightActive, rightConfirmed);
 }
+
+#if TESTING
+bool32 BattleAgent_TestArePlayerActionsConfirmed(bool32 leftActive, bool32 leftConfirmed, bool32 rightActive, bool32 rightConfirmed)
+{
+    return ArePlayerActionsConfirmedForExternalAiStatus(leftActive, leftConfirmed, rightActive, rightConfirmed);
+}
+#endif
 
 static void HandleTurnActionSelectionState(void)
 {

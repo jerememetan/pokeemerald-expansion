@@ -704,6 +704,14 @@ TEST("External AI thinking status waits for player action confirmation")
     EXPECT_EQ(BattleAgent_TestGetThinkingStatusFrames(B_POSITION_OPPONENT_LEFT), 0);
 }
 
+TEST("External AI thinking status requires every alive player action in doubles")
+{
+    EXPECT_EQ(BattleAgent_TestArePlayerActionsConfirmed(TRUE, TRUE, FALSE, FALSE), TRUE);
+    EXPECT_EQ(BattleAgent_TestArePlayerActionsConfirmed(TRUE, TRUE, TRUE, FALSE), FALSE);
+    EXPECT_EQ(BattleAgent_TestArePlayerActionsConfirmed(TRUE, TRUE, TRUE, TRUE), TRUE);
+    EXPECT_EQ(BattleAgent_TestArePlayerActionsConfirmed(FALSE, FALSE, TRUE, TRUE), TRUE);
+}
+
 TEST("External AI thinking status waits for an idle message window")
 {
     BattleAgent_ResetMailbox();
