@@ -6,6 +6,8 @@ import json
 import argparse
 import socket
 import struct
+import subprocess
+import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -25,6 +27,10 @@ class ToolError(ValueError):
     """Raised when a model attempts an unavailable or illegal action."""
 
 
+class ModelSelectionError(RuntimeError):
+    """Raised before bridge startup when no local Ollama model is available."""
+
+
 @dataclass(frozen=True)
 class AgentDecision:
     """Validated actor-keyed model actions and the read-only tools used."""
@@ -35,14 +41,75 @@ class AgentDecision:
 
 OLLAMA_URL = "http://127.0.0.1:11434/api/chat"
 OLLAMA_MODEL = "qwen2.5-coder:7b"
+PREFERRED_OLLAMA_MODEL = OLLAMA_MODEL
 MAX_TOOL_CALLS = 12
-SERVICE_TIMEOUT_SECONDS = 12.0
+SERVICE_TIMEOUT_SECONDS = 20.0
 FORMAT_RETRY_MESSAGE = (
     "Your previous reply was not a valid tool call. Reply with exactly one "
     "supported tool call; do not answer in prose or malformed JSON."
 )
 CATALOG_PATH = Path(__file__).with_name("catalog_v2.json")
 LOOPBACK_HOST = "127.0.0.1"
+
+
+def parse_ollama_model_list(output: str) -> tuple[str, ...]:
+    """Return installed model names from the human-readable `ollama list` table."""
+    models = []
+    for line in output.splitlines():
+        fields = line.split()
+        if fields and fields[0] != "NAME":
+            models.append(fields[0])
+    return tuple(models)
+
+
+def default_model_index(models: tuple[str, ...]) -> int:
+    """Prefer the established Qwen default when it is locally installed."""
+    if PREFERRED_OLLAMA_MODEL in models:
+        return models.index(PREFERRED_OLLAMA_MODEL)
+    return 0
+
+
+def advance_model_index(index: int, delta: int, count: int) -> int:
+    """Move through a non-empty model list, wrapping at either end."""
+    return (index + delta) % count
+
+
+def discover_ollama_models() -> tuple[str, ...]:
+    """List locally installed Ollama models without contacting mGBA."""
+    try:
+        completed = subprocess.run(["ollama", "list"], check=True, capture_output=True, text=True)
+    except (OSError, subprocess.CalledProcessError) as error:
+        raise ModelSelectionError("No local Ollama models found. Run 'ollama list' or 'ollama pull <model>'.") from error
+    models = parse_ollama_model_list(completed.stdout)
+    if not models:
+        raise ModelSelectionError("No local Ollama models found. Run 'ollama list' or 'ollama pull <model>'.")
+    return models
+
+
+def select_ollama_model(models: tuple[str, ...]) -> str:
+    """Select a local model, using arrow keys in an interactive Windows terminal."""
+    index = default_model_index(models)
+    if not (sys.stdin.isatty() and sys.stdout.isatty()):
+        return models[index]
+    if sys.platform != "win32":
+        for number, model in enumerate(models, 1):
+            print(f"{number}. {model}")
+        answer = input(f"Select model [{index + 1}]: ").strip()
+        return models[int(answer) - 1] if answer else models[index]
+    import msvcrt
+    while True:
+        print("\nSelect local Ollama model (Up/Down, Enter):")
+        for number, model in enumerate(models):
+            print(f"{'>' if number == index else ' '} {model}")
+        key = msvcrt.getwch()
+        if key in ("\x00", "\xe0"):
+            key = msvcrt.getwch()
+        if key == "H":
+            index = advance_model_index(index, -1, len(models))
+        elif key == "P":
+            index = advance_model_index(index, 1, len(models))
+        elif key == "\r":
+            return models[index]
 EFFECTIVENESS_LABELS = {
     0: "immune",
     1: "not-very-effective",
@@ -65,9 +132,22 @@ def load_catalog(path: Path = CATALOG_PATH) -> dict[str, dict[str, str]]:
 CATALOG = load_catalog()
 
 
+def format_console_audit(message: str, ansi_enabled: bool) -> str:
+    """Highlight accepted action lines without changing the plain audit record."""
+    if not ansi_enabled or not message.startswith("audit #"):
+        return message
+    highlighted = []
+    for line in message.splitlines():
+        if line.startswith("  selected:") or (line.startswith("  battler ") and " ROM facts:" in line):
+            highlighted.append(f"\x1b[1;92m{line}\x1b[0m")
+        else:
+            highlighted.append(line)
+    return "\n".join(highlighted)
+
+
 def log(message: str) -> None:
     """Emit concise local diagnostics; no battle data is persisted."""
-    print(f"BAGB service: {message}", flush=True)
+    print(f"BAGB service: {format_console_audit(message, sys.stdout.isatty())}", flush=True)
 
 
 def _label(category: str, value: int) -> str:
@@ -312,9 +392,9 @@ def format_decision_audit(
     return "\n".join(lines)
 
 
-def request_ollama(messages: list[dict[str, object]]) -> dict[str, object]:
+def request_ollama(messages: list[dict[str, object]], model: str = OLLAMA_MODEL) -> dict[str, object]:
     """Call only the local Ollama chat endpoint with the bounded tool schema."""
-    body = json.dumps({"model": OLLAMA_MODEL, "stream": False, "messages": messages, "tools": TOOL_SCHEMAS}).encode()
+    body = json.dumps({"model": model, "stream": False, "messages": messages, "tools": TOOL_SCHEMAS}).encode()
     request = Request(OLLAMA_URL, data=body, headers={"Content-Type": "application/json"})
     with urlopen(request, timeout=SERVICE_TIMEOUT_SECONDS) as response:
         decoded = json.loads(response.read().decode())
@@ -358,6 +438,7 @@ def run_tool_agent(
     battler_count: int,
     actions_by_battler: dict[int, tuple[LegalAction, ...]],
     payload: bytes,
+    model: str = OLLAMA_MODEL,
 ) -> AgentDecision | None:
     """Run a bounded local model/tool exchange and return one atomic legal plan."""
     messages: list[dict[str, object]] = [{"role": "system", "content": "Use only the supplied read-only tools to inspect this battle. Make exactly one tool call per response; never emit multiple calls. Do not answer in prose. Return only one JSON object with exactly name and arguments. For an ordinary move turn, call get_battle_state, then list_legal_actions, then choose_actions: the legal-action list already includes each move's ROM facts. Call get_party before choosing a voluntary switch; call other inspection tools only when their extra information is necessary. Finish exactly once with choose_actions and exactly one legal action for every controlled battler."}]
@@ -368,7 +449,7 @@ def run_tool_agent(
         if time.monotonic() - started >= SERVICE_TIMEOUT_SECONDS:
             return None
         try:
-            message = request_ollama(messages)
+            message = request_ollama(messages, model)
             tool_call = extract_tool_call(message)
             if tool_call is None:
                 if format_retry_used:
@@ -413,7 +494,7 @@ def run_tool_agent(
     return None
 
 
-def handle_request_frame(frame: bytes) -> bytes | None:
+def handle_request_frame(frame: bytes, model: str = OLLAMA_MODEL) -> bytes | None:
     """Decode one bridge request and return a response only for a valid model choice."""
     request = parse_request_frame(frame)
     log(f"request {request.sequence} received")
@@ -424,6 +505,7 @@ def handle_request_frame(frame: bytes) -> bytes | None:
         request.battler_count,
         request.actions_by_battler,
         request.payload,
+        model,
     )
     if decision is None:
         log(f"request {request.sequence} produced no response")
@@ -454,7 +536,7 @@ def _connect(port: int) -> socket.socket:
             time.sleep(0.25)
 
 
-def _serve_connection(connection: socket.socket) -> None:
+def _serve_connection(connection: socket.socket, model: str = OLLAMA_MODEL) -> None:
     """Forward complete fixed request frames over one established Lua connection."""
     buffer = b""
     while True:
@@ -468,7 +550,7 @@ def _serve_connection(connection: socket.socket) -> None:
         if len(buffer) != REQUEST_FRAME_SIZE:
             continue
         try:
-            response = handle_request_frame(buffer)
+            response = handle_request_frame(buffer, model)
         except (ToolError, ValueError):
             response = None
         if response is not None:
@@ -479,22 +561,28 @@ def _serve_connection(connection: socket.socket) -> None:
         buffer = b""
 
 
-def serve(host: str = LOOPBACK_HOST, port: int = 57621) -> None:
+def serve(host: str = LOOPBACK_HOST, port: int = 57621, model: str = OLLAMA_MODEL) -> None:
     """Connect once to mGBA's loopback listener and process its request frames."""
     if host != LOOPBACK_HOST:
         raise ValueError("battle-agent service connects only to the loopback Lua listener")
     log(f"connecting to mGBA at {host}:{port}")
     with _connect(port) as connection:
         log("mGBA bridge connected")
-        _serve_connection(connection)
+        _serve_connection(connection, model)
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=57621)
+    parser.add_argument("--model")
     args = parser.parse_args()
-    serve(args.host, args.port)
+    try:
+        model = args.model or select_ollama_model(discover_ollama_models())
+    except ModelSelectionError as error:
+        parser.error(str(error))
+    print(f"BAGB service: using Ollama model {model}")
+    serve(args.host, args.port, model)
 
 
 if __name__ == "__main__":

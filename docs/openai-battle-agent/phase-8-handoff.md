@@ -87,6 +87,24 @@ During a pending response, the lower message panel shows exactly `AI is thinking
 
 Stop or omit the PowerShell service during a voluntary opponent turn. After its bounded wait, the ROM clears `AI is thinking..` and uses saved vanilla trainer-AI actions. The battle must remain playable. After a service disconnect, restart mGBA and reload Lua before a new connected attempt; an existing Lua session is not reconnected in place.
 
+## Choose a local Ollama model
+
+Run the service normally to select from installed local models:
+
+```powershell
+py -3 tools\mgba-bridge\battle_agent_service.py
+```
+
+In Windows PowerShell, use Up/Down and Enter. `qwen2.5-coder:7b` is the
+default when installed. To skip the menu for a specific model:
+
+```powershell
+py -3 tools\mgba-bridge\battle_agent_service.py --model hermes3:8b
+```
+
+Run `ollama list` to view names. Ctrl+C at the menu exits before mGBA connects;
+Ctrl+C after connection still uses the existing ROM timeout and vanilla fallback.
+
 ## Automated verification
 
 Run in PowerShell:

@@ -16,10 +16,14 @@ from battle_agent_service import (  # noqa: E402
     AgentDecision,
     ToolError,
     _connect,
+    SERVICE_TIMEOUT_SECONDS,
+    advance_model_index,
     analyze_action,
     choose_actions,
     compare_speed,
+    default_model_index,
     format_decision_audit,
+    format_console_audit,
     get_battle_state,
     get_battler,
     get_battler_moves,
@@ -27,6 +31,7 @@ from battle_agent_service import (  # noqa: E402
     get_party,
     handle_request_frame,
     list_legal_actions,
+    parse_ollama_model_list,
     run_tool_agent,
 )
 from bridge_protocol import (  # noqa: E402
@@ -67,6 +72,30 @@ class BattleAgentServiceTests(unittest.TestCase):
                 LegalAction(1, ACTION_KIND_MOVE, 1, 0, ACTION_NONE, 3, 1, 1, actor_battler=1),
             ),
         }
+
+    def test_model_list_parser_reads_only_model_names(self) -> None:
+        output = "NAME ID SIZE MODIFIED\nqwen2.5-coder:7b abc 4.7 GB now\nllama3.2:3b def 2.0 GB now\n"
+
+        self.assertEqual(parse_ollama_model_list(output), ("qwen2.5-coder:7b", "llama3.2:3b"))
+        self.assertEqual(parse_ollama_model_list("NAME ID SIZE MODIFIED\n\n"), ())
+
+    def test_model_selection_prefers_qwen_and_wraps(self) -> None:
+        models = ("llama3.2:3b", "qwen2.5-coder:7b")
+
+        self.assertEqual(default_model_index(models), 1)
+        self.assertEqual(default_model_index(models[:1]), 0)
+        self.assertEqual(advance_model_index(0, -1, len(models)), 1)
+        self.assertEqual(advance_model_index(1, 1, len(models)), 0)
+
+    def test_service_timeout_allows_twenty_seconds_for_local_model_responses(self) -> None:
+        self.assertEqual(SERVICE_TIMEOUT_SECONDS, 20.0)
+
+    def test_console_audit_highlights_selected_decision_only_when_ansi_enabled(self) -> None:
+        audit = "audit #7\n  tools used: list_legal_actions\n  selected: battler 1: 1=BOUNCE->battler 0\n  battler 1 ROM facts: STAB=yes"
+
+        self.assertIn("\x1b[1;92m  selected:", format_console_audit(audit, True))
+        self.assertIn("\x1b[1;92m  battler 1 ROM facts:", format_console_audit(audit, True))
+        self.assertEqual(format_console_audit(audit, False), audit)
 
     def test_list_legal_actions_is_actor_keyed(self) -> None:
         self.assertEqual(
