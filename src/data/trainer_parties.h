@@ -5311,6 +5311,7 @@ static const struct TrainerMon sParty_Calvin1[] = {
     {
     .lvl = 6,
     .species = SPECIES_LILLIPUP,
+    .moves = {MOVE_GROWL, MOVE_TACKLE, MOVE_ODOR_SLEUTH, MOVE_NONE}
     },
     {
     .lvl = 6,
@@ -5319,8 +5320,8 @@ static const struct TrainerMon sParty_Calvin1[] = {
     },
     {
     .lvl = 6,
-    .species = SPECIES_SPOINK,
-    .moves = {MOVE_CONFUSION, MOVE_BOUNCE, MOVE_NONE, MOVE_NONE}
+    .species = SPECIES_WINGULL,
+    .moves = {MOVE_GUST, MOVE_WATER_GUN, MOVE_GROWL, MOVE_NONE}
     },
 };
 
