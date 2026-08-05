@@ -21,6 +21,13 @@ from battle_agent_service import (  # noqa: E402
     analyze_action,
     choose_actions,
     compare_speed,
+    decode_major_status,
+    decode_stat_changes,
+    decode_types,
+    decode_volatile_status,
+    decode_field_state,
+    decode_move_target,
+    decode_move_split,
     default_model_index,
     format_decision_audit,
     format_console_audit,
@@ -97,6 +104,32 @@ class BattleAgentServiceTests(unittest.TestCase):
         self.assertIn("\x1b[1;92m  battler 1 ROM facts:", format_console_audit(audit, True))
         self.assertEqual(format_console_audit(audit, False), audit)
 
+    def test_readable_battle_facts_decode_types_status_and_stat_deltas(self) -> None:
+        self.assertEqual(decode_types((10, 9, 10)), ["FIRE"])
+        self.assertEqual(decode_major_status(1 << 6), ["PARALYSIS"])
+        self.assertEqual(decode_stat_changes((7, 5, 6, 8, 4, 6, 6, 6)), {
+            "attack": 1, "defense": -1, "speed": 0, "special_attack": 2,
+            "special_defense": -2, "accuracy": 0, "evasion": 0,
+        })
+
+    def test_volatile_status_decoder_names_directly_published_effects(self) -> None:
+        self.assertEqual(decode_volatile_status((1 << 0) | (1 << 24), (1 << 2) | (1 << 10) | (1 << 27)), [
+            "CONFUSION", "SUBSTITUTE", "LEECH_SEED", "ROOTED", "HEAL_BLOCK",
+        ])
+
+    def test_field_state_decoder_names_weather_field_and_side_effects(self) -> None:
+        self.assertEqual(decode_field_state((1 << 0), 0, (1 << 1), (1 << 0) | (1 << 14), (1 << 1) | (1 << 5)), {
+            "weather": ["RAIN"], "terrain": "GRASS", "field_effects": ["TRICK_ROOM"],
+            "player_side_effects": ["REFLECT", "STEALTH_ROCK"],
+            "opponent_side_effects": ["LIGHT_SCREEN", "SAFEGUARD"],
+        })
+
+    def test_move_metadata_decoders_name_target_and_damage_category(self) -> None:
+        self.assertEqual(decode_move_target(0), "SELECTED_TARGET")
+        self.assertEqual(decode_move_target(1 << 7), "ALLY")
+        self.assertEqual(decode_move_split(0), "PHYSICAL")
+        self.assertEqual(decode_move_split(2), "STATUS")
+
     def test_list_legal_actions_is_actor_keyed(self) -> None:
         self.assertEqual(
             list_legal_actions(self.actions_by_battler),
@@ -169,7 +202,7 @@ class BattleAgentServiceTests(unittest.TestCase):
         self.assertEqual(battler["ability"], 42)
         self.assertEqual(battler["item"], 99)
         self.assertEqual(battler["hp"], 25)
-        self.assertEqual(get_field_state(bytes(payload))["field_statuses"], 3)
+        self.assertEqual(get_field_state(bytes(payload))["field_effects"], ["MAGIC_ROOM", "TRICK_ROOM"])
 
     def test_party_tool_exposes_all_slots_and_usable_metadata(self) -> None:
         payload = _v4_payload()
@@ -211,6 +244,17 @@ class BattleAgentServiceTests(unittest.TestCase):
         speed = compare_speed(bytes(payload), 4)
         self.assertEqual(speed["speeds"]["battler_3"], 55)
         self.assertEqual(speed["normal_order"][0], "battler_3")
+
+    def test_compare_speed_reverses_effective_speed_order_in_trick_room(self) -> None:
+        payload = _v4_payload(battle_mode=BATTLE_MODE_TRAINER_DOUBLE)
+        payload[14 + 18:14 + 20] = (18).to_bytes(2, "little")
+        payload[14 + 92 + 18:14 + 92 + 20] = (55).to_bytes(2, "little")
+        payload[385:389] = (1 << 1).to_bytes(4, "little")
+
+        speed = compare_speed(bytes(payload), 2)
+
+        self.assertTrue(speed["trick_room_active"])
+        self.assertEqual(speed["normal_order"], ["battler_0", "battler_1"])
 
     def test_tool_loop_requires_atomic_terminal_choice(self) -> None:
         payload = bytes(_v4_payload(battle_mode=BATTLE_MODE_TRAINER_DOUBLE))

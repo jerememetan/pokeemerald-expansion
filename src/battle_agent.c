@@ -5,6 +5,7 @@
 #include "battle_ai_util.h"
 #include "battle_anim.h"
 #include "battle_controllers.h"
+#include "battle_main.h"
 #include "battle_message.h"
 #include "battle_setup.h"
 #include "battle_util.h"
@@ -356,7 +357,7 @@ static void BattleAgent_CopySnapshot(u32 requester)
         snapshotBattler->item = gBattleMons[battler].item;
         snapshotBattler->attack = gBattleMons[battler].attack;
         snapshotBattler->defense = gBattleMons[battler].defense;
-        snapshotBattler->speed = gBattleMons[battler].speed;
+        snapshotBattler->speed = GetBattlerTotalSpeedStat(battler);
         snapshotBattler->spAttack = gBattleMons[battler].spAttack;
         snapshotBattler->spDefense = gBattleMons[battler].spDefense;
         snapshotBattler->status2 = gBattleMons[battler].status2;

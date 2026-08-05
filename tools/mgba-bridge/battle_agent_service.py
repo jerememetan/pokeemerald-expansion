@@ -50,6 +50,8 @@ FORMAT_RETRY_MESSAGE = (
 )
 CATALOG_PATH = Path(__file__).with_name("catalog_v2.json")
 LOOPBACK_HOST = "127.0.0.1"
+TYPE_NAMES = ("NORMAL", "FIGHTING", "FLYING", "POISON", "GROUND", "ROCK", "BUG", "GHOST", "STEEL", "MYSTERY", "FIRE", "WATER", "GRASS", "ELECTRIC", "PSYCHIC", "ICE", "DRAGON", "DARK", "FAIRY")
+STAT_CHANGE_NAMES = ("attack", "defense", "speed", "special_attack", "special_defense", "accuracy", "evasion")
 
 
 def parse_ollama_model_list(output: str) -> tuple[str, ...]:
@@ -72,6 +74,53 @@ def default_model_index(models: tuple[str, ...]) -> int:
 def advance_model_index(index: int, delta: int, count: int) -> int:
     """Move through a non-empty model list, wrapping at either end."""
     return (index + delta) % count
+
+
+def decode_types(raw_types: tuple[int, int, int]) -> list[str]:
+    """Return unique non-placeholder type names from ROM type IDs."""
+    return list(dict.fromkeys(TYPE_NAMES[type_id] for type_id in raw_types if 0 <= type_id < len(TYPE_NAMES) and type_id != 9))
+
+
+def decode_major_status(status1: int) -> list[str]:
+    """Name persistent major statuses; volatile bitfields remain separate."""
+    if status1 & 7:
+        return ["SLEEP"]
+    for bit, name in ((1 << 3, "POISON"), (1 << 4, "BURN"), (1 << 5, "FREEZE"), (1 << 6, "PARALYSIS"), (1 << 7, "TOXIC_POISON"), (1 << 12, "FROSTBITE")):
+        if status1 & bit:
+            return [name]
+    return []
+
+
+def decode_stat_changes(raw_stages: tuple[int, ...]) -> dict[str, int]:
+    """Convert engine stages with neutral value six to signed named deltas."""
+    return {name: raw_stages[index] - 6 for index, name in enumerate(STAT_CHANGE_NAMES)}
+
+
+def decode_volatile_status(status2: int, status3: int) -> list[str]:
+    """Name directly published battle-only effects, omitting timer/source bits."""
+    status2_flags = ((7, "CONFUSION"), (1 << 3, "FLINCHED"), (0x70, "UPROAR"), (0x300, "BIDE"), (0xC00, "LOCK_CONFUSE"), (1 << 12, "MULTIPLETURNS"), (1 << 13, "WRAPPED"), (1 << 14, "POWDER"), (0xF0000, "INFATUATION"), (1 << 20, "FOCUS_ENERGY"), (1 << 21, "TRANSFORMED"), (1 << 22, "RECHARGE"), (1 << 23, "RAGE"), (1 << 24, "SUBSTITUTE"), (1 << 25, "DESTINY_BOND"), (1 << 26, "ESCAPE_PREVENTION"), (1 << 27, "NIGHTMARE"), (1 << 28, "CURSED"), (1 << 29, "FORESIGHT"), (1 << 30, "DEFENSE_CURL"), (1 << 31, "TORMENT"))
+    status3_flags = ((1 << 2, "LEECH_SEED"), (0x18, "ALWAYS_HITS"), (1 << 5, "PERISH_SONG"), (1 << 6, "ON_AIR"), (1 << 7, "UNDERGROUND"), (1 << 8, "MINIMIZED"), (1 << 9, "CHARGED_UP"), (1 << 10, "ROOTED"), (0x1800, "YAWN"), (1 << 13, "IMPRISONED_OTHERS"), (1 << 14, "GRUDGE"), (1 << 15, "CANT_SCORE_A_CRIT"), (1 << 16, "GASTRO_ACID"), (1 << 17, "EMBARGO"), (1 << 18, "UNDERWATER"), (1 << 21, "SMACKED_DOWN"), (1 << 22, "ME_FIRST"), (1 << 23, "TELEKINESIS"), (1 << 24, "PHANTOM_FORCE"), (1 << 25, "MIRACLE_EYE"), (1 << 26, "MAGNET_RISE"), (1 << 27, "HEAL_BLOCK"), (1 << 28, "AQUA_RING"), (1 << 29, "LASER_FOCUS"), (1 << 30, "POWER_TRICK"), (1 << 31, "SKY_DROPPED"))
+    return [name for flag, name in status2_flags if status2 & flag] + [name for flag, name in status3_flags if status3 & flag]
+
+
+def decode_field_state(weather: int, terrain: int, field: int, player_side: int, opponent_side: int) -> dict[str, object]:
+    """Convert published weather and effect flags into names for the local agent."""
+    weather_flags = ((0xF, "RAIN"), (0x30, "SANDSTORM"), (0x1C0, "SUN"), (0x600, "HAIL"), (1 << 11, "STRONG_WINDS"), (0x3000, "SNOW"))
+    field_flags = ((1 << 0, "MAGIC_ROOM"), (1 << 1, "TRICK_ROOM"), (1 << 2, "WONDER_ROOM"), (1 << 3, "MUD_SPORT"), (1 << 4, "WATER_SPORT"), (1 << 5, "GRAVITY"), (1 << 6, "GRASSY_TERRAIN"), (1 << 7, "MISTY_TERRAIN"), (1 << 8, "ELECTRIC_TERRAIN"), (1 << 9, "PSYCHIC_TERRAIN"), (1 << 10, "ION_DELUGE"), (1 << 11, "FAIRY_LOCK"))
+    side_flags = ((1 << 0, "REFLECT"), (1 << 1, "LIGHT_SCREEN"), (1 << 2, "STICKY_WEB"), (1 << 4, "SPIKES"), (1 << 5, "SAFEGUARD"), (1 << 8, "MIST"), (1 << 10, "TAILWIND"), (1 << 11, "AURORA_VEIL"), (1 << 13, "TOXIC_SPIKES"), (1 << 14, "STEALTH_ROCK"), (1 << 18, "QUICK_GUARD"), (1 << 19, "WIDE_GUARD"), (1 << 22, "STEELSURGE"))
+    terrain_names = ("GRASS", "LONG_GRASS", "SAND", "UNDERWATER", "WATER", "POND", "MOUNTAIN", "CAVE", "BUILDING", "PLAIN")
+    names = lambda value, flags: [name for flag, name in flags if value & flag]
+    return {"weather": names(weather, weather_flags), "terrain": terrain_names[terrain] if 0 <= terrain < len(terrain_names) else "UNKNOWN", "field_effects": names(field, field_flags), "player_side_effects": names(player_side, side_flags), "opponent_side_effects": names(opponent_side, side_flags)}
+
+
+def decode_move_target(target: int) -> str:
+    """Name the move-targeting category published by the battle engine."""
+    return {0: "SELECTED_TARGET", 1: "DEPENDS", 2: "USER_OR_SELECTED", 4: "RANDOM_OPPONENT", 8: "BOTH_OPPONENTS", 16: "USER", 32: "FOES_AND_ALLY", 64: "OPPONENTS_FIELD", 128: "ALLY", 272: "ALL_BATTLERS"}.get(target, "UNKNOWN")
+
+
+def decode_move_split(split: int) -> str:
+    """Name the physical/special/status category of a move."""
+    return ("PHYSICAL", "SPECIAL", "STATUS")[split] if 0 <= split <= 2 else "UNKNOWN"
 
 
 def discover_ollama_models() -> tuple[str, ...]:
@@ -178,7 +227,8 @@ def _decode_battler(payload: bytes, offset: int, battler_id: int | None = None) 
     level, type1, type2, type3 = payload[offset + 2], payload[offset + 3], payload[offset + 4], payload[offset + 5]
     attack, defense, speed, sp_attack, sp_defense = struct.unpack_from("<HHHHH", payload, offset + 14)
     status1, status2, status3 = struct.unpack_from("<III", payload, offset + 24)
-    result: dict[str, int | list[int]] = {"species": species, "species_name": _label("species", species), "level": level, "types": [type1, type2, type3], "ability": ability, "ability_name": _label("abilities", ability), "item": item, "item_name": _label("items", item), "hp": hp, "max_hp": max_hp, "attack": attack, "defense": defense, "speed": speed, "sp_attack": sp_attack, "sp_defense": sp_defense, "status1": status1, "status2": status2, "status3": status3, "stat_stages": list(payload[offset + 36 : offset + 44])}
+    raw_stages = tuple(payload[offset + 36 : offset + 44])
+    result: dict[str, int | list[int] | dict[str, int]] = {"species": species, "species_name": _label("species", species), "level": level, "types": decode_types((type1, type2, type3)), "ability": ability, "ability_name": _label("abilities", ability), "item": item, "item_name": _label("items", item), "hp": hp, "max_hp": max_hp, "attack": attack, "defense": defense, "speed": speed, "sp_attack": sp_attack, "sp_defense": sp_defense, "major_status": decode_major_status(status1), "volatile_status": decode_volatile_status(status2, status3), "stat_changes": decode_stat_changes(raw_stages)}
     if battler_id is not None:
         result["battler_id"] = battler_id
     return result
@@ -195,7 +245,7 @@ def get_battler_moves(payload: bytes, battler_id: int) -> list[dict[str, int]]:
     moves = []
     for slot in range(4):
         move, pp, move_type, power, accuracy, effect, target, priority, split = struct.unpack_from("<HBBBBHHbB", payload, offset + slot * 12)
-        moves.append({"slot": slot, "move": move, "move_name": _label("moves", move), "pp": pp, "type": move_type, "power": power, "accuracy": accuracy, "effect": effect, "effect_name": _label("effects", effect), "target_category": target, "priority": priority, "split": split})
+        moves.append({"slot": slot, "move": move, "move_name": _label("moves", move), "pp": pp, "type": TYPE_NAMES[move_type] if 0 <= move_type < len(TYPE_NAMES) else "UNKNOWN", "power": power, "accuracy": accuracy, "effect": effect, "effect_name": _label("effects", effect), "target_category": decode_move_target(target), "priority": priority, "split": decode_move_split(split)})
     return moves
 
 
@@ -203,7 +253,7 @@ def get_field_state(payload: bytes) -> dict[str, int | list[int]]:
     """Decode field and side status data from the canonical V4 payload."""
     weather, = struct.unpack_from("<H", payload, 382)
     field_statuses, player_side, opponent_side = struct.unpack_from("<III", payload, 385)
-    return {"weather": weather, "terrain": payload[384], "field_statuses": field_statuses, "side_statuses": [player_side, opponent_side]}
+    return decode_field_state(weather, payload[384], field_statuses, player_side, opponent_side)
 
 
 def get_party(payload: bytes) -> list[dict[str, int | bool | str | list[int]]]:
@@ -325,13 +375,19 @@ def analyze_action(actions: tuple[LegalAction, ...], action_index: int, actor_mo
 
 
 def compare_speed(payload: bytes, battler_count: int) -> dict[str, object]:
-    """Compare all active speeds while warning that priority wins first."""
+    """Order ROM-calculated active speeds, applying the field's Trick Room rule."""
     speeds = {f"battler_{battler_id}": get_battler(payload, battler_id)["speed"] for battler_id in range(battler_count)}
-    ordered = sorted(range(battler_count), key=lambda battler_id: (-int(speeds[f"battler_{battler_id}"]), battler_id))
+    field_statuses, = struct.unpack_from("<I", payload, 385)
+    trick_room_active = bool(field_statuses & (1 << 1))
+    ordered = sorted(
+        range(battler_count),
+        key=lambda battler_id: (int(speeds[f"battler_{battler_id}"]), battler_id) if trick_room_active else (-int(speeds[f"battler_{battler_id}"]), battler_id),
+    )
     return {
         "speeds": speeds,
         "normal_order": [f"battler_{battler_id}" for battler_id in ordered],
-        "note": "Move priority can override normal speed order.",
+        "trick_room_active": trick_room_active,
+        "note": "Order uses the ROM's effective active speed and reverses under Trick Room. Move priority can override it; equal speeds still use the game's speed-tie resolution.",
     }
 
 

@@ -12,6 +12,12 @@ SOURCE_PATH = REPOSITORY_ROOT / "src" / "battle_agent.c"
 
 
 class BattleAgentSourceTests(unittest.TestCase):
+    def test_snapshot_exports_rom_calculated_effective_speed(self) -> None:
+        source = SOURCE_PATH.read_text(encoding="utf-8")
+
+        self.assertIn("snapshotBattler->speed = GetBattlerTotalSpeedStat(battler);", source)
+        self.assertNotIn("snapshotBattler->speed = gBattleMons[battler].speed;", source)
+
     def test_thinking_status_renders_atomically(self) -> None:
         source = SOURCE_PATH.read_text(encoding="utf-8")
         match = re.search(

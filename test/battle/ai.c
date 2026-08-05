@@ -3,6 +3,7 @@
 #include "battle_agent.h"
 #include "battle_ai_main.h"
 #include "battle_ai_util.h"
+#include "text.h"
 
 AI_SINGLE_BATTLE_TEST("AI gets baited by Protect Switch tactics") // This behavior is to be fixed.
 {
@@ -766,7 +767,9 @@ TEST("External AI thinking status starts fresh after a previous wait")
 TEST("External AI thinking status shows the normal message panel")
 {
     BattleAgent_ResetMailbox();
+    DeactivateAllTextPrinters();
     BattleAgent_TestStartThinkingStatus(B_POSITION_OPPONENT_LEFT);
+    EXPECT_EQ(IsTextPrinterActive(B_WIN_MSG), FALSE);
     gBattle_BG0_X = 24;
     gBattle_BG0_Y = DISPLAY_HEIGHT * 2;
 
