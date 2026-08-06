@@ -43,7 +43,9 @@ OLLAMA_URL = "http://127.0.0.1:11434/api/chat"
 OLLAMA_MODEL = "qwen2.5-coder:7b"
 PREFERRED_OLLAMA_MODEL = OLLAMA_MODEL
 MAX_TOOL_CALLS = 12
-SERVICE_TIMEOUT_SECONDS = 20.0
+OLLAMA_RESPONSE_TIMEOUT_SECONDS = 20.0
+TOOL_EXCHANGE_TIMEOUT_SECONDS = 45.0
+MODEL_RESPONSE_PREVIEW_LIMIT = 240
 FORMAT_RETRY_MESSAGE = (
     "Your previous reply was not a valid tool call. Reply with exactly one "
     "supported tool call; do not answer in prose or malformed JSON."
@@ -208,7 +210,7 @@ TOOL_SCHEMAS = [
     {"type": "function", "function": {"name": "get_battler", "description": "Read one active battler.", "parameters": {"type": "object", "properties": {"battler_id": {"type": "integer"}}, "required": ["battler_id"]}}},
     {"type": "function", "function": {"name": "get_battler_moves", "description": "Read one active battler's moves.", "parameters": {"type": "object", "properties": {"battler_id": {"type": "integer"}}, "required": ["battler_id"]}}},
     {"type": "function", "function": {"name": "get_party", "description": "Read the six-slot opponent party, including current usability. This does not itself switch a Pokémon.", "parameters": {"type": "object", "properties": {}}}},
-    {"type": "function", "function": {"name": "list_legal_actions", "description": "List ROM-authorized actions, grouped by controlled battler. Move actions include published move data plus STAB, effectiveness, and KO facts. Optionally request one controlled battler by battler_id.", "parameters": {"type": "object", "properties": {"battler_id": {"type": "integer"}}}}},
+    {"type": "function", "function": {"name": "list_legal_actions", "description": "List all ROM-authorized actions, grouped by controlled battler. Move actions include published move data plus STAB, effectiveness, and KO facts.", "parameters": {"type": "object", "properties": {}}}},
     {"type": "function", "function": {"name": "analyze_action", "description": "Read ROM-derived facts for one legal action.", "parameters": {"type": "object", "properties": {"battler_id": {"type": "integer"}, "action_index": {"type": "integer"}}, "required": ["battler_id", "action_index"]}}},
     {"type": "function", "function": {"name": "compare_speed", "description": "Compare active battlers' normal speed order; move priority can override it.", "parameters": {"type": "object", "properties": {}}}},
     {"type": "function", "function": {"name": "choose_actions", "description": "Terminally select exactly one legal action for each controlled battler.", "parameters": {"type": "object", "properties": {"actions": {"type": "array", "items": {"type": "object", "properties": {"battler_id": {"type": "integer"}, "action_index": {"type": "integer"}}, "required": ["battler_id", "action_index"]}}}, "required": ["actions"]}}},
@@ -452,11 +454,60 @@ def request_ollama(messages: list[dict[str, object]], model: str = OLLAMA_MODEL)
     """Call only the local Ollama chat endpoint with the bounded tool schema."""
     body = json.dumps({"model": model, "stream": False, "messages": messages, "tools": TOOL_SCHEMAS}).encode()
     request = Request(OLLAMA_URL, data=body, headers={"Content-Type": "application/json"})
-    with urlopen(request, timeout=SERVICE_TIMEOUT_SECONDS) as response:
+    with urlopen(request, timeout=OLLAMA_RESPONSE_TIMEOUT_SECONDS) as response:
         decoded = json.loads(response.read().decode())
     if not isinstance(decoded, dict) or not isinstance(decoded.get("message"), dict):
         raise ToolError("Ollama response has no message object")
     return decoded["message"]
+
+
+def format_model_response_preview(message: dict[str, object]) -> str:
+    """Return one bounded console-safe preview of an assistant response."""
+    content = message.get("content")
+    preview = repr(content) if isinstance(content, str) else repr(message)
+    return preview.replace("\r", " ").replace("\n", " ")[:MODEL_RESPONSE_PREVIEW_LIMIT]
+
+
+def describe_malformed_tool_call(message: dict[str, object]) -> str:
+    """Classify an assistant response that the existing parser cannot accept."""
+    calls = message.get("tool_calls")
+    if calls is not None:
+        if not isinstance(calls, list):
+            return "native_tool_calls_not_list"
+        if len(calls) != 1:
+            return f"native_tool_calls_count={len(calls)}"
+        if not isinstance(calls[0], dict):
+            return "native_tool_call_not_object"
+        function = calls[0].get("function")
+        if not isinstance(function, dict):
+            return "native_function_not_object"
+        if not isinstance(function.get("name"), str):
+            return "native_function_name_not_string"
+        if not isinstance(function.get("arguments"), dict):
+            return "native_function_arguments_not_object"
+        return "valid"
+
+    content = message.get("content")
+    if content is None:
+        return "content_missing"
+    if not isinstance(content, str):
+        return "content_not_string"
+    try:
+        compatibility_call = json.loads(content)
+    except json.JSONDecodeError:
+        return "content_invalid_json"
+    if not isinstance(compatibility_call, dict):
+        return "content_not_object"
+    if set(compatibility_call) != {"name", "arguments"}:
+        return "content_unexpected_keys"
+    if not isinstance(compatibility_call["name"], str):
+        return "content_name_not_string"
+    if (compatibility_call["name"] == "choose_actions"
+            and isinstance(compatibility_call["arguments"], list)):
+        return "valid"
+    if not isinstance(compatibility_call["arguments"], dict):
+        return "content_arguments_not_object"
+    return "valid"
 
 
 def extract_tool_call(message: dict[str, object]) -> tuple[str, dict[str, object]] | None:
@@ -502,16 +553,24 @@ def run_tool_agent(
     format_retry_used = False
     tools_used: list[str] = []
     for _ in range(MAX_TOOL_CALLS):
-        if time.monotonic() - started >= SERVICE_TIMEOUT_SECONDS:
+        elapsed = time.monotonic() - started
+        if elapsed >= TOOL_EXCHANGE_TIMEOUT_SECONDS:
+            log(f"request {sequence} exchange deadline reached after {elapsed:.1f}s")
             return None
         try:
             message = request_ollama(messages, model)
             tool_call = extract_tool_call(message)
             if tool_call is None:
+                diagnostic = (
+                    f"request {sequence} malformed tool call: "
+                    f"{describe_malformed_tool_call(message)}; "
+                    f"response={format_model_response_preview(message)}"
+                )
                 if format_retry_used:
+                    log(diagnostic + "; retry exhausted")
                     return None
                 format_retry_used = True
-                log(f"request {sequence} retrying malformed tool call")
+                log(diagnostic + "; retrying once")
                 messages.append({"role": "system", "content": FORMAT_RETRY_MESSAGE})
                 continue
             name, arguments = tool_call
@@ -530,16 +589,16 @@ def run_tool_agent(
                 result = get_battler_moves(payload, arguments["battler_id"])
             elif name == "get_party" and not arguments:
                 result = get_party(payload)
-            elif (name == "list_legal_actions"
-                  and (not arguments
-                       or (set(arguments) == {"battler_id"}
-                           and arguments["battler_id"] in actions_by_battler))):
-                result = list_legal_actions(actions_by_battler, arguments.get("battler_id"), payload)
+            elif name == "list_legal_actions":
+                if arguments:
+                    log(f"request {sequence} normalized list_legal_actions arguments: argument_keys={sorted(arguments)!r}")
+                result = list_legal_actions(actions_by_battler, payload=payload)
             elif name == "analyze_action" and set(arguments) == {"battler_id", "action_index"} and arguments["battler_id"] in actions_by_battler:
                 result = analyze_action(actions_by_battler[arguments["battler_id"]], arguments["action_index"], get_battler_moves(payload, arguments["battler_id"]))
             elif name == "compare_speed" and not arguments:
                 result = compare_speed(payload, battler_count)
             else:
+                log(f"request {sequence} unsupported tool call: name={name!r}, argument_keys={sorted(arguments)!r}")
                 return None
             tools_used.append(name)
             messages.append(message)

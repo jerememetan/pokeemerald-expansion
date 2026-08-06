@@ -12,11 +12,12 @@ from unittest import mock
 BRIDGE_DIRECTORY = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(BRIDGE_DIRECTORY))
 
+import battle_agent_service  # noqa: E402
 from battle_agent_service import (  # noqa: E402
     AgentDecision,
+    TOOL_SCHEMAS,
     ToolError,
     _connect,
-    SERVICE_TIMEOUT_SECONDS,
     advance_model_index,
     analyze_action,
     choose_actions,
@@ -94,8 +95,110 @@ class BattleAgentServiceTests(unittest.TestCase):
         self.assertEqual(advance_model_index(0, -1, len(models)), 1)
         self.assertEqual(advance_model_index(1, 1, len(models)), 0)
 
-    def test_service_timeout_allows_twenty_seconds_for_local_model_responses(self) -> None:
-        self.assertEqual(SERVICE_TIMEOUT_SECONDS, 20.0)
+    def test_service_uses_separate_response_and_exchange_deadlines(self) -> None:
+        self.assertEqual(getattr(battle_agent_service, "OLLAMA_RESPONSE_TIMEOUT_SECONDS", None), 20.0)
+        self.assertEqual(getattr(battle_agent_service, "TOOL_EXCHANGE_TIMEOUT_SECONDS", None), 45.0)
+
+    def test_malformed_tool_diagnostic_classifies_parser_failures(self) -> None:
+        describe = getattr(battle_agent_service, "describe_malformed_tool_call", lambda _: "helper_missing")
+
+        self.assertEqual(describe({"tool_calls": []}), "native_tool_calls_count=0")
+        self.assertEqual(describe({"content": "not json"}), "content_invalid_json")
+        self.assertEqual(describe({"content": '{"name":"get_battle_state","arguments":{},"extra":true}'}), "content_unexpected_keys")
+        self.assertEqual(describe({"content": '{"name":"choose_actions","arguments":[]}'}), "valid")
+
+    def test_model_response_preview_is_single_line_and_bounded(self) -> None:
+        preview_response = getattr(battle_agent_service, "format_model_response_preview", lambda _: "helper_missing")
+
+        preview = preview_response({"content": "first\n" + "x" * 300})
+        self.assertNotEqual(preview, "helper_missing")
+        self.assertNotIn("\n", preview)
+        self.assertLessEqual(len(preview), 240)
+
+    def test_tool_loop_logs_malformed_response_category_before_retrying(self) -> None:
+        payload = bytes(_v4_payload())
+        with mock.patch("battle_agent_service.request_ollama", return_value={"content": "not json"}), mock.patch(
+            "battle_agent_service.log"
+        ) as log:
+            self.assertIsNone(run_tool_agent(7, 3, (1,), 2, self.actions_by_battler, payload))
+        log.assert_any_call("request 7 malformed tool call: content_invalid_json; response='not json'; retrying once")
+
+    def test_tool_loop_logs_elapsed_time_before_exchange_deadline_fallback(self) -> None:
+        payload = bytes(_v4_payload())
+        with mock.patch("battle_agent_service.time.monotonic", side_effect=[0.0, 45.2]), mock.patch(
+            "battle_agent_service.log"
+        ) as log:
+            self.assertIsNone(run_tool_agent(7, 3, (1,), 2, self.actions_by_battler, payload))
+        log.assert_any_call("request 7 exchange deadline reached after 45.2s")
+
+    def test_tool_loop_logs_parsed_unsupported_tool_call(self) -> None:
+        payload = bytes(_v4_payload())
+        response = {"tool_calls": [{"function": {"name": "open_shell", "arguments": {}}}]}
+        with mock.patch("battle_agent_service.request_ollama", return_value=response), mock.patch(
+            "battle_agent_service.log"
+        ) as log:
+            self.assertIsNone(run_tool_agent(7, 3, (1,), 2, self.actions_by_battler, payload))
+        log.assert_any_call("request 7 unsupported tool call: name='open_shell', argument_keys=[]")
+
+    def test_list_legal_actions_schema_requires_no_model_arguments(self) -> None:
+        schema = next(tool for tool in TOOL_SCHEMAS if tool["function"]["name"] == "list_legal_actions")
+
+        self.assertEqual(schema["function"]["parameters"]["properties"], {})
+
+    def test_tool_loop_normalizes_wrong_list_legal_actions_battler_argument(self) -> None:
+        payload = bytes(_v4_payload())
+        responses = [
+            {"content": '{"name":"list_legal_actions","arguments":{"battler_id":0}}'},
+            {"content": '{"name":"choose_actions","arguments":{"actions":[{"battler_id":1,"action_index":1}]}}'},
+        ]
+        with mock.patch("battle_agent_service.request_ollama", side_effect=responses), mock.patch(
+            "battle_agent_service.log"
+        ) as log:
+            selected = run_tool_agent(7, 3, (1,), 2, self.actions_by_battler, payload)
+        self.assertEqual(selected, AgentDecision(((1, 1),), ("list_legal_actions", "choose_actions")))
+        log.assert_any_call("request 7 normalized list_legal_actions arguments: argument_keys=['battler_id']")
+
+    def test_tool_loop_normalizes_invented_list_legal_actions_argument_in_a_double(self) -> None:
+        payload = bytes(_v4_payload(battle_mode=BATTLE_MODE_TRAINER_DOUBLE))
+        actions = {
+            1: (LegalAction(0, ACTION_KIND_MOVE, 0, 0, ACTION_NONE, 2, 1, 0, actor_battler=1),),
+            3: (LegalAction(0, ACTION_KIND_MOVE, 0, 0, ACTION_NONE, 2, 1, 0, actor_battler=3),),
+        }
+        responses = [
+            {"content": '{"name":"list_legal_actions","arguments":{"controlled_battlers":[1,3]}}'},
+            {"content": '{"name":"choose_actions","arguments":{"actions":[{"battler_id":1,"action_index":0},{"battler_id":3,"action_index":0}]}}'},
+        ]
+        with mock.patch("battle_agent_service.request_ollama", side_effect=responses), mock.patch(
+            "battle_agent_service.log"
+        ) as log:
+            selected = run_tool_agent(7, 3, (1, 3), 4, actions, payload)
+        self.assertEqual(selected, AgentDecision(((1, 0), (3, 0)), ("list_legal_actions", "choose_actions")))
+        log.assert_any_call("request 7 normalized list_legal_actions arguments: argument_keys=['controlled_battlers']")
+
+    def test_tool_loop_allows_a_valid_choice_after_twenty_seconds_but_before_exchange_deadline(self) -> None:
+        payload = bytes(_v4_payload())
+        responses = [
+            {"content": '{"name":"get_battle_state","arguments":{}}'},
+            {"content": '{"name":"list_legal_actions","arguments":{}}'},
+            {"content": '{"name":"choose_actions","arguments":{"actions":[{"battler_id":1,"action_index":0}]}}'},
+        ]
+        expected = AgentDecision(((1, 0),), ("get_battle_state", "list_legal_actions", "choose_actions"))
+        with mock.patch("battle_agent_service.request_ollama", side_effect=responses) as request, mock.patch(
+            "battle_agent_service.time.monotonic", side_effect=[0.0, 0.0, 20.1, 21.0]
+        ):
+            selected = run_tool_agent(7, 3, (1,), 2, self.actions_by_battler, payload)
+        self.assertEqual(selected, expected)
+        self.assertEqual(request.call_count, 3)
+
+    def test_tool_loop_keeps_vanilla_fallback_after_the_exchange_deadline(self) -> None:
+        payload = bytes(_v4_payload())
+        response = {"content": '{"name":"get_battle_state","arguments":{}}'}
+        with mock.patch("battle_agent_service.request_ollama", return_value=response) as request, mock.patch(
+            "battle_agent_service.time.monotonic", side_effect=[0.0, 0.0, 45.0]
+        ):
+            selected = run_tool_agent(7, 3, (1,), 2, self.actions_by_battler, payload)
+        self.assertIsNone(selected)
+        self.assertEqual(request.call_count, 1)
 
     def test_console_audit_highlights_selected_decision_only_when_ansi_enabled(self) -> None:
         audit = "audit #7\n  tools used: list_legal_actions\n  selected: battler 1: 1=BOUNCE->battler 0\n  battler 1 ROM facts: STAB=yes"
