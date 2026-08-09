@@ -23,13 +23,13 @@
 
 - Modify: `data/maps/LavaridgeTown/scripts.inc`
 
-- [ ] **Step 1: Inspect current guards**
+- [x] **Step 1: Inspect current guards**
 
 Run `rg -n -C 16 'LavaridgeTown_EventScript_EggWoman|LavaridgeTown_EventScript_ReceivedEgg' data/maps/LavaridgeTown/scripts.inc`.
 
 Expected: the flow checks the received-Egg flag, acceptance, and party size; sets the flag; then gives Wynaut.
 
-- [ ] **Step 2: Replace the hard-coded result**
+- [x] **Step 2: Replace the hard-coded result**
 
 Replace only the post-fanfare command with:
 
@@ -69,7 +69,7 @@ LavaridgeTown_EventScript_GiveEggTurtwig::
 
 Do not change existing guards, messages, flags, or post-receipt labels.
 
-- [ ] **Step 3: Check the source contract**
+- [x] **Step 3: Check the source contract**
 
 Run `rg -n -C 3 'GiveRandomEgg|GiveEgg(Wynaut|Togepi|Chimchar|Piplup|Turtwig)|random 5|SPECIES_(WYNAUT|TOGEPI|CHIMCHAR|PIPLUP|TURTWIG)' data/maps/LavaridgeTown/scripts.inc`.
 
@@ -85,7 +85,7 @@ Expected: exit code 0 with no script-assembly error.
 
 Verify that decline and full-party cases preserve the offer, accepting sets the existing flag and shows the post-receipt text later, and repeated eligible fresh-save trials produce Wynaut, Togepi, Chimchar, Piplup, and Turtwig.
 
-- [ ] **Step 6: Commit the isolated change**
+- [x] **Step 6: Commit the isolated change**
 
 Run `git add data/maps/LavaridgeTown/scripts.inc docs/superpowers/plans/2026-08-09-lavaridge-random-egg-migration.md` followed by `git commit -m "feat: randomize lavaridge egg gift"`.
 
