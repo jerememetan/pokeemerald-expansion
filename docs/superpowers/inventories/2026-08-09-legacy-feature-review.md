@@ -1,54 +1,146 @@
 # Legacy Feature Review
 
-This review is a complete, path-level disposition of the generated [legacy path inventory](2026-08-09-legacy-feature-inventory.json). It compares `master` (Expansion 1.16.3, `c828d12721`) with `archive/master-pre-1.16.3` (`f5e81e85df`). A path belongs to exactly one inventory category, and each category appears in exactly one table row; the selector manifest below is deliberately machine-checkable.
+This is the exhaustive feature disposition for [the generated path inventory](2026-08-09-legacy-feature-inventory.json), comparing `master` (Expansion 1.16.3, `c828d12721`) with `archive/master-pre-1.16.3` (`f5e81e85df`). The checked-in feature manifest below maps every generated destination path to exactly one feature entry. It is deliberately selector-based: the inventory remains the canonical 2,124-path listing, while the manifest makes the review readable and mechanically auditable.
 
-The review distinguishes behavior from implementation. Legacy upstream ports, generated assembly, old test suites, and obsolete build tooling remain on the current release. Custom behavior is brought forward only through the current data/configuration interfaces or the smallest dedicated implementation needed after a phase validates it.
+“Upstream equivalent” means retain the 1.16.3 implementation and, where needed, configure it; it never means copy the archived implementation. “Planned” is an inventory status, not a claim that ROM behavior has already been ported.
 
 | Feature | Legacy paths | 1.16.3 equivalent or target paths | Decision | Phase | Acceptance evidence |
-| --- | --- | --- | --- | --- | --- |
-| Map and event behavior | [maps-and-events selector](#coverage-manifest) (1,220 paths: `data/maps/**`, `data/layouts/**`) | `data/maps/**`, `data/layouts/**`, current map JSON/Poryscript generators | Modern adaptation | 2 | The inventory includes the custom `Littleroot_Extension` and `Verdanturf_Extension` layouts alongside all map-source conversions. Recreate changed layouts, events, warps, objects, and scripts in current JSON/Poryscript; do not copy generated `.inc` output. Verify new-game, each changed warp/event, and the extension-map entry/exit in-game. |
-| Start-menu, bag, and QoL interface | [ui-and-quality-of-life selector](#coverage-manifest) (41 paths: fullscreen menu graphics and `src/start_menu`, `src/option_menu`, `src/item_menu` changes) | `src/start_menu.c`, `src/item_menu.c`, `include/config/item.h`, current UI graphics/build rules | Modern adaptation | 3 | Legacy commits `1b4f48d986` (full-screen start menu) and BetterBag history (`3480da2c61`, `f5f24a808a`, `ef69dde01e`) establish the intended custom UI and pocket behavior. Implement only the preserved screen/pocket behavior on current APIs; exercise every menu action, pocket, and gender/clock variant. |
-| Custom content: species, items, moves, trainers, encounters, graphics, and cries | [game-content selector](#coverage-manifest) (118 paths: `data/trainers/**`, `data/wild/**`, `src/data/{pokemon,items,moves}/**`, Pokémon/item graphics, `sound/**`) | Current `src/data/**`, `graphics/**`, `sound/**`, trainer and encounter source formats | Direct transfer | 2 | The legacy history records nature-mint content in `624403ccab` and custom trainer/frontier tuning in `f5e81e85df`. Transfer only deltas that change available content, using current tables/assets and current generated formats; verify item use, learnsets, encounters, trainer parties, and asset linkage. |
-| Battle, gameplay, and Battle Frontier tuning | [gameplay-and-battle selector](#coverage-manifest) (593 paths: battle/config/core sources, headers, macros, and battle tests) | `include/config/**`, `src/data/**`, `src/battle_*.c`, `src/data/battle_frontier/**`, current `test/battle/**` | Use upstream equivalent | 4 | Current 1.16.3 already owns the battle engine, scripts, macros, and tests. Legacy commits `476030333c` (EXP All), `624403ccab` (mints), and `f5e81e85df` (Frontier tables) identify behavior to configure or re-express on those interfaces. Add only missing content/configuration; run targeted battle tests plus EXP, mint, and Frontier streak/manual checks. |
-| Historical tooling, generated output, and imported upstream material | [tooling-and-generated-output selector](#coverage-manifest) (152 paths: documentation, build/config, generated scripts/text, tools, and non-feature assets) | Current 1.16.3 `Makefile`, `tools/**`, generated source pipeline, docs, and CI configuration | Use upstream equivalent | 5 | These paths fall outside the feature classifiers because they are old build/documentation/generated artifacts. Keep 1.16.3’s maintained tooling, regenerate derived files from current inputs, and confirm the supported build plus relevant generators complete without importing legacy infrastructure. |
+| --- | --- | --- | --- | --- |
+| Upstream map and event source conversion | [`upstream-map-event-source`](#feature-manifest) — all `maps-and-events` paths except the two explicit extension layouts | Current `data/maps/**`, `data/layouts/**`, JSON/Poryscript generation | Use upstream equivalent | 2 | The paths include generated `.inc` files and broad map-source format drift. Keep current source formats; regenerate derived scripts, build, and smoke-test affected vanilla maps. |
+| Littleroot and Verdanturf extensions | [`custom-map-extensions`](#feature-manifest) — `data/layouts/{Littleroot,Verdanturf}_Extension/**` | Current layout JSON, map headers, events, and warps | Modern adaptation | 2 | These are the only added extension-layout directory names in the inventory. Recreate geometry, connections, events, and warps in current formats; enter and leave both maps from a clean save. |
+| Full-screen start menu | [`fullscreen-start-menu`](#feature-manifest) — full-screen graphics plus start-menu implementation paths | Current `src/start_menu.c`, UI assets, current menu interfaces | Modern adaptation | 3 | `git show --stat 1b4f48d986` adds the fullscreen assets and implementation. Verify every visible action and the archived gender/clock variants on the current menu APIs. |
+| Better Bag and remaining QoL UI | [`better-bag-and-qol-ui`](#feature-manifest) — remaining UI-category paths | Current `src/item_menu.c`, `src/option_menu.c`, item configuration and UI assets | Modern adaptation | 3 | BetterBag history (`3480da2c61`, `f5f24a808a`, `ef69dde01e`) identifies pocket and interface behavior. Verify all pockets, item selection/use, and options; retain current menu internals. |
+| Species, item, move, trainer, encounter, graphic, and cry corpus | [`legacy-content-corpus`](#feature-manifest) — every `game-content` path | Current `src/data/**`, `graphics/**`, `sound/**`, trainer/encounter generators | Use upstream equivalent | 2 | `git show --stat 624403ccab` identifies legacy mint work, while the inventory’s Gen 9 assets/tables overlap maintained expansion content. Compare the legacy deltas at current source-table granularity; configure or add only content absent from 1.16.3, then verify linkage and gameplay use. |
+| Battle Frontier roster tuning | [`frontier-roster-tuning`](#feature-manifest) — the archived Frontier roster table and its direct constants/engine callers | Current `src/data/battle_frontier/**`, current Frontier configuration | Modern adaptation | 4 | `git show --stat f5e81e85df` changes `battle_frontier_mons.h`, `battle_tower.c`, and the Frontier constant. Re-express only its roster/rule deltas against 1.16.3 and verify a representative facility streak. |
+| Legacy battle engine, config, and tests | [`upstream-gameplay-and-battle`](#feature-manifest) — all remaining `gameplay-and-battle` paths | Current battle engine, config headers, scripts, macros, and `test/battle/**` | Use upstream equivalent | 4 | `476030333c` documents EXP All and `624403ccab` documents mint behavior; 1.16.3 supplies both systems. Configure current behavior if the archived setting differs; run targeted battle tests and EXP/mint manual checks without restoring obsolete engine code. |
+| Historical tooling and generated material | [`historical-tooling-and-generated-material`](#feature-manifest) — every `tooling-and-generated-output` path | Current `Makefile`, tools, docs, generators, CI, and generated outputs | Use upstream equivalent | 5 | These paths are outside all feature-source classifiers and include old build/docs/generated artifacts. Build with the supported current command and regenerate outputs; do not import archived infrastructure. |
 
-## Evidence used
+## Feature manifest
 
-- `git log master..archive/master-pre-1.16.3` identifies the independent legacy feature work rather than treating every version-skew path as custom behavior.
-- `git show --stat 1b4f48d986`, `624403ccab`, `476030333c`, and `f5e81e85df` show the fullscreen menu, nature-mint, EXP All, and Battle Frontier work respectively.
-- `git diff --name-status -z master...archive/master-pre-1.16.3` is the inventory generator’s input. The generated JSON, rather than this prose, is the authoritative enumeration.
+The machine-readable manifest supplies the behavior, dependencies, validation, status, evidence, target paths, permitted decision, and path selector for every table entry. A selector matches a record only when its `category` is equal and its path has a listed prefix; `exclude_prefixes` then removes a match. Paths are evaluated against all entries, so a gap or overlap fails validation.
 
-## Coverage manifest
-
-The following selectors intentionally use the inventory’s mutually exclusive `category` field. They are review-row identifiers, not directory globs: a renamed path is accounted for by its generated destination `path`, exactly as it appears in the inventory.
-
-```json
+<!-- feature-manifest
 {
-  "maps-and-events": "Map and event behavior",
-  "ui-and-quality-of-life": "Start-menu, bag, and QoL interface",
-  "game-content": "Custom content: species, items, moves, trainers, encounters, graphics, and cries",
-  "gameplay-and-battle": "Battle, gameplay, and Battle Frontier tuning",
-  "tooling-and-generated-output": "Historical tooling, generated output, and imported upstream material"
+  "features": [
+    {
+      "id": "upstream-map-event-source",
+      "legacy_paths": [{"category": "maps-and-events", "prefixes": ["data/maps/", "data/layouts/"], "exclude_prefixes": ["data/layouts/Littleroot_Extension/", "data/layouts/Verdanturf_Extension/"]}],
+      "target_paths": ["data/maps/**", "data/layouts/**", "tools/poryscript/**"],
+      "decision": "Use upstream equivalent", "phase": 2, "status": "planned",
+      "behavior": "Keep the current map source pipeline and vanilla map behavior.",
+      "dependencies": ["current JSON/Poryscript generators"],
+      "validation": ["regenerate map scripts", "supported build", "affected-map smoke test"],
+      "evidence": ["git diff --name-status master...archive/master-pre-1.16.3"]
+    },
+    {
+      "id": "custom-map-extensions",
+      "legacy_paths": [{"category": "maps-and-events", "prefixes": ["data/layouts/Littleroot_Extension/", "data/layouts/Verdanturf_Extension/"]}],
+      "target_paths": ["data/layouts/Littleroot_Extension/**", "data/layouts/Verdanturf_Extension/**", "data/maps/**"],
+      "decision": "Modern adaptation", "phase": 2, "status": "planned",
+      "behavior": "Preserve the two named custom extension maps, their connections, and their events.",
+      "dependencies": ["upstream map source pipeline"],
+      "validation": ["clean-save entry and exit", "warp/event checks", "supported build"],
+      "evidence": ["inventory paths data/layouts/Littleroot_Extension/*", "inventory paths data/layouts/Verdanturf_Extension/*"]
+    },
+    {
+      "id": "fullscreen-start-menu",
+      "legacy_paths": [{"category": "ui-and-quality-of-life", "prefixes": ["graphics/ui_startmenu_full/", "src/ui_startmenu_full.c", "src/start_menu.c", "include/ui_startmenu_full.h", "include/start_menu.h"]}],
+      "target_paths": ["src/start_menu.c", "graphics/ui_startmenu_full/**", "include/start_menu.h"],
+      "decision": "Modern adaptation", "phase": 3, "status": "planned",
+      "behavior": "Preserve the archived full-screen menu presentation and its gender/clock variants.",
+      "dependencies": ["current start-menu and option-menu APIs"],
+      "validation": ["all start-menu actions", "gender/clock variants", "supported build"],
+      "evidence": ["git show --stat 1b4f48d986"]
+    },
+    {
+      "id": "better-bag-and-qol-ui",
+      "legacy_paths": [{"category": "ui-and-quality-of-life", "prefixes": [""], "exclude_prefixes": ["graphics/ui_startmenu_full/", "src/ui_startmenu_full.c", "src/start_menu.c", "include/ui_startmenu_full.h", "include/start_menu.h"]}],
+      "target_paths": ["src/item_menu.c", "src/option_menu.c", "include/config/item.h", "graphics/interface/**"],
+      "decision": "Modern adaptation", "phase": 3, "status": "planned",
+      "behavior": "Preserve the archived bag-pocket and related UI behavior without reintroducing its old menu implementation.",
+      "dependencies": ["current item configuration", "current menu framework"],
+      "validation": ["open every pocket", "select/use items", "option-menu smoke test"],
+      "evidence": ["git show --stat 3480da2c61", "git show --stat f5f24a808a", "git show --stat ef69dde01e"]
+    },
+    {
+      "id": "legacy-content-corpus",
+      "legacy_paths": [{"category": "game-content", "prefixes": [""]}],
+      "target_paths": ["src/data/**", "graphics/**", "sound/**", "data/trainers/**", "data/wild/**"],
+      "decision": "Use upstream equivalent", "phase": 2, "status": "planned",
+      "behavior": "Retain only archived content deltas that 1.16.3 does not already provide.",
+      "dependencies": ["current species/item/move/trainer/encounter data generators"],
+      "validation": ["source-table comparison", "asset linkage", "item/encounter/trainer smoke tests"],
+      "evidence": ["git show --stat 624403ccab", "inventory game-content paths"]
+    },
+    {
+      "id": "frontier-roster-tuning",
+      "legacy_paths": [{"category": "gameplay-and-battle", "prefixes": ["src/data/battle_frontier/battle_frontier_mons.h", "src/battle_tower.c", "include/constants/battle_frontier.h"]}],
+      "target_paths": ["src/data/battle_frontier/**", "src/battle_tower.c", "include/constants/battle_frontier.h"],
+      "decision": "Modern adaptation", "phase": 4, "status": "planned",
+      "behavior": "Preserve the archived Battle Frontier roster/rule tuning.",
+      "dependencies": ["current Battle Frontier engine"],
+      "validation": ["representative facility streak", "targeted Frontier tests", "supported build"],
+      "evidence": ["git show --stat f5e81e85df"]
+    },
+    {
+      "id": "upstream-gameplay-and-battle",
+      "legacy_paths": [{"category": "gameplay-and-battle", "prefixes": [""], "exclude_prefixes": ["src/data/battle_frontier/battle_frontier_mons.h", "src/battle_tower.c", "include/constants/battle_frontier.h"]}],
+      "target_paths": ["include/config/**", "src/battle_*.c", "test/battle/**", "current battle scripts/macros"],
+      "decision": "Use upstream equivalent", "phase": 4, "status": "planned",
+      "behavior": "Keep the current battle engine and configure only missing archived EXP All or mint behavior.",
+      "dependencies": ["current battle engine", "current test suite"],
+      "validation": ["targeted battle tests", "EXP All manual check", "mint manual check"],
+      "evidence": ["git show --stat 476030333c", "git show --stat 624403ccab"]
+    },
+    {
+      "id": "historical-tooling-and-generated-material",
+      "legacy_paths": [{"category": "tooling-and-generated-output", "prefixes": [""]}],
+      "target_paths": ["Makefile", "tools/**", "docs/**", "current generators"],
+      "decision": "Use upstream equivalent", "phase": 5, "status": "planned",
+      "behavior": "Keep maintained 1.16.3 tooling and generated outputs.",
+      "dependencies": ["current build and generator toolchain"],
+      "validation": ["supported build", "regenerate applicable outputs"],
+      "evidence": ["inventory tooling-and-generated-output paths"]
+    }
+  ]
 }
-```
+-->
 
-Coverage check (run from the repository root):
+## Coverage check
+
+Run from the repository root. This reads the manifest from its explicit comment markers (not a newline-sensitive regular expression), checks each inventory path against every selector, validates the allowed decision vocabulary and all required feature fields, and prints the feature allocation.
 
 ```powershell
 @'
-import json, re
+import json
 from collections import Counter
+
 inventory = json.load(open('docs/superpowers/inventories/2026-08-09-legacy-feature-inventory.json', encoding='utf-8'))
 review = open('docs/superpowers/inventories/2026-08-09-legacy-feature-review.md', encoding='utf-8').read()
-manifest = json.loads(re.search(r'```json\\n(.*?)\\n```', review, re.S).group(1))
-counts = Counter(change['category'] for change in inventory['changes'])
-assert set(manifest) == set(counts), (set(manifest), set(counts))
-assert sum(counts.values()) == len(inventory['changes']) == 2124
-matches = [sum(change['category'] == selector for selector in manifest) for change in inventory['changes']]
-assert Counter(matches) == {1: len(inventory['changes'])}, Counter(matches)
-assert dict(sorted(counts.items())) == inventory['summary']
-print('coverage:', len(inventory['changes']), 'paths; selectors:', len(manifest), '; category counts:', dict(sorted(counts.items())))
+marker = '<!-- feature-manifest\n'
+payload = review.split(marker, 1)[1].split('\n-->', 1)[0]
+manifest = json.loads(payload)
+features = manifest['features']
+allowed = {'Direct transfer', 'Use upstream equivalent', 'Modern adaptation', 'Custom replacement'}
+required = {'id', 'legacy_paths', 'target_paths', 'decision', 'phase', 'status', 'behavior', 'dependencies', 'validation', 'evidence'}
+assert all(required <= feature.keys() and feature['decision'] in allowed for feature in features)
+assert len({feature['id'] for feature in features}) == len(features)
+
+def matches(change, selector):
+    path = change['path']
+    return (change['category'] == selector['category']
+            and any(path.startswith(prefix) for prefix in selector['prefixes'])
+            and not any(path.startswith(prefix) for prefix in selector.get('exclude_prefixes', [])))
+
+allocations = []
+for change in inventory['changes']:
+    matched = [feature['id'] for feature in features
+               if any(matches(change, selector) for selector in feature['legacy_paths'])]
+    assert len(matched) == 1, (change['path'], matched)
+    allocations.append(matched[0])
+assert len(allocations) == len(inventory['changes']) == 2124
+print('coverage:', len(allocations), 'paths; feature counts:', dict(sorted(Counter(allocations).items())))
 '@ | python -
 ```
 
-The `Counter` is over every generated record; categories are a single required field in the generator, the manifest has one key for each category, and the set equality plus total makes a missing or duplicate review selector fail. The count assertion pins this review to the 2,124-path inventory produced from the stated refs; regenerate and re-review if the inventory changes.
+Regenerate the path inventory and repeat this check whenever either compared ref changes. A selector overlap or an unassigned path is a review failure, not a request to copy legacy code.
