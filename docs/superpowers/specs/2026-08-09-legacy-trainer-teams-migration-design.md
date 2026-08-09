@@ -14,7 +14,8 @@ Trainers present only in 1.16.3 remain unchanged. Legacy-only trainers are repor
 
 In scope:
 
-- A reporting/conversion tool that reads archived `src/data/trainer_parties.h`, `src/data/trainers.h`, and `include/constants/opponents.h` directly from Git.
+- Reuse the upstream `migration_scripts/1.9/convert_trainer_parties.py` conversion tool against archived `src/data/trainer_parties.h` and `src/data/trainers.h` materialized into a temporary directory.
+- A small reporting/merge tool that reads the converter output and current `src/data/trainers.party` by symbolic identifier.
 - Parsing current `src/data/trainers.party` into trainer blocks keyed by `TRAINER_*` identifier.
 - Producing a deterministic candidate current-format file plus a machine-readable report of converted, current-only, legacy-only, and unsupported records.
 - Replacing matching current trainer blocks only after the report is reviewed.
@@ -28,7 +29,7 @@ Out of scope:
 
 ## Architecture
 
-The converter is a one-off Python standard-library command under `tools/migration/`. It resolves legacy files with `git show archive/master-pre-1.16.3:<path>`, parses trainer defines and static party arrays, and maps data by symbolic `TRAINER_*` name rather than numeric ID. It parses current trainer blocks from `src/data/trainers.party`, converts each matching legacy record to supported competitive syntax, and writes candidate output only to an explicitly named path. It never overwrites `src/data/trainers.party` by default.
+The established upstream `migration_scripts/1.9/convert_trainer_parties.py` performs the old C trainer-structure to competitive `.party` conversion. A one-off Python standard-library command under `tools/migration/` resolves the two archived source files with `git show archive/master-pre-1.16.3:<path>`, writes them only to a temporary directory, invokes that converter, then parses its output and current `src/data/trainers.party`. It maps records by symbolic `TRAINER_*` name rather than numeric ID and writes candidate output only to an explicitly named path. It never overwrites `src/data/trainers.party` by default.
 
 The report includes exact counts and identifiers for: converted matching trainers, current-only trainers retained unchanged, legacy-only trainers needing separate treatment, and every unsupported field/value. Conversion fails rather than emitting a partial trainer block when an archived value cannot be represented in current syntax.
 
@@ -51,6 +52,7 @@ After report review, a separate explicit apply mode replaces only converted matc
 
 ## Evidence
 
+- Upstream converter: `migration_scripts/1.9/convert_trainer_parties.py`.
 - Legacy data: `archive/master-pre-1.16.3:src/data/trainer_parties.h`, `archive/master-pre-1.16.3:src/data/trainers.h`, and `archive/master-pre-1.16.3:include/constants/opponents.h`.
 - Current authoring source: `src/data/trainers.party`; derived output: `src/data/trainers.h`.
 - Baseline counts observed on 2026-08-09: 859 legacy party arrays and 855 current trainer blocks.
