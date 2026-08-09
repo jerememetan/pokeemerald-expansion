@@ -9,6 +9,7 @@ This is the exhaustive feature disposition for [the generated path inventory](20
 | Upstream map and event source conversion | [`upstream-map-event-source`](#feature-manifest) — all `maps-and-events` paths except the explicit custom map features below | Current `data/maps/**`, `data/layouts/**`, JSON/Poryscript generation | Use upstream equivalent | 2 | The paths include generated `.inc` files and broad map-source format drift. Keep current source formats; regenerate derived scripts, build, and smoke-test affected vanilla maps. |
 | Littleroot and Verdanturf extensions | [`custom-map-extensions`](#feature-manifest) — all ten `data/{maps,layouts}/{Littleroot,Verdanturf}_Extension/**` paths | Current layout JSON, map headers, events, and warps | Modern adaptation | 2 | The inventory adds five source/layout paths for each extension. Recreate geometry, connections, events, and warps in current formats; enter and leave both maps from a clean save. |
 | Petalburg Woodgrove early-game and rebattle map edits | [`petalburg-woodgrove-map-edits`](#feature-manifest) — four `data/{maps,layouts}/PetalburgWoodgrove/**` paths | Current Petalburg Woodgrove JSON/layout/event sources | Modern adaptation | 2 | `0080ad90f7` adds the map/layout/scripts as part of map reworks and mandatory trainers; `43acf35679` changes its tiles; `8ae5c75c40` updates a gym-rebattle placement. Recreate those authored map/event deltas and verify the early-game route plus the rebattle trigger. |
+| V2.2.2 map reworks, Red encounter, and Game Corner shop | [`v2-2-2-map-events`](#feature-manifest) — the Route 123/124, Game Corner, Glass Workshop, route/gauntlet, and event paths changed by `0080ad90f7` | Current map JSON/Poryscript, layout, event, mart, item-ball, and player-house sources | Modern adaptation | 2 | `0080ad90f7` documents Route 123 Red, Game Corner Mega Stones, map gauntlets, item placements, Glass Workshop prices, and Mom’s Mega Stones. Port those authored values/events to current formats; verify each map/event/shop path in-game. |
 | Full-screen start menu | [`fullscreen-start-menu`](#feature-manifest) — full-screen graphics, implementation, and dedicated headers | Current `src/start_menu.c`, `src/ui_startmenu_full.c`, `include/start_menu.h`, `include/ui_startmenu_full.h`, UI assets | Modern adaptation | 3 | `git show --stat 1b4f48d986` adds the fullscreen assets, implementation, and `include/ui_startmenu_full.h`; the manifest explicitly assigns both headers and the implementation here. Verify every visible action and the archived gender/clock variants on the current menu APIs. |
 | Better Bag and remaining QoL UI | [`better-bag-and-qol-ui`](#feature-manifest) — remaining UI-category paths | Current `src/item_menu.c`, `src/option_menu.c`, item configuration and UI assets | Modern adaptation | 3 | BetterBag history (`3480da2c61`, `f5f24a808a`, `ef69dde01e`) identifies pocket and interface behavior. Verify all pockets, item selection/use, and options; retain current menu internals. |
 | Current-only content additions | [`current-only-content-additions`](#feature-manifest) — 66 `game-content` deletion records (present in 1.16.3, absent from legacy) | Same current `src/data/**`, `graphics/**`, and `.wav` cry sources | Use upstream equivalent | 2 | Inventory status `D` proves the legacy ref lacks these current paths, including newer items/species assets and source tables. Retain the 1.16.3 assets/tables; verify the supported build and representative asset linkage. |
@@ -16,6 +17,7 @@ This is the exhaustive feature disposition for [the generated path inventory](20
 | Pokémon graphics and cry-pipeline updates | [`upstream-pokemon-assets-and-cries`](#feature-manifest) — 34 modified Pokémon graphic/palette and cry-table records | Current PNG/palette asset pipeline and current cry tables/data | Use upstream equivalent | 2 | Direct diffs show the eight Pokémon asset quartets are presentation-format changes and the two cry files are current table/data-pipeline changes; retain current output/assets rather than copying legacy binaries. |
 | Custom item and Pokémon-data tuning | [`custom-item-and-pokemon-data`](#feature-manifest) — eight modified item/experience/form/effect/dex/learnset tables | Current `src/data/items.h` and Pokémon data generators/tables | Modern adaptation | 2 | Direct table diffs show archived item prices/content, experience/form/effect, dex, species, and teachable-learnset deltas. Preserve those intended values through current source tables/generators, without restoring obsolete table layouts. |
 | Battle Frontier roster tuning | [`frontier-roster-tuning`](#feature-manifest) — the archived Frontier roster table and its direct constants/engine callers | Current `src/data/battle_frontier/**`, current Frontier configuration | Modern adaptation | 4 | `git show --stat f5e81e85df` changes `battle_frontier_mons.h`, `battle_tower.c`, and the Frontier constant. Re-express only its roster/rule deltas against 1.16.3 and verify a representative facility streak. |
+| Custom mandatory-trainer teams | [`custom-trainer-teams`](#feature-manifest) — `src/data/trainer_parties.h` and `src/data/trainers.h` | Current trainer party/trainer source tables | Modern adaptation | 2 | `0080ad90f7` explicitly records mandatory-trainer and trainer-party updates. Port the authored parties/flags to current tables; verify mandatory encounters and representative trainer battles. |
 | Legacy battle engine, config, and tests | [`upstream-gameplay-and-battle`](#feature-manifest) — all remaining `gameplay-and-battle` paths | Current battle engine, config headers, scripts, macros, and `test/battle/**` | Use upstream equivalent | 4 | `476030333c` documents EXP All and `624403ccab` documents mint behavior; 1.16.3 supplies both systems. Configure current behavior if the archived setting differs; run targeted battle tests and EXP/mint manual checks without restoring obsolete engine code. |
 | Historical tooling and generated material | [`historical-tooling-and-generated-material`](#feature-manifest) — every `tooling-and-generated-output` path | Current `Makefile`, tools, docs, generators, CI, and generated outputs | Use upstream equivalent | 5 | These paths are outside all feature-source classifiers and include old build/docs/generated artifacts. Build with the supported current command and regenerate outputs; do not import archived infrastructure. |
 
@@ -28,7 +30,7 @@ The machine-readable manifest supplies the behavior, dependencies, validation, s
   "features": [
     {
       "id": "upstream-map-event-source",
-      "legacy_paths": [{"category": "maps-and-events", "prefixes": ["data/maps/", "data/layouts/"], "exclude_prefixes": ["data/layouts/Littleroot_Extension/", "data/maps/Littleroot_Extension/", "data/layouts/Verdanturf_Extension/", "data/maps/Verdanturf_Extension/", "data/layouts/PetalburgWoodgrove/", "data/maps/PetalburgWoodgrove/"]}],
+      "legacy_paths": [{"category": "maps-and-events", "prefixes": ["data/maps/", "data/layouts/"], "exclude_prefixes": ["data/layouts/Littleroot_Extension/", "data/maps/Littleroot_Extension/", "data/layouts/Verdanturf_Extension/", "data/maps/Verdanturf_Extension/", "data/layouts/PetalburgWoodgrove/", "data/maps/PetalburgWoodgrove/", "data/maps/Route123/", "data/maps/Route124/", "data/maps/MauvilleCity_GameCorner/", "data/maps/Route113_GlassWorkshop/", "data/maps/Route122/", "data/maps/Route125/", "data/maps/Route126/", "data/maps/Route127/", "data/maps/Route128/", "data/maps/Route129/", "data/maps/Route130/", "data/maps/Route131/", "data/maps/VictoryRoad_", "data/layouts/Route123/", "data/layouts/Route124/", "data/layouts/Route125/", "data/layouts/Route126/", "data/layouts/Route127/", "data/layouts/Route128/", "data/layouts/Route130/", "data/layouts/Route131/", "data/layouts/VictoryRoad_"]}],
       "target_paths": ["data/maps/**", "data/layouts/**", "tools/poryscript/**"],
       "decision": "Use upstream equivalent", "phase": 2, "status": "planned",
       "behavior": "Keep the current map source pipeline and vanilla map behavior.",
@@ -55,6 +57,16 @@ The machine-readable manifest supplies the behavior, dependencies, validation, s
       "dependencies": ["upstream map source pipeline", "trainer-rebattle data"],
       "validation": ["early-game traversal", "mandatory-trainer checks", "gym-rebattle trigger", "supported build"],
       "evidence": ["git show --stat 0080ad90f7", "git show --stat 43acf35679", "git show --stat 8ae5c75c40"]
+    },
+    {
+      "id": "v2-2-2-map-events",
+      "legacy_paths": [{"category": "maps-and-events", "prefixes": ["data/maps/Route123/", "data/maps/Route124/", "data/maps/MauvilleCity_GameCorner/", "data/maps/Route113_GlassWorkshop/", "data/maps/Route122/", "data/maps/Route125/", "data/maps/Route126/", "data/maps/Route127/", "data/maps/Route128/", "data/maps/Route129/", "data/maps/Route130/", "data/maps/Route131/", "data/maps/VictoryRoad_", "data/layouts/Route123/", "data/layouts/Route124/", "data/layouts/Route125/", "data/layouts/Route126/", "data/layouts/Route127/", "data/layouts/Route128/", "data/layouts/Route130/", "data/layouts/Route131/", "data/layouts/VictoryRoad_"]}],
+      "target_paths": ["data/maps/Route123/**", "data/maps/Route124/**", "data/maps/MauvilleCity_GameCorner/**", "data/maps/Route113_GlassWorkshop/**", "current map/event/mart sources"],
+      "decision": "Modern adaptation", "phase": 2, "status": "planned",
+      "behavior": "Preserve V2.2.2 authored map gauntlets, the Route 123 Red event, Game Corner Mega Stone shop, item placements, and related progression events.",
+      "dependencies": ["current map JSON/Poryscript pipeline", "item and trainer data"],
+      "validation": ["Route 123 Red event", "Route 124 traversal", "Game Corner inventory", "Glass Workshop prices", "Victory Road and route event checks"],
+      "evidence": ["git show --name-status 0080ad90f7", "commit message documents Route 123, Game Corner, map reworks, prices, and Mega Stone events"]
     },
     {
       "id": "fullscreen-start-menu",
@@ -120,17 +132,27 @@ The machine-readable manifest supplies the behavior, dependencies, validation, s
     },
     {
       "id": "frontier-roster-tuning",
-      "legacy_paths": [{"category": "gameplay-and-battle", "prefixes": ["src/data/battle_frontier/battle_frontier_mons.h", "src/battle_tower.c", "include/constants/battle_frontier.h"]}],
-      "target_paths": ["src/data/battle_frontier/**", "src/battle_tower.c", "include/constants/battle_frontier.h"],
+      "legacy_paths": [{"category": "gameplay-and-battle", "prefixes": ["src/data/battle_frontier/battle_frontier_mons.h", "src/data/battle_frontier/battle_frontier_trainer_mons.h", "src/battle_tower.c", "include/constants/battle_frontier.h"]}],
+      "target_paths": ["src/data/battle_frontier/battle_frontier_mons.h", "src/data/battle_frontier/battle_frontier_trainer_mons.h", "src/battle_tower.c", "include/constants/battle_frontier.h"],
       "decision": "Modern adaptation", "phase": 4, "status": "planned",
       "behavior": "Preserve the archived Battle Frontier roster/rule tuning.",
       "dependencies": ["current Battle Frontier engine"],
       "validation": ["representative facility streak", "targeted Frontier tests", "supported build"],
-      "evidence": ["git show --stat f5e81e85df"]
+      "evidence": ["git show --stat f5e81e85df", "git show --name-status 0080ad90f7 -- src/data/battle_frontier/battle_frontier_trainer_mons.h"]
+    },
+    {
+      "id": "custom-trainer-teams",
+      "legacy_paths": [{"category": "tooling-and-generated-output", "prefixes": ["src/data/trainer_parties.h", "src/data/trainers.h"]}],
+      "target_paths": ["src/data/trainer_parties.h", "src/data/trainers.h"],
+      "decision": "Modern adaptation", "phase": 2, "status": "planned",
+      "behavior": "Preserve documented mandatory-trainer and trainer-party changes.",
+      "dependencies": ["current trainer source tables", "map/event progression"],
+      "validation": ["mandatory trainer encounter checks", "representative team battles", "supported build"],
+      "evidence": ["git show --name-status 0080ad90f7 -- src/data/trainer_parties.h src/data/trainers.h"]
     },
     {
       "id": "upstream-gameplay-and-battle",
-      "legacy_paths": [{"category": "gameplay-and-battle", "prefixes": [""], "exclude_prefixes": ["src/data/battle_frontier/battle_frontier_mons.h", "src/battle_tower.c", "include/constants/battle_frontier.h", "src/ui_startmenu_full.c", "include/start_menu.h", "include/ui_startmenu_full.h"]}],
+      "legacy_paths": [{"category": "gameplay-and-battle", "prefixes": [""], "exclude_prefixes": ["src/data/battle_frontier/battle_frontier_mons.h", "src/data/battle_frontier/battle_frontier_trainer_mons.h", "src/battle_tower.c", "include/constants/battle_frontier.h", "src/ui_startmenu_full.c", "include/start_menu.h", "include/ui_startmenu_full.h"]}],
       "target_paths": ["include/config/**", "src/battle_*.c", "test/battle/**", "current battle scripts/macros"],
       "decision": "Use upstream equivalent", "phase": 4, "status": "planned",
       "behavior": "Keep the current battle engine and configure only missing archived EXP All or mint behavior.",
@@ -140,7 +162,7 @@ The machine-readable manifest supplies the behavior, dependencies, validation, s
     },
     {
       "id": "historical-tooling-and-generated-material",
-      "legacy_paths": [{"category": "tooling-and-generated-output", "prefixes": [""]}],
+      "legacy_paths": [{"category": "tooling-and-generated-output", "prefixes": [""], "exclude_prefixes": ["src/data/trainer_parties.h", "src/data/trainers.h"]}],
       "target_paths": ["Makefile", "tools/**", "docs/**", "current generators"],
       "decision": "Use upstream equivalent", "phase": 5, "status": "planned",
       "behavior": "Keep maintained 1.16.3 tooling and generated outputs.",
