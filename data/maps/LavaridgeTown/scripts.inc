@@ -242,9 +242,39 @@ LavaridgeTown_EventScript_EggWoman::
 	playfanfare MUS_OBTAIN_ITEM
 	message LavaridgeTown_Text_ReceivedTheEgg
 	waitfanfare
-	giveegg SPECIES_WYNAUT
+	call LavaridgeTown_EventScript_GiveRandomEgg
 	release
 	end
+
+LavaridgeTown_EventScript_GiveRandomEgg::
+	random 5
+	switch VAR_RESULT
+	case 0, LavaridgeTown_EventScript_GiveEggWynaut
+	case 1, LavaridgeTown_EventScript_GiveEggTogepi
+	case 2, LavaridgeTown_EventScript_GiveEggChimchar
+	case 3, LavaridgeTown_EventScript_GiveEggPiplup
+	case 4, LavaridgeTown_EventScript_GiveEggTurtwig
+	return
+
+LavaridgeTown_EventScript_GiveEggWynaut::
+	giveegg SPECIES_WYNAUT
+	return
+
+LavaridgeTown_EventScript_GiveEggTogepi::
+	giveegg SPECIES_TOGEPI
+	return
+
+LavaridgeTown_EventScript_GiveEggChimchar::
+	giveegg SPECIES_CHIMCHAR
+	return
+
+LavaridgeTown_EventScript_GiveEggPiplup::
+	giveegg SPECIES_PIPLUP
+	return
+
+LavaridgeTown_EventScript_GiveEggTurtwig::
+	giveegg SPECIES_TURTWIG
+	return
 
 LavaridgeTown_EventScript_ReceivedEgg::
 	msgbox LavaridgeTown_Text_EverySoOftenEggFoundAtDayCare, MSGBOX_DEFAULT
@@ -403,4 +433,3 @@ LavaridgeTown_Text_GymSign:
 LavaridgeTown_Text_HerbShopSign:
 	.string "POKéMON HERB SHOP\n"
 	.string "“Bitter taste--better cure!”$"
-
