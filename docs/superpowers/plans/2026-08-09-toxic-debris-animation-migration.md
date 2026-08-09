@@ -23,13 +23,13 @@
 
 - Modify: `data/battle_scripts_1.s`
 
-- [ ] **Step 1: Inspect the current control flow**
+- [x] **Step 1: Inspect the current control flow**
 
 Run `rg -n -C 7 'BattleScript_ToxicDebrisActivates|BattleScript_ToxicDebrisRet' data/battle_scripts_1.s`.
 
 Expected: `settoxicspikes BattleScript_ToxicDebrisRet` precedes the scattered-hazards message, and the return label restores targets.
 
-- [ ] **Step 2: Add the archived visual sequence on the success path**
+- [x] **Step 2: Add the archived visual sequence on the success path**
 
 Immediately after `settoxicspikes BattleScript_ToxicDebrisRet`, add:
 
@@ -43,7 +43,7 @@ Immediately after `settoxicspikes BattleScript_ToxicDebrisRet`, add:
 
 Leave the existing message, wait, and `BattleScript_ToxicDebrisRet` target restoration unchanged.
 
-- [ ] **Step 3: Check script ordering**
+- [x] **Step 3: Check script ordering**
 
 Run `rg -n -C 10 'BattleScript_ToxicDebrisActivates|settoxicspikes|copyhword gChosenMove|sethword gCurrentMove, MOVE_TOXIC_SPIKES|attackanimation|waitanimation|BattleScript_ToxicDebrisRet' data/battle_scripts_1.s`.
 
@@ -62,7 +62,7 @@ Expected: exit code 0 with no battle-script assembly errors.
 
 Expected: only the successful placement path animates, with no mechanical or state regression.
 
-- [ ] **Step 6: Commit the isolated change**
+- [x] **Step 6: Commit the isolated change**
 
 Run `git add data/battle_scripts_1.s docs/superpowers/plans/2026-08-09-toxic-debris-animation-migration.md` followed by `git commit -m "feat: animate toxic debris hazards"`.
 
