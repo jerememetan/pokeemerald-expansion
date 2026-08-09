@@ -139,6 +139,7 @@ def main() -> int:
     parser.add_argument("--candidate", required=True, type=Path)
     parser.add_argument("--report", required=True, type=Path)
     parser.add_argument("--apply", action="store_true")
+    parser.add_argument("--append-legacy-only", action="store_true")
     args = parser.parse_args()
 
     candidate = args.candidate.resolve()
@@ -160,8 +161,12 @@ def main() -> int:
     if len(converted_ids) != len(set(converted_ids)):
         raise ValueError("matching trainer identifiers are not unique")
 
+    candidate_order = current_order + (legacy_only_ids if args.append_legacy_only else [])
     candidate_text = current_header
-    candidate_text += "\n\n".join(legacy_blocks.get(identifier, current_blocks[identifier]).rstrip() for identifier in current_order)
+    candidate_text += "\n\n".join(
+        legacy_blocks.get(identifier, current_blocks.get(identifier, "")).rstrip()
+        for identifier in candidate_order
+    )
     candidate_text = "\n".join(line.rstrip() for line in candidate_text.splitlines()) + "\n"
     candidate.parent.mkdir(parents=True, exist_ok=True)
     candidate.write_bytes(candidate_text.encode("utf-8"))
@@ -178,6 +183,7 @@ def main() -> int:
         "converted_ids": converted_ids,
         "current_only_ids": current_only_ids,
         "legacy_only_ids": legacy_only_ids,
+        "appended_legacy_only_ids": legacy_only_ids if args.append_legacy_only else [],
         "input_normalizations": normalizations,
         "current_syntax_renames": syntax_renames,
         "converter_diagnostics": converter_output.splitlines(),

@@ -20699,3 +20699,277 @@ Double Battle: No
 Kyogre
 Level: 5
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+
+=== TRAINER_STEVEN_GRANITE_CAVE ===
+Name: STEVEN
+Class: Rival
+Pic: Steven
+Gender: Male
+Music: Male
+Double Battle: No
+AI: Check Bad Move / Try To Faint / Check Viability / Smart Switching / Smart Mon Choices
+
+Aron @ Focus Sash
+Level: 16
+IVs: 11 HP / 11 Atk / 11 Def / 11 SpA / 11 SpD / 11 Spe
+- Stealth Rock
+- Dig
+- Rock Throw
+- Metal Claw
+
+Anorith
+Level: 16
+IVs: 11 HP / 11 Atk / 11 Def / 11 SpA / 11 SpD / 11 Spe
+- Fury Cutter
+- Rock Throw
+- Metal Claw
+- Aqua Jet
+
+Lileep
+Level: 16
+IVs: 11 HP / 11 Atk / 11 Def / 11 SpA / 11 SpD / 11 Spe
+- Mega Drain
+- Acid
+- Ingrain
+- Leech Seed
+
+Metang @ Leftovers
+Level: 18
+IVs: 11 HP / 11 Atk / 11 Def / 11 SpA / 11 SpD / 11 Spe
+- Iron Head
+- Confusion
+- Take Down
+- Iron Defense
+
+Gible @ Berry Juice
+Level: 16
+IVs: 11 HP / 11 Atk / 11 Def / 11 SpA / 11 SpD / 11 Spe
+- Bulldoze
+- Bite
+- Rock Slide
+- Dragon Dance
+
+=== TRAINER_RED_ALTERING_CAVE ===
+Name: RED
+Class: Rival
+Pic: Red
+Gender: Male
+Music: Male
+Double Battle: No
+AI: Check Bad Move / Try To Faint / Check Viability / Smart Switching / Smart Mon Choices
+
+Pikachu Hoenn @ Light Ball
+Level: 22
+IVs: 21 HP / 21 Atk / 21 Def / 21 SpA / 21 SpD / 21 Spe
+- Volt Tackle
+- Iron Tail
+- Extreme Speed
+- Volt Switch
+
+Snorlax
+Level: 21
+IVs: 21 HP / 21 Atk / 21 Def / 21 SpA / 21 SpD / 21 Spe
+- Body Slam
+- Crunch
+- Rest
+- Defense Curl
+
+Charmeleon @ Charcoal
+Level: 21
+IVs: 21 HP / 21 Atk / 21 Def / 21 SpA / 21 SpD / 21 Spe
+- Flame Charge
+- Dragon Breath
+- Metal Claw
+- Incinerate
+
+Frogadier @ Mystic Water
+Level: 21
+IVs: 21 HP / 21 Atk / 21 Def / 21 SpA / 21 SpD / 21 Spe
+- Water Pulse
+- U Turn
+- Mud Shot
+- Grass Knot
+
+Grotle @ Eviolite
+Level: 21
+IVs: 21 HP / 21 Atk / 21 Def / 21 SpA / 21 SpD / 21 Spe
+- Substitute
+- Shell Smash
+- Earth Power
+- Mega Drain
+
+=== TRAINER_MOM ===
+Name: MOM
+Class: Lady
+Pic: Pokemon Breeder F
+Gender: Female
+Music: Female
+Double Battle: No
+AI: Check Bad Move / Try To Faint / Check Viability / Smart Switching / Smart Mon Choices
+
+Pikachu @ Light Ball
+Level: 38
+Ability: Lightning Rod
+IVs: 30 HP / 30 Atk / 30 Def / 30 SpA / 30 SpD / 30 Spe
+Shiny: Yes
+- Surf
+- Iron Tail
+- Volt Switch
+- Extremespeed
+
+Kangaskhan @ Lum Berry
+Level: 39
+Ability: Scrappy
+IVs: 30 HP / 30 Atk / 30 Def / 30 SpA / 30 SpD / 30 Spe
+- Fake Out
+- Power Up Punch
+- Dizzy Punch
+- Crunch
+
+Blaziken
+Level: 39
+Ability: Speed Boost
+IVs: 30 HP / 30 Atk / 30 Def / 30 SpA / 30 SpD / 30 Spe
+- Flare Blitz
+- Hi Jump Kick
+- Earthquake
+- Swords Dance
+
+Swampert
+Level: 39
+IVs: 30 HP / 30 Atk / 30 Def / 30 SpA / 30 SpD / 30 Spe
+- Surf
+- Mud Bomb
+- Toxic
+- Ice Punch
+
+Sceptile @ Flying Gem
+Level: 40
+Ability: Unburden
+IVs: 30 HP / 30 Atk / 30 Def / 30 SpA / 30 SpD / 30 Spe
+- Swords Dance
+- Acrobatics
+- Leaf Blade
+- Dual Chop
+
+Florges
+Level: 41
+IVs: 30 HP / 30 Atk / 30 Def / 30 SpA / 30 SpD / 30 Spe
+- Calm Mind
+- Giga Drain
+- Draining Kiss
+- Synthesis
+
+=== TRAINER_LEAF_2 ===
+Name: LEAF
+Class: Rival
+Pic: Leaf
+Gender: Female
+Music: Male
+Double Battle: No
+AI: Check Bad Move / Try To Faint / Check Viability / Smart Switching / Smart Mon Choices
+
+Mr Rime
+Level: 39
+IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+- Freeze Dry
+- Psybeam
+- Charge Beam
+- Hypnosis
+
+Venusaur @ Venusaurite
+Level: 40
+Ability: Overgrow
+IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+- Giga Drain
+- Leech Seed
+- Sludge Bomb
+- Sleep Powder
+
+Arcanine-Hisui
+Level: 42
+Ability: Rock Head
+IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+- Head Smash
+- Flare Blitz
+- Extremespeed
+- Will O Wisp
+
+Gyarados
+Level: 41
+Ability: Intimidate
+IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+- Crunch
+- Dragon Dance
+- Ice Fang
+- Thrash
+
+Klawf
+Level: 42
+IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+- Crabhammer
+- Rock Tomb
+- Knock Off
+- Dig
+
+=== TRAINER_MT_PYRE_ARCHIE ===
+Name: ARCHIE
+Class: Aqua Leader
+Pic: Aqua Leader Archie
+Gender: Male
+Music: Aqua
+Double Battle: Yes
+AI: Check Bad Move / Try To Faint / Check Viability / Smart Switching / Smart Mon Choices
+
+Crobat @ Black Sludge
+Level: 52
+Ability: Infiltrator
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+- Brave Bird
+- Cross Poison
+- U Turn
+- Tailwind
+
+Qwilfish @ Bright Powder
+Level: 52
+Ability: Intimidate
+IVs: 15 HP / 15 Atk / 15 Def / 15 SpA / 15 SpD / 15 Spe
+- Barb Barrage
+- Aqua Jet
+- Toxic Spikes
+- Dive
+
+Inteleon @ Scope Lens
+Level: 52
+Ability: Sniper
+IVs: 15 HP / 15 Atk / 15 Def / 15 SpA / 15 SpD / 15 Spe
+- Snipe Shot
+- Focus Energy
+- Vacuum Wave
+- Rain Dance
+
+Thievul @ Misty Seed
+Level: 53
+Ability: Unburden
+IVs: 15 HP / 15 Atk / 15 Def / 15 SpA / 15 SpD / 15 Spe
+- Nasty Plot
+- Dark Pulse
+- Burning Jealousy
+- Shadow Ball
+
+Sharpedo @ Sharpedonite
+Level: 53
+Ability: Speed Boost
+IVs: 15 HP / 15 Atk / 15 Def / 15 SpA / 15 SpD / 15 Spe
+- Protect
+- Waterfall
+- Crunch
+- Psychic Fangs
+
+Metagross @ Misty Seed
+Level: 54
+IVs: 15 HP / 15 Atk / 15 Def / 15 SpA / 15 SpD / 15 Spe
+- Iron Defense
+- Body Press
+- Heavy Slam
+- Rest
