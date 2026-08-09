@@ -75,11 +75,11 @@ Run `rg -n -C 3 'GiveRandomEgg|GiveEgg(Wynaut|Togepi|Chimchar|Piplup|Turtwig)|ra
 
 Expected: one `random 5` dispatch has cases 0–4 and all five intended `giveegg` calls; original flag and party-space guards remain.
 
-- [ ] **Step 4: Build the ROM**
+- [x] **Step 4: Build the ROM**
 
 Run `make -j4` from a configured development environment.
 
-Expected: exit code 0 with no script-assembly error.
+Expected: exit code 0 with no script-assembly error. User verified this compile after the change on 2026-08-09.
 
 - [ ] **Step 5: Validate in-game**
 
