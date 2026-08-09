@@ -329,16 +329,42 @@ PlayersHouse_1F_EventScript_TryRegisterMom::
 	end
 
 PlayersHouse_1F_EventScript_CheckGiveAmuletCoin::
+	goto_if_set FLAG_FOUGHT_MOM, PlayersHouse_1F_EventScript_MomHealsParty
+	goto_if_set FLAG_MOM_BATTLE_AVAILABLE, PlayersHouse_1F_EventScript_ReadyForMomBattle
 	goto_if_set FLAG_BADGE05_GET, PlayersHouse_1F_EventScript_TryGiveAmuletCoin
 	goto PlayersHouse_1F_EventScript_MomHealsParty
 
+PlayersHouse_1F_EventScript_ReadyForMomBattle::
+	msgbox PlayersHouse_1F_Text_AreYouReady, MSGBOX_YESNO
+	goto PlayersHouse_1F_EventScript_ChallengeMomPrompt
+
 PlayersHouse_1F_EventScript_TryGiveAmuletCoin::
-	goto_if_set FLAG_RECEIVED_AMULET_COIN, PlayersHouse_1F_EventScript_MomHealsParty
+	goto_if_set FLAG_RECEIVED_AMULET_COIN, PlayersHouse_1F_EventScript_ReadyForMomBattle
 	msgbox PlayersHouse_1F_Text_GotDadsBadgeHeresSomethingFromMom, MSGBOX_DEFAULT
 	giveitem ITEM_AMULET_COIN
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
-	msgbox PlayersHouse_1F_Text_DontPushYourselfTooHard, MSGBOX_DEFAULT
 	setflag FLAG_RECEIVED_AMULET_COIN
+	msgbox PlayersHouse_1F_Text_SecretFightForMegaStones, MSGBOX_YESNO
+
+PlayersHouse_1F_EventScript_ChallengeMomPrompt::
+	setflag FLAG_MOM_BATTLE_AVAILABLE
+	goto_if_eq VAR_RESULT, YES, PlayersHouse_1F_EventScript_BattleMom
+	msgbox PlayersHouse_1F_Text_LetMeKnowIfYouAreReady, MSGBOX_DEFAULT
+	release
+	end
+
+PlayersHouse_1F_EventScript_BattleMom::
+	msgbox PlayersHouse_1F_Text_MomLetsGetStarted, MSGBOX_DEFAULT
+	trainerbattle_no_intro TRAINER_MOM, PlayersHouse_1F_Text_MomDefeat
+	giveitem ITEM_SCEPTILITE
+	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
+	giveitem ITEM_BLAZIKENITE
+	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
+	giveitem ITEM_SWAMPERTITE
+	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
+	setflag FLAG_FOUGHT_MOM
+	clearflag FLAG_MOM_BATTLE_AVAILABLE
+	msgbox PlayersHouse_1F_Text_DontPushYourselfTooHard, MSGBOX_DEFAULT
 	release
 	end
 

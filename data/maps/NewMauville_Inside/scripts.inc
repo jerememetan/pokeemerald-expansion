@@ -50,6 +50,11 @@ NewMauville_Inside_EventScript_BlueButton::
 	releaseall
 	end
 
+NewMauville_Inside_EventScript_Leaf2::
+	trainerbattle_single TRAINER_LEAF_2, NewMauville_Inside_Text_Leaf2Intro, NewMauville_Inside_Text_Leaf2Defeated
+	msgbox NewMauville_Inside_Text_Leaf2PostBattle, MSGBOX_AUTOCLOSE
+	end
+
 NewMauville_Inside_EventScript_GreenButton::
 	lockall
 	setvar VAR_TEMP_1, 0

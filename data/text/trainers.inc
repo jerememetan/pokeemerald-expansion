@@ -4794,3 +4794,24 @@ VSSeeker_Text_TrainersNotReady::
 	.string "The other Trainers don't appear\n"
 	.string "to be ready for battle.\p"
 	.string "Let's wait till later.{PAUSE_UNTIL_PRESS}$"
+
+AlteringCave_Text_RedIntro:
+	.string ".....$"
+
+AlteringCave_Text_RedDefeat:
+	.string "....!$"
+
+NewMauville_Inside_Text_Leaf2Intro:
+	.string "Hi there! {PLAYER}, right?\p"
+	.string "This place is utterly...\n"
+	.string "ELECTRIFYING!!\p"
+	.string "Anyway, let's fight, {PLAYER}!$"
+
+NewMauville_Inside_Text_Leaf2Defeated:
+	.string "That was a shockingly\n"
+	.string "terrifying loss. Also,\n"
+	.string "have you seen RED around?$"
+
+NewMauville_Inside_Text_Leaf2PostBattle:
+	.string "RED... I wonder where he is.\n"
+	.string "Are you stronger than him as well?$"

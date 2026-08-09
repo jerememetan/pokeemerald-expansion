@@ -6,7 +6,7 @@ Restore the five archived custom encounters omitted from the bulk trainer-team i
 
 ## Scope and Boundaries
 
-Each encounter is an independently buildable vertical slice, but all five share one trainer-ID allocation change. The source of truth for each trainer's party, class, portrait, battle type, AI, dialogue, rewards, object location, and event flow is the archived commit named below. Current JSON map files and current Poryscript sources are the only authoring targets; generated `.inc` files are regenerated and never copied from the archive.
+Each encounter is an independently buildable vertical slice, but all five share one trainer-ID allocation change. The source of truth for each trainer's party, class, portrait, battle type, AI, dialogue, rewards, object location, and event flow is the archived commit named below. Current JSON map files and current script sources are the only authoring targets. Expansion 1.16.3 retains authored `.inc` files for these maps, so those files are edited directly rather than recreating the archive's removed Poryscript pipeline.
 
 | Encounter | Archived evidence | Current behavior to preserve |
 | --- | --- | --- |
@@ -24,7 +24,7 @@ Out of scope: importing full archived maps/layouts, changing existing late-game 
 
 Increase `TRAINERS_COUNT_EMERALD` from 855 to 860. This stays within `MAX_TRAINERS_COUNT_EMERALD` 864 and does not move any existing numeric ID. Preserve the archived team records exactly except where an archived species, move, item, ability, or AI spelling has a documented current 1.16.3 equivalent; such a substitution must be reported and validated in generated trainer output.
 
-Use named progression flags rather than raw numeric values. The Mom flow uses the archived formerly-unused flags `0x1DA` (`FLAG_FOUGHT_MOM`) and `0x1DE` (`FLAG_DECLINED_MOM_BATTLE`) only after confirming they remain unused in current 1.16.3. Red gets a dedicated named hide flag selected from a currently unused flag after confirming no collision. Leaf uses the trainer-defeat state produced by its trainer battle; no second custom hide flag is added unless current map behavior requires one. Mt. Pyre Archie uses the archived battle-defeat state and any existing current story flag needed by its map script.
+Use named progression flags rather than raw numeric values. The Mom flow uses the archived formerly-unused flags `0x1DA` (`FLAG_FOUGHT_MOM`) and `0x1DE` (`FLAG_MOM_BATTLE_AVAILABLE`) only after confirming they remain unused in current 1.16.3. Red uses `0x25` as `FLAG_ALTERINGCAVE_RED_DEFEATED`; the object event's hide flag supplies reload persistence without a redundant map-load script. Leaf uses the trainer-defeat state produced by its trainer battle. Mt. Pyre Archie uses the archived battle-defeat state and current story flags already present in its map script.
 
 ## Encounter Flows
 
@@ -34,11 +34,11 @@ Add the archived battle invitation and no-intro trainer battle at the opening of
 
 ### Red
 
-Add Red to current `data/maps/AlteringCave/map.json` with the current object-event schema, archived `(18,19)` coordinates, `OBJ_EVENT_GFX_RED`, and a dedicated hide flag. His script starts the archived single battle. On victory only, show the archived completion text, fade/hide Red, set the hide flag, and release the player. On defeat, do not set the hide flag. The map-load script must respect the flag so Red remains absent after re-entry without modifying the existing landmark transition.
+Add Red to current `data/maps/AlteringCave/map.json` with the current object-event schema, archived `(18,19)` coordinates, `OBJ_EVENT_GFX_RED`, and a dedicated hide flag. His script starts the archived single battle. On victory only, show the archived completion text, fade/hide Red, set the hide flag, and release the player. On defeat, do not set the hide flag. The object-event hide flag keeps Red absent after re-entry without modifying the existing landmark transition.
 
 ### Mom
 
-Extend the current post-Amulet-Coin Mom interaction. If the Amulet Coin cannot enter the bag, use the existing bag-full fallback and do not offer the battle. Otherwise present the archived challenge prompt. Accepting starts the no-intro Mom battle; victory awards Sceptilite, Blazikenite, and Swampertite in order, with bag-full handling after every item, then sets `FLAG_FOUGHT_MOM`. Declining sets `FLAG_DECLINED_MOM_BATTLE` and leaves the later retry prompt available. Once fought, preserve Mom's normal healing behavior and never award the stones again.
+Extend the current post-Amulet-Coin Mom interaction. If the Amulet Coin cannot enter the bag, use the existing bag-full fallback and do not offer the battle. Otherwise set `FLAG_MOM_BATTLE_AVAILABLE` and present the archived challenge prompt. Accepting starts the no-intro Mom battle; victory awards Sceptilite, Blazikenite, and Swampertite in order, with bag-full handling after every item, then sets `FLAG_FOUGHT_MOM` and clears the availability flag. Declining or losing leaves the later retry prompt available. Once fought, preserve Mom's normal healing behavior and never award the stones again.
 
 ### Leaf 2
 

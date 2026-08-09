@@ -17,7 +17,7 @@
 - Modify `include/constants/opponents.h`: append five trainer IDs `855..859`; set `TRAINERS_COUNT_EMERALD` to `860`.
 - Modify `src/data/trainers.party`: add the five archived parties in current competitive syntax.
 - Modify `include/constants/flags.h`: name the two verified Mom flags and one verified unused Red hide flag.
-- Modify current Poryscript sources under `data/maps/`; modify `data/scripts/players_house.inc` only for the shared Mom dispatch flow.
+- Modify the current authored `.inc` script sources under `data/maps/`; modify `data/scripts/players_house.inc` for the shared Mom dispatch flow.
 - Modify only `data/maps/AlteringCave/map.json` and `data/maps/NewMauville_Inside/map.json` for the new Red and Leaf objects.
 - Regenerate, never hand-edit: `src/data/trainers.h` and map `scripts.inc` files.
 
@@ -47,8 +47,8 @@ Expected: exit 0; generated output contains every new ID; `TRAINERS_COUNT_EMERAL
 ### Task 2: Restore Steven and Red
 
 **Files:**
-- Modify: `data/maps/GraniteCave_StevensRoom/scripts.pory`
-- Modify: `data/maps/AlteringCave/scripts.pory`
+- Modify: `data/maps/GraniteCave_StevensRoom/scripts.inc`
+- Modify: `data/maps/AlteringCave/scripts.inc`
 - Modify: `data/maps/AlteringCave/map.json`
 - Modify: `include/constants/flags.h`
 
@@ -64,10 +64,10 @@ Expected: a loss leaves Steven's Letter flow and Red's object available; a victo
 **Files:**
 - Modify: `include/constants/flags.h`
 - Modify: `data/scripts/players_house.inc:331-343`
-- Modify: `data/maps/LittlerootTown_BrendansHouse_1F/scripts.pory`
+- Modify: `data/maps/LittlerootTown_BrendansHouse_1F/scripts.inc`
 
-- [ ] Confirm `0x1DA` and `0x1DE` are unused, then name them `FLAG_FOUGHT_MOM` and `FLAG_DECLINED_MOM_BATTLE`.
-- [ ] Extend `PlayersHouse_1F_EventScript_CheckGiveAmuletCoin` exactly after the existing successful `giveitem ITEM_AMULET_COIN` path: retain `Common_EventScript_ShowBagIsFull`; then show the challenge yes/no prompt. Decline sets `FLAG_DECLINED_MOM_BATTLE`; acceptance runs `trainerbattle_no_intro TRAINER_MOM`.
+- [ ] Confirm `0x1DA` and `0x1DE` are unused, then name them `FLAG_FOUGHT_MOM` and `FLAG_MOM_BATTLE_AVAILABLE`.
+- [ ] Extend `PlayersHouse_1F_EventScript_CheckGiveAmuletCoin` exactly after the existing successful `giveitem ITEM_AMULET_COIN` path: retain `Common_EventScript_ShowBagIsFull`; set `FLAG_MOM_BATTLE_AVAILABLE`, then show the challenge yes/no prompt. Decline or battle loss leaves the availability flag set; acceptance runs `trainerbattle_no_intro TRAINER_MOM`.
 - [ ] On victory, grant `ITEM_SCEPTILITE`, `ITEM_BLAZIKENITE`, and `ITEM_SWAMPERTITE` in that order with a bag-full branch after each grant, then set `FLAG_FOUGHT_MOM`. When `FLAG_FOUGHT_MOM` is set, use the existing Mom healing path and never repeat the rewards.
 - [ ] Generate scripts and manually check accept, decline/retry, win, loss, and bag-full paths.
 
@@ -77,9 +77,9 @@ Expected: the Amulet Coin is not lost on a full bag; declining does not permanen
 
 **Files:**
 - Modify: `data/maps/NewMauville_Inside/map.json`
-- Modify: `data/maps/NewMauville_Inside/scripts.pory`
+- Modify: `data/maps/NewMauville_Inside/scripts.inc`
 - Modify: `data/text/trainers.inc`
-- Modify: `data/maps/MtPyre_Summit/scripts.pory`
+- Modify: `data/maps/MtPyre_Summit/scripts.inc`
 
 - [ ] Add Leaf with `OBJ_EVENT_GFX_LEAF` at `(27,34)`, `MOVEMENT_TYPE_FACE_RIGHT`, normal trainer sight range `6`, and `NewMauville_Inside_EventScript_Leaf2`. Use the archived intro/defeat flow and retain the Red-focused post-battle text in `data/text/trainers.inc`.
 - [ ] In `MtPyre_Summit_EventScript_TeamAquaExits`, insert `trainerbattle_no_intro TRAINER_MT_PYRE_ARCHIE` after `MtPyre_Summit_Text_ArchieTryToStopMe` and before the existing orb/exit text. Do not alter the existing success-only removal, hide-flag, and `VAR_MT_PYRE_STATE` sequence.

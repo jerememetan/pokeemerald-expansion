@@ -39,6 +39,8 @@ MtPyre_Summit_EventScript_TeamAquaExits::
 	call_if_eq VAR_0x8008, 0, MtPyre_Summit_EventScript_ArchieFacePlayer0
 	call_if_eq VAR_0x8008, 1, MtPyre_Summit_EventScript_ArchieFacePlayer1
 	call_if_eq VAR_0x8008, 2, MtPyre_Summit_EventScript_ArchieFacePlayer2
+	msgbox MtPyre_Summit_Text_ArchieTryToStopMe, MSGBOX_DEFAULT
+	trainerbattle_no_intro TRAINER_MT_PYRE_ARCHIE, MtPyre_Summit_Text_ArchieItsTooLate
 	msgbox MtPyre_Summit_Text_ArchieWeGotTheOrbLetsGo, MSGBOX_DEFAULT
 	closemessage
 	fadescreenswapbuffers FADE_TO_BLACK
@@ -482,12 +484,8 @@ MtPyre_Summit_Text_Grunt4PostBattle:
 	.string "with us members and our leader.$"
 
 MtPyre_Summit_Text_ArchieWeGotTheOrbLetsGo:
-	.string "ARCHIE: TEAM MAGMA's MAXIE got ahead\n"
-	.string "of us, but we also got what we wanted.\p"
-	.string "The RED ORB preserved at MT. PYRE…\n"
-	.string "I, ARCHIE, now have it in my possession!\p"
-	.string "Fufufu… Now we can bring our ultimate\n"
-	.string "objective to fruition!\p"
+	.string "ARCHIE: You may have defeated me,\n"
+	.string "but it's too late now!\p"
 	.string "Okay, TEAM!\n"
 	.string "We're pulling out!$"
 
@@ -615,3 +613,13 @@ MtPyre_Summit_Text_HoennTrioTale:
 	.string "Then, its duty done, the green POKéMON\n"
 	.string "flew off into the wild blue yonder…$"
 
+MtPyre_Summit_Text_ArchieTryToStopMe:
+	.string "ARCHIE: TEAM MAGMA's MAXIE got ahead\n"
+	.string "of us, but we also got what we wanted.\p"
+	.string "The RED ORB preserved at MT. PYRE...\n"
+	.string "I, ARCHIE, now have it in my possession!\p"
+	.string "Try to stop me if you can, KID!$"
+
+MtPyre_Summit_Text_ArchieItsTooLate:
+	.string "You may have won the battle,\n"
+	.string "but you will lose the WAR!$"

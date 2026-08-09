@@ -345,6 +345,26 @@ PlayersHouse_1F_Text_GotDadsBadgeHeresSomethingFromMom:
 	.string "MOM: Oh? Did DAD give you that BADGE?\p"
 	.string "Then here's something from your MOM!$"
 
+PlayersHouse_1F_Text_MomLetsGetStarted:
+	.string "All right, let's get started!$"
+
+PlayersHouse_1F_Text_MomDefeat:
+	.string "Wow! That was fun!\p"
+	.string "As promised, let me give you these!$"
+
+PlayersHouse_1F_Text_SecretFightForMegaStones:
+	.string "MOM: You know, I was also a TRAINER\n"
+	.string "myself. I have a surprise gift for you,\n"
+	.string "but you've got to work for it.\p"
+	.string "Are you up for the challenge?$"
+
+PlayersHouse_1F_Text_LetMeKnowIfYouAreReady:
+	.string "Okay, let me know when you're ready,\n"
+	.string "honey!$"
+
+PlayersHouse_1F_Text_AreYouReady:
+	.string "So, are you ready, honey?$"
+
 PlayersHouse_1F_Text_DontPushYourselfTooHard:
 	.string "Don't push yourself too hard, dear.\n"
 	.string "You can always come home.\p"
