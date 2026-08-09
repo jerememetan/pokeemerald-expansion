@@ -9,9 +9,11 @@ This is the exhaustive feature disposition for [the generated path inventory](20
 | Upstream map and event source conversion | [`upstream-map-event-source`](#feature-manifest) — all `maps-and-events` paths except the explicit custom map features below | Current `data/maps/**`, `data/layouts/**`, JSON/Poryscript generation | Use upstream equivalent | 2 | The paths include generated `.inc` files and broad map-source format drift. Keep current source formats; regenerate derived scripts, build, and smoke-test affected vanilla maps. |
 | Littleroot and Verdanturf extensions | [`custom-map-extensions`](#feature-manifest) — all ten `data/{maps,layouts}/{Littleroot,Verdanturf}_Extension/**` paths | Current layout JSON, map headers, events, and warps | Modern adaptation | 2 | The inventory adds five source/layout paths for each extension. Recreate geometry, connections, events, and warps in current formats; enter and leave both maps from a clean save. |
 | Petalburg Woodgrove early-game and rebattle map edits | [`petalburg-woodgrove-map-edits`](#feature-manifest) — four `data/{maps,layouts}/PetalburgWoodgrove/**` paths | Current Petalburg Woodgrove JSON/layout/event sources | Modern adaptation | 2 | `0080ad90f7` adds the map/layout/scripts as part of map reworks and mandatory trainers; `43acf35679` changes its tiles; `8ae5c75c40` updates a gym-rebattle placement. Recreate those authored map/event deltas and verify the early-game route plus the rebattle trigger. |
-| Full-screen start menu | [`fullscreen-start-menu`](#feature-manifest) — full-screen graphics plus start-menu implementation paths | Current `src/start_menu.c`, UI assets, current menu interfaces | Modern adaptation | 3 | `git show --stat 1b4f48d986` adds the fullscreen assets and implementation. Verify every visible action and the archived gender/clock variants on the current menu APIs. |
+| Full-screen start menu | [`fullscreen-start-menu`](#feature-manifest) — full-screen graphics, implementation, and dedicated headers | Current `src/start_menu.c`, `src/ui_startmenu_full.c`, `include/start_menu.h`, `include/ui_startmenu_full.h`, UI assets | Modern adaptation | 3 | `git show --stat 1b4f48d986` adds the fullscreen assets, implementation, and `include/ui_startmenu_full.h`; the manifest explicitly assigns both headers and the implementation here. Verify every visible action and the archived gender/clock variants on the current menu APIs. |
 | Better Bag and remaining QoL UI | [`better-bag-and-qol-ui`](#feature-manifest) — remaining UI-category paths | Current `src/item_menu.c`, `src/option_menu.c`, item configuration and UI assets | Modern adaptation | 3 | BetterBag history (`3480da2c61`, `f5f24a808a`, `ef69dde01e`) identifies pocket and interface behavior. Verify all pockets, item selection/use, and options; retain current menu internals. |
-| Species, item, move, trainer, encounter, graphic, and cry corpus | [`legacy-content-corpus`](#feature-manifest) — every `game-content` path | Current `src/data/**`, `graphics/**`, `sound/**`, trainer/encounter generators | Use upstream equivalent | 2 | `git show --stat 624403ccab` identifies legacy mint work, while the inventory’s Gen 9 assets/tables overlap maintained expansion content. Compare the legacy deltas at current source-table granularity; configure or add only content absent from 1.16.3, then verify linkage and gameplay use. |
+| Current-only content additions | [`current-only-content-additions`](#feature-manifest) — 66 `game-content` deletion records (present in 1.16.3, absent from legacy) | Same current `src/data/**`, `graphics/**`, and `.wav` cry sources | Use upstream equivalent | 2 | Inventory status `D` proves the legacy ref lacks these current paths, including newer items/species assets and source tables. Retain the 1.16.3 assets/tables; verify the supported build and representative asset linkage. |
+| Content source-format renames | [`content-source-format-renames`](#feature-manifest) — 10 renamed learnset/species-info records | Current `level_up_learnsets/**`, `species_info/*_families.h`, and generated data inputs | Use upstream equivalent | 2 | The inventory’s `R*` records prove these are source-format moves, not legacy-only assets. Keep the current split family-table representation and validate the relevant data generators. |
+| Overlapping current content tables and assets | [`overlapping-current-content`](#feature-manifest) — 42 modified `game-content` records | Current item, move, Pokémon, cry, and form data tables/assets | Use upstream equivalent | 2 | Every remaining content path is `M`, so both refs contain it; comparison against current 1.16.3 source identifies maintained replacements, including mints (`src/data/items.h`) and current cry tables. No legacy-only (`A`) game-content record exists; validate tables/assets without copying archived data. |
 | Battle Frontier roster tuning | [`frontier-roster-tuning`](#feature-manifest) — the archived Frontier roster table and its direct constants/engine callers | Current `src/data/battle_frontier/**`, current Frontier configuration | Modern adaptation | 4 | `git show --stat f5e81e85df` changes `battle_frontier_mons.h`, `battle_tower.c`, and the Frontier constant. Re-express only its roster/rule deltas against 1.16.3 and verify a representative facility streak. |
 | Legacy battle engine, config, and tests | [`upstream-gameplay-and-battle`](#feature-manifest) — all remaining `gameplay-and-battle` paths | Current battle engine, config headers, scripts, macros, and `test/battle/**` | Use upstream equivalent | 4 | `476030333c` documents EXP All and `624403ccab` documents mint behavior; 1.16.3 supplies both systems. Configure current behavior if the archived setting differs; run targeted battle tests and EXP/mint manual checks without restoring obsolete engine code. |
 | Historical tooling and generated material | [`historical-tooling-and-generated-material`](#feature-manifest) — every `tooling-and-generated-output` path | Current `Makefile`, tools, docs, generators, CI, and generated outputs | Use upstream equivalent | 5 | These paths are outside all feature-source classifiers and include old build/docs/generated artifacts. Build with the supported current command and regenerate outputs; do not import archived infrastructure. |
@@ -55,13 +57,13 @@ The machine-readable manifest supplies the behavior, dependencies, validation, s
     },
     {
       "id": "fullscreen-start-menu",
-      "legacy_paths": [{"category": "ui-and-quality-of-life", "prefixes": ["graphics/ui_startmenu_full/", "src/ui_startmenu_full.c", "src/start_menu.c", "include/ui_startmenu_full.h", "include/start_menu.h"]}],
-      "target_paths": ["src/start_menu.c", "graphics/ui_startmenu_full/**", "include/start_menu.h"],
+      "legacy_paths": [{"category": "ui-and-quality-of-life", "prefixes": ["graphics/ui_startmenu_full/", "src/start_menu.c"]}, {"category": "gameplay-and-battle", "prefixes": ["src/ui_startmenu_full.c", "include/start_menu.h", "include/ui_startmenu_full.h"]}],
+      "target_paths": ["src/start_menu.c", "src/ui_startmenu_full.c", "graphics/ui_startmenu_full/**", "include/start_menu.h", "include/ui_startmenu_full.h"],
       "decision": "Modern adaptation", "phase": 3, "status": "planned",
       "behavior": "Preserve the archived full-screen menu presentation and its gender/clock variants.",
       "dependencies": ["current start-menu and option-menu APIs"],
       "validation": ["all start-menu actions", "gender/clock variants", "supported build"],
-      "evidence": ["git show --stat 1b4f48d986"]
+      "evidence": ["git show --stat 1b4f48d986", "inventory includes src/ui_startmenu_full.c and include/ui_startmenu_full.h"]
     },
     {
       "id": "better-bag-and-qol-ui",
@@ -74,14 +76,34 @@ The machine-readable manifest supplies the behavior, dependencies, validation, s
       "evidence": ["git show --stat 3480da2c61", "git show --stat f5f24a808a", "git show --stat ef69dde01e"]
     },
     {
-      "id": "legacy-content-corpus",
-      "legacy_paths": [{"category": "game-content", "prefixes": [""]}],
-      "target_paths": ["src/data/**", "graphics/**", "sound/**", "data/trainers/**", "data/wild/**"],
+      "id": "current-only-content-additions",
+      "legacy_paths": [{"category": "game-content", "prefixes": [""], "statuses": ["D"]}],
+      "target_paths": ["src/data/**", "graphics/**", "sound/direct_sound_samples/cries/*.wav"],
       "decision": "Use upstream equivalent", "phase": 2, "status": "planned",
-      "behavior": "Retain only archived content deltas that 1.16.3 does not already provide.",
+      "behavior": "Retain content added by current 1.16.3 that the archived ref does not contain.",
       "dependencies": ["current species/item/move/trainer/encounter data generators"],
-      "validation": ["source-table comparison", "asset linkage", "item/encounter/trainer smoke tests"],
-      "evidence": ["git show --stat 624403ccab", "inventory game-content paths"]
+      "validation": ["supported build", "asset linkage", "representative item/species/cry lookup"],
+      "evidence": ["inventory game-content status D count: 66", "master contains the listed current paths"]
+    },
+    {
+      "id": "content-source-format-renames",
+      "legacy_paths": [{"category": "game-content", "prefixes": [""], "statuses": ["R050", "R052", "R053", "R054", "R056", "R057", "R058", "R089"]}],
+      "target_paths": ["src/data/pokemon/level_up_learnsets/**", "src/data/pokemon/species_info/*_families.h"],
+      "decision": "Use upstream equivalent", "phase": 2, "status": "planned",
+      "behavior": "Use current split learnset and species-family source formats.",
+      "dependencies": ["current Pokémon data generators"],
+      "validation": ["regenerate Pokémon data", "supported build"],
+      "evidence": ["inventory game-content rename records: 10", "master src/data/pokemon/species_info/*_families.h"]
+    },
+    {
+      "id": "overlapping-current-content",
+      "legacy_paths": [{"category": "game-content", "prefixes": [""], "statuses": ["M"]}],
+      "target_paths": ["src/data/items.h", "src/data/moves_info.h", "src/data/pokemon/**", "graphics/pokemon/**", "sound/cry_tables.inc"],
+      "decision": "Use upstream equivalent", "phase": 2, "status": "planned",
+      "behavior": "Keep maintained 1.16.3 content where both refs have a version of the path, including current mint and cry-table behavior.",
+      "dependencies": ["current content tables and asset pipeline"],
+      "validation": ["table diff review", "mint use", "cry playback", "supported build"],
+      "evidence": ["inventory game-content status M count: 42", "git show --stat 624403ccab", "master src/data/items.h and sound/cry_tables.inc"]
     },
     {
       "id": "frontier-roster-tuning",
@@ -95,7 +117,7 @@ The machine-readable manifest supplies the behavior, dependencies, validation, s
     },
     {
       "id": "upstream-gameplay-and-battle",
-      "legacy_paths": [{"category": "gameplay-and-battle", "prefixes": [""], "exclude_prefixes": ["src/data/battle_frontier/battle_frontier_mons.h", "src/battle_tower.c", "include/constants/battle_frontier.h"]}],
+      "legacy_paths": [{"category": "gameplay-and-battle", "prefixes": [""], "exclude_prefixes": ["src/data/battle_frontier/battle_frontier_mons.h", "src/battle_tower.c", "include/constants/battle_frontier.h", "src/ui_startmenu_full.c", "include/start_menu.h", "include/ui_startmenu_full.h"]}],
       "target_paths": ["include/config/**", "src/battle_*.c", "test/battle/**", "current battle scripts/macros"],
       "decision": "Use upstream equivalent", "phase": 4, "status": "planned",
       "behavior": "Keep the current battle engine and configure only missing archived EXP All or mint behavior.",
@@ -141,6 +163,7 @@ def matches(change, selector):
     path = change['path']
     return (change['category'] == selector['category']
             and any(path.startswith(prefix) for prefix in selector['prefixes'])
+            and (not selector.get('statuses') or change['status'] in selector['statuses'])
             and not any(path.startswith(prefix) for prefix in selector.get('exclude_prefixes', [])))
 
 allocations = []
