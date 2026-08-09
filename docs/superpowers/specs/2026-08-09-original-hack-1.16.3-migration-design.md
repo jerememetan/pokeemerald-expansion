@@ -23,6 +23,8 @@ Recreate every intended custom, player-visible and developer-configured behavior
 
 ## Current Evidence
 
+The generated [path inventory](../inventories/2026-08-09-legacy-feature-inventory.json) and [feature review](../inventories/2026-08-09-legacy-feature-review.md) are the authoritative migration checklist for this work.
+
 The archived and target trees differ in 2,124 paths: 1,411 modifications, 540 additions, 154 deletions, and renamed paths. The legacy history includes custom content, full-screen start-menu work, bag/pocket changes, nature-mint work, experience configuration, map/script edits, trainer changes, move and animation changes, and Battle Frontier changes. It also contains historical Expansion code and third-party merges that must not overwrite 1.16.3 blindly.
 
 ## Architecture
