@@ -2,7 +2,7 @@
 
 ## Goal
 
-Recreate every custom, player-visible and developer-configured change present on `archive/master-pre-1.16.3` on top of the clean Expansion 1.16.3 release, while retaining the current release's upstream systems and fixes.
+Recreate every intended custom, player-visible and developer-configured behavior present on `archive/master-pre-1.16.3` on top of the clean Expansion 1.16.3 release, while retaining the current release's upstream systems and fixes with the smallest maintainable implementation.
 
 ## Baselines
 
@@ -13,11 +13,13 @@ Recreate every custom, player-visible and developer-configured change present on
 ## Migration Principles
 
 1. Preserve intended legacy behavior, not obsolete legacy implementation details.
-2. Never merge the legacy archive wholesale into the 1.16.3 baseline.
-3. Retain all upstream 1.16.3 functionality unless a legacy custom behavior intentionally replaces it.
-4. Port each independent feature in a dedicated, testable phase. A phase may depend only on previously completed phases.
-5. Keep `master` releasable. Migration work happens on dedicated branches and reaches `master` only after verification.
-6. Treat legacy imported features as required functionality when they are present in the archived game, but first determine whether 1.16.3 already supplies an equivalent implementation.
+2. Prefer existing Expansion 1.16.3 configuration, data, and feature implementations over custom code.
+3. Do not carry forward legacy code merely because it is custom; retain it only when it changes the archived game's intended behavior.
+4. Never merge the legacy archive wholesale into the 1.16.3 baseline.
+5. Retain all upstream 1.16.3 functionality unless a legacy custom behavior intentionally replaces it.
+6. Port each independent feature in a dedicated, testable phase. A phase may depend only on previously completed phases.
+7. Keep `master` releasable. Migration work happens on dedicated branches and reaches `master` only after verification.
+8. Treat legacy imported features as required only where they create an archived-game behavior not already supplied by 1.16.3.
 
 ## Current Evidence
 
@@ -47,6 +49,8 @@ archive/master-pre-1.16.3 (behavior reference)
 
 Produce a feature-level manifest that maps every legacy difference to one of: direct transfer, current upstream equivalent, modern adaptation, or deliberate custom replacement. Each feature entry must list legacy source paths, target paths, behavior, dependencies, validation, and completion status.
 
+Entries with a current upstream equivalent are closed by configuring or documenting that equivalent; they must not add duplicate code. Entries with no player-visible or developer-configured behavioral effect are excluded as obsolete implementation detail.
+
 ### 2. Data, assets, and content
 
 Port custom maps, map scripts, events, trainer data, encounters, text, graphics, audio, Pokémon, moves, items, and configuration data. Use modern source formats and generators. Regenerate derived assets instead of carrying legacy build output.
@@ -61,7 +65,7 @@ Port custom mechanics, move changes, battle animations, team changes, and Battle
 
 ### 5. Imported-feature reconciliation
 
-For each old third-party feature, identify the 1.16.3 equivalent or reimplement the missing behavior. Preserve the archived game's player-facing result, including intended configuration choices.
+For each old third-party feature, use the 1.16.3 equivalent when available; otherwise reimplement only the missing behavior. Preserve the archived game's player-facing result and intended configuration choices without restoring redundant legacy subsystems.
 
 ### 6. End-to-end parity verification
 
@@ -84,3 +88,4 @@ The migration is complete only when:
 4. Automated tests relevant to changed mechanics pass.
 5. Manual in-game checks prove all custom maps, events, UI, content, and gameplay changes function as intended.
 6. The `hackathon-ai-trainer` branch remains unmodified by this migration.
+7. Every completed inventory entry has the simplest justified implementation: an upstream configuration/equivalent where sufficient, otherwise the minimal custom code needed to preserve behavior.
