@@ -142,7 +142,7 @@ The machine-readable manifest supplies the behavior, dependencies, validation, s
     },
     {
       "id": "custom-trainer-teams",
-      "legacy_paths": [{"category": "tooling-and-generated-output", "prefixes": ["src/data/trainer_parties.h", "src/data/trainers.h"]}],
+      "legacy_paths": [{"category": "gameplay-and-battle", "prefixes": ["src/data/trainer_parties.h", "src/data/trainers.h"]}],
       "target_paths": ["src/data/trainer_parties.h", "src/data/trainers.h"],
       "decision": "Modern adaptation", "phase": 2, "status": "planned",
       "behavior": "Preserve documented mandatory-trainer and trainer-party changes.",
@@ -152,7 +152,7 @@ The machine-readable manifest supplies the behavior, dependencies, validation, s
     },
     {
       "id": "upstream-gameplay-and-battle",
-      "legacy_paths": [{"category": "gameplay-and-battle", "prefixes": [""], "exclude_prefixes": ["src/data/battle_frontier/battle_frontier_mons.h", "src/data/battle_frontier/battle_frontier_trainer_mons.h", "src/battle_tower.c", "include/constants/battle_frontier.h", "src/ui_startmenu_full.c", "include/start_menu.h", "include/ui_startmenu_full.h"]}],
+      "legacy_paths": [{"category": "gameplay-and-battle", "prefixes": [""], "exclude_prefixes": ["src/data/battle_frontier/battle_frontier_mons.h", "src/data/battle_frontier/battle_frontier_trainer_mons.h", "src/battle_tower.c", "include/constants/battle_frontier.h", "src/data/trainer_parties.h", "src/data/trainers.h", "src/ui_startmenu_full.c", "include/start_menu.h", "include/ui_startmenu_full.h"]}],
       "target_paths": ["include/config/**", "src/battle_*.c", "test/battle/**", "current battle scripts/macros"],
       "decision": "Use upstream equivalent", "phase": 4, "status": "planned",
       "behavior": "Keep the current battle engine and configure only missing archived EXP All or mint behavior.",
@@ -162,7 +162,7 @@ The machine-readable manifest supplies the behavior, dependencies, validation, s
     },
     {
       "id": "historical-tooling-and-generated-material",
-      "legacy_paths": [{"category": "tooling-and-generated-output", "prefixes": [""], "exclude_prefixes": ["src/data/trainer_parties.h", "src/data/trainers.h"]}],
+      "legacy_paths": [{"category": "tooling-and-generated-output", "prefixes": [""]}],
       "target_paths": ["Makefile", "tools/**", "docs/**", "current generators"],
       "decision": "Use upstream equivalent", "phase": 5, "status": "planned",
       "behavior": "Keep maintained 1.16.3 tooling and generated outputs.",
