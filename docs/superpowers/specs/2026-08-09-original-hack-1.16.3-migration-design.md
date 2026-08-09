@@ -49,7 +49,7 @@ archive/master-pre-1.16.3 (behavior reference)
 
 ### 1. Migration inventory
 
-Produce a feature-level manifest that maps every legacy difference to one of: direct transfer, current upstream equivalent, modern adaptation, or deliberate custom replacement. Each feature entry must list legacy source paths, target paths, behavior, dependencies, validation, and completion status.
+Produce a feature-level manifest that maps every legacy difference to one of: Direct transfer, Use upstream equivalent, Modern adaptation, or Custom replacement. Each feature entry must list legacy source paths, target paths, behavior, dependencies, validation, and completion status.
 
 Entries with a current upstream equivalent are closed by configuring or documenting that equivalent; they must not add duplicate code. Entries with no player-visible or developer-configured behavioral effect are excluded as obsolete implementation detail.
 

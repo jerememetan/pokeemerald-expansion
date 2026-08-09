@@ -5,9 +5,10 @@ This is the exhaustive feature disposition for [the generated path inventory](20
 “Upstream equivalent” means retain the 1.16.3 implementation and, where needed, configure it; it never means copy the archived implementation. “Planned” is an inventory status, not a claim that ROM behavior has already been ported.
 
 | Feature | Legacy paths | 1.16.3 equivalent or target paths | Decision | Phase | Acceptance evidence |
-| --- | --- | --- | --- | --- |
-| Upstream map and event source conversion | [`upstream-map-event-source`](#feature-manifest) — all `maps-and-events` paths except the two explicit extension layouts | Current `data/maps/**`, `data/layouts/**`, JSON/Poryscript generation | Use upstream equivalent | 2 | The paths include generated `.inc` files and broad map-source format drift. Keep current source formats; regenerate derived scripts, build, and smoke-test affected vanilla maps. |
-| Littleroot and Verdanturf extensions | [`custom-map-extensions`](#feature-manifest) — `data/layouts/{Littleroot,Verdanturf}_Extension/**` | Current layout JSON, map headers, events, and warps | Modern adaptation | 2 | These are the only added extension-layout directory names in the inventory. Recreate geometry, connections, events, and warps in current formats; enter and leave both maps from a clean save. |
+| --- | --- | --- | --- | --- | --- |
+| Upstream map and event source conversion | [`upstream-map-event-source`](#feature-manifest) — all `maps-and-events` paths except the explicit custom map features below | Current `data/maps/**`, `data/layouts/**`, JSON/Poryscript generation | Use upstream equivalent | 2 | The paths include generated `.inc` files and broad map-source format drift. Keep current source formats; regenerate derived scripts, build, and smoke-test affected vanilla maps. |
+| Littleroot and Verdanturf extensions | [`custom-map-extensions`](#feature-manifest) — all ten `data/{maps,layouts}/{Littleroot,Verdanturf}_Extension/**` paths | Current layout JSON, map headers, events, and warps | Modern adaptation | 2 | The inventory adds five source/layout paths for each extension. Recreate geometry, connections, events, and warps in current formats; enter and leave both maps from a clean save. |
+| Petalburg Woodgrove early-game and rebattle map edits | [`petalburg-woodgrove-map-edits`](#feature-manifest) — four `data/{maps,layouts}/PetalburgWoodgrove/**` paths | Current Petalburg Woodgrove JSON/layout/event sources | Modern adaptation | 2 | `0080ad90f7` adds the map/layout/scripts as part of map reworks and mandatory trainers; `43acf35679` changes its tiles; `8ae5c75c40` updates a gym-rebattle placement. Recreate those authored map/event deltas and verify the early-game route plus the rebattle trigger. |
 | Full-screen start menu | [`fullscreen-start-menu`](#feature-manifest) — full-screen graphics plus start-menu implementation paths | Current `src/start_menu.c`, UI assets, current menu interfaces | Modern adaptation | 3 | `git show --stat 1b4f48d986` adds the fullscreen assets and implementation. Verify every visible action and the archived gender/clock variants on the current menu APIs. |
 | Better Bag and remaining QoL UI | [`better-bag-and-qol-ui`](#feature-manifest) — remaining UI-category paths | Current `src/item_menu.c`, `src/option_menu.c`, item configuration and UI assets | Modern adaptation | 3 | BetterBag history (`3480da2c61`, `f5f24a808a`, `ef69dde01e`) identifies pocket and interface behavior. Verify all pockets, item selection/use, and options; retain current menu internals. |
 | Species, item, move, trainer, encounter, graphic, and cry corpus | [`legacy-content-corpus`](#feature-manifest) — every `game-content` path | Current `src/data/**`, `graphics/**`, `sound/**`, trainer/encounter generators | Use upstream equivalent | 2 | `git show --stat 624403ccab` identifies legacy mint work, while the inventory’s Gen 9 assets/tables overlap maintained expansion content. Compare the legacy deltas at current source-table granularity; configure or add only content absent from 1.16.3, then verify linkage and gameplay use. |
@@ -24,7 +25,7 @@ The machine-readable manifest supplies the behavior, dependencies, validation, s
   "features": [
     {
       "id": "upstream-map-event-source",
-      "legacy_paths": [{"category": "maps-and-events", "prefixes": ["data/maps/", "data/layouts/"], "exclude_prefixes": ["data/layouts/Littleroot_Extension/", "data/layouts/Verdanturf_Extension/"]}],
+      "legacy_paths": [{"category": "maps-and-events", "prefixes": ["data/maps/", "data/layouts/"], "exclude_prefixes": ["data/layouts/Littleroot_Extension/", "data/maps/Littleroot_Extension/", "data/layouts/Verdanturf_Extension/", "data/maps/Verdanturf_Extension/", "data/layouts/PetalburgWoodgrove/", "data/maps/PetalburgWoodgrove/"]}],
       "target_paths": ["data/maps/**", "data/layouts/**", "tools/poryscript/**"],
       "decision": "Use upstream equivalent", "phase": 2, "status": "planned",
       "behavior": "Keep the current map source pipeline and vanilla map behavior.",
@@ -34,13 +35,23 @@ The machine-readable manifest supplies the behavior, dependencies, validation, s
     },
     {
       "id": "custom-map-extensions",
-      "legacy_paths": [{"category": "maps-and-events", "prefixes": ["data/layouts/Littleroot_Extension/", "data/layouts/Verdanturf_Extension/"]}],
-      "target_paths": ["data/layouts/Littleroot_Extension/**", "data/layouts/Verdanturf_Extension/**", "data/maps/**"],
+      "legacy_paths": [{"category": "maps-and-events", "prefixes": ["data/layouts/Littleroot_Extension/", "data/maps/Littleroot_Extension/", "data/layouts/Verdanturf_Extension/", "data/maps/Verdanturf_Extension/"]}],
+      "target_paths": ["data/layouts/Littleroot_Extension/**", "data/maps/Littleroot_Extension/**", "data/layouts/Verdanturf_Extension/**", "data/maps/Verdanturf_Extension/**"],
       "decision": "Modern adaptation", "phase": 2, "status": "planned",
       "behavior": "Preserve the two named custom extension maps, their connections, and their events.",
       "dependencies": ["upstream map source pipeline"],
       "validation": ["clean-save entry and exit", "warp/event checks", "supported build"],
-      "evidence": ["inventory paths data/layouts/Littleroot_Extension/*", "inventory paths data/layouts/Verdanturf_Extension/*"]
+      "evidence": ["inventory adds five Littleroot_Extension paths", "inventory adds five Verdanturf_Extension paths"]
+    },
+    {
+      "id": "petalburg-woodgrove-map-edits",
+      "legacy_paths": [{"category": "maps-and-events", "prefixes": ["data/layouts/PetalburgWoodgrove/", "data/maps/PetalburgWoodgrove/"]}],
+      "target_paths": ["data/layouts/PetalburgWoodgrove/**", "data/maps/PetalburgWoodgrove/**"],
+      "decision": "Modern adaptation", "phase": 2, "status": "planned",
+      "behavior": "Preserve the authored Woodgrove tile, early-game trainer, and gym-rebattle placement changes.",
+      "dependencies": ["upstream map source pipeline", "trainer-rebattle data"],
+      "validation": ["early-game traversal", "mandatory-trainer checks", "gym-rebattle trigger", "supported build"],
+      "evidence": ["git show --stat 0080ad90f7", "git show --stat 43acf35679", "git show --stat 8ae5c75c40"]
     },
     {
       "id": "fullscreen-start-menu",
