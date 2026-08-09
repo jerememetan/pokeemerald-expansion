@@ -4,70 +4,33 @@
 
 **Goal:** Produce a reproducible, reviewed inventory of every archived-hack difference before porting ROM features to 1.16.3.
 
-**Architecture:** A small standard-library Python command reads Git's NUL-delimited name-status output for `master...archive/master-pre-1.16.3`, assigns every path to a migration category, and emits deterministic JSON. A Markdown review groups those paths into feature decisions. The tool is reporting-only and never copies legacy source files.
+**Architecture:** A small standard-library Python command reads Git's NUL-delimited name-status output for `master...archive/master-pre-1.16.3`, assigns every path to a migration category, and emits deterministic JSON. A Markdown review groups those paths into feature decisions. The tool is reporting-only and never copies legacy source files. Validation is command-based rather than test-driven.
 
-**Tech Stack:** Python 3 standard library, Git, unittest.
+**Tech Stack:** Python 3 standard library and Git.
 
 ---
 
 ## File structure
 
 - Create: `tools/migration/generate_legacy_inventory.py` — Git-diff parser and JSON renderer.
-- Create: `tools/migration/tests/test_generate_legacy_inventory.py` — parser, classifier, and JSON-shape tests.
 - Create: `docs/superpowers/inventories/2026-08-09-legacy-feature-inventory.json` — generated path-level evidence.
 - Create: `docs/superpowers/inventories/2026-08-09-legacy-feature-review.md` — feature-level decisions.
 - Modify: `docs/superpowers/specs/2026-08-09-original-hack-1.16.3-migration-design.md` — links to both evidence files.
 
-### Task 1: Define the inventory behavior with failing tests
-
-**Files:**
-
-- Create: `tools/migration/tests/test_generate_legacy_inventory.py`
-- Test: `tools/migration/tests/test_generate_legacy_inventory.py`
-
-- [ ] **Step 1: Add tests for NUL-delimited Git records, including rename records**
-
-```python
-raw = b"M\\0src/main.c\\0A\\0graphics/ui_startmenu_full/logo.png\\0R100\\0old.c\\0new.c\\0"
-assert parse_name_status(raw) == [
-    {"status": "M", "old_path": None, "path": "src/main.c"},
-    {"status": "A", "old_path": None, "path": "graphics/ui_startmenu_full/logo.png"},
-    {"status": "R100", "old_path": "old.c", "path": "new.c"},
-]
-```
-
-- [ ] **Step 2: Add table-driven classifier tests**
-
-```python
-assert classify_path("data/maps/LittlerootTown/scripts.pory") == "maps-and-events"
-assert classify_path("graphics/ui_startmenu_full/bg.png") == "ui-and-quality-of-life"
-assert classify_path("data/trainers.parties") == "game-content"
-assert classify_path("src/battle_script_commands.c") == "gameplay-and-battle"
-assert classify_path("tools/poryscript/poryscript") == "tooling-and-generated-output"
-```
-
-- [ ] **Step 3: Run the test module before implementation**
-
-Run: `python -m unittest tools/migration/tests/test_generate_legacy_inventory.py -v`
-
-Expected: FAIL because `generate_legacy_inventory` does not exist.
-
-- [ ] **Step 4: Commit the failing test checkpoint**
-
-Run: `git add tools/migration/tests/test_generate_legacy_inventory.py; git commit -m "test: define legacy inventory expectations"`
-
-Expected: one test-only commit.
-
-### Task 2: Implement the reporting-only inventory command
+### Task 1: Implement the reporting-only inventory command
 
 **Files:**
 
 - Create: `tools/migration/generate_legacy_inventory.py`
-- Test: `tools/migration/tests/test_generate_legacy_inventory.py`
+- Test: command execution and JSON validation.
 
 - [ ] **Step 1: Implement `parse_name_status(raw)`**
 
-Split the byte string by `b"\\0"`, discard the final empty field, decode UTF-8, and consume one path for ordinary statuses or two paths for statuses beginning with `R` or `C`. Return dictionaries with exactly `status`, `old_path`, and `path`.
+```python
+fields = [field.decode("utf-8") for field in raw.split(b"\\0") if field]
+# Consume one path for ordinary statuses and two paths for R*/C* statuses.
+# Each result has exactly: status, old_path, path.
+```
 
 - [ ] **Step 2: Implement `classify_path(path)` with these ordered rules**
 
@@ -83,25 +46,24 @@ if path.startswith(("src/", "include/", "asm/", "constants/", "data/battle", "te
 return "tooling-and-generated-output"
 ```
 
-- [ ] **Step 3: Implement `render_inventory(base_ref, legacy_ref, records)`**
+- [ ] **Step 3: Implement `render_inventory(base_ref, legacy_ref, records)` and the command-line entry point**
 
-Attach the category to each record, sort changes by `path`, count categories with `collections.Counter`, and return JSON containing exactly `base_ref`, `legacy_ref`, `summary`, and `changes`, using `indent=2`, `sort_keys=True`, and a trailing newline.
 
-- [ ] **Step 4: Implement the command-line entry point**
+Attach the category to each record, sort changes by `path`, count categories with `collections.Counter`, and return JSON containing `base_ref`, `legacy_ref`, `summary`, and `changes`, using stable indentation and a trailing newline. Use `argparse` flags `--base`, `--legacy`, and required `--output`; run `git diff --name-status -z {base}...{legacy}` with `subprocess.run(check=True, stdout=subprocess.PIPE)`.
 
-Use `argparse` flags `--base` (default `master`), `--legacy` (default `archive/master-pre-1.16.3`), and required `--output`. Run `git diff --name-status -z <base>...<legacy>` with `subprocess.run(check=True, stdout=subprocess.PIPE)`, then create the output parent directory and write the JSON in UTF-8.
+- [ ] **Step 4: Run the command against the preserved refs and validate its output**
 
-- [ ] **Step 5: Run tests and commit**
+Run: `python tools/migration/generate_legacy_inventory.py --base master --legacy archive/master-pre-1.16.3 --output docs/superpowers/inventories/2026-08-09-legacy-feature-inventory.json; python -m json.tool docs/superpowers/inventories/2026-08-09-legacy-feature-inventory.json > $null`
 
-Run: `python -m unittest tools/migration/tests/test_generate_legacy_inventory.py -v`
+Expected: both commands exit 0, and the JSON has non-empty `changes`.
 
-Expected: all parser, category, and render tests pass.
+- [ ] **Step 5: Commit the tool and generated output**
 
-Run: `git add tools/migration/generate_legacy_inventory.py tools/migration/tests/test_generate_legacy_inventory.py; git commit -m "tools: add legacy migration inventory generator"`
+Run: `git add tools/migration/generate_legacy_inventory.py docs/superpowers/inventories/2026-08-09-legacy-feature-inventory.json; git commit -m "tools: inventory legacy hack changes"`
 
 Expected: one implementation commit.
 
-### Task 3: Generate the evidence and complete the feature review
+### Task 2: Complete the feature review
 
 **Files:**
 
