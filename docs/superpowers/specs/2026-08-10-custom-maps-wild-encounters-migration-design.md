@@ -70,6 +70,8 @@ Restore each custom map's authoritative `map.json` and adapt it to the current s
 
 The current repository has no authored `scripts.pory` map sources. Translate the archived Littleroot and Verdanturf Poryscript behavior into current authored `scripts.inc` files, and retain Petalburg Woodgrove's authored `scripts.inc`. Do not restore obsolete Poryscript-generated line directives.
 
+Verdanturf Extension's Leaf object depends on `VerdanturfExtension_LeafIntro`, `VerdanturfExtension_LeafDefeat`, and `VerdanturfExtension_LeafPostBattle`, which are absent from the current text source. Restore only those three archived labels in `data/text/trainers.inc`; do not copy neighboring archived trainer dialogue.
+
 Add only these shared-map access deltas:
 
 - `LittlerootTown` gains a `down` connection to `MAP_LITTLEROOT_EXTENSION` at offset `7`; the extension retains its `up` connection at offset `-7`.
