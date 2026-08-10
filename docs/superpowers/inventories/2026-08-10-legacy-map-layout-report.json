@@ -1,0 +1,509 @@
+{
+  "classification_counts": {
+    "layouts": {
+      "archive_only": 3,
+      "base": 441,
+      "current": 785,
+      "current_only": 344,
+      "legacy": 444,
+      "shared": 441
+    },
+    "maps": {
+      "both_changed_conflicts": 0,
+      "custom_only": 61,
+      "identical": 380,
+      "upstream_only": 0
+    },
+    "unique_borders": {
+      "both_changed_conflicts": 0,
+      "custom_only": 1,
+      "identical": 440,
+      "upstream_only": 0
+    }
+  },
+  "source_refs": {
+    "base_ref": "024848a9e9c0ae30cbb9a269779504561d5443d3",
+    "current_source": "worktree",
+    "layouts_json": "data/layouts/layouts.json",
+    "legacy_commit": "f5e81e85df6fe40ae490bf7268d0186d7f0426ed",
+    "legacy_ref": "archive/master-pre-1.16.3"
+  },
+  "writes": [
+    {
+      "byte_length": 1536,
+      "layout_id": "LAYOUT_ALTERING_CAVE",
+      "new_sha256": "c63a55e5c400e6c7426334fbca4bcfca6eb14e43f8580b252827746905157cba",
+      "old_sha256": "51fab8b4622ddd10f45814a2210b7d3c9836020edee71d51002c03c4d107b5e9",
+      "repository_path": "data/layouts/AlteringCave/map.bin"
+    },
+    {
+      "byte_length": 2448,
+      "layout_id": "LAYOUT_AQUA_HIDEOUT_B1F",
+      "new_sha256": "825e13150f67083379861e2940dfea7ebcf9ea1b1db9074f1334f39b748d09a1",
+      "old_sha256": "e3c55b859b019797965e012e524f0f10d1d776d1500446d0b9033f23fed000b1",
+      "repository_path": "data/layouts/AquaHideout_B1F/map.bin"
+    },
+    {
+      "byte_length": 800,
+      "layout_id": "LAYOUT_DEWFORD_TOWN",
+      "new_sha256": "9c88137a0f0cbf9f5b73ad318b9fa5c39aaef9401fc787b3bd98a28d413ad62e",
+      "old_sha256": "f99942a2f630ca1fc16d7d84f7f831485934962c4477e8b1fa88cfbe30c61f74",
+      "repository_path": "data/layouts/DewfordTown/map.bin"
+    },
+    {
+      "byte_length": 6400,
+      "layout_id": "LAYOUT_EVER_GRANDE_CITY",
+      "new_sha256": "f72e57b7c633e581f68d25eda987f230871f85b4d0b67a6f356ff2814883111f",
+      "old_sha256": "65fe6682e18c1befab20f007b86811bc5cde2346ded25dd908cc15757ce17d1c",
+      "repository_path": "data/layouts/EverGrandeCity/map.bin"
+    },
+    {
+      "byte_length": 456,
+      "layout_id": "LAYOUT_EVER_GRANDE_CITY_POKEMON_LEAGUE_1F",
+      "new_sha256": "e5b79856c6ff0078dd14d35cd11bb67c027bb8fbae47f9f01d0df11e9948192c",
+      "old_sha256": "aecc5a42619b5b8608a95651b4a313024dc9de3972a508af3c86e1a062df59fb",
+      "repository_path": "data/layouts/EverGrandeCity_PokemonLeague_1F/map.bin"
+    },
+    {
+      "byte_length": 1600,
+      "layout_id": "LAYOUT_FORTREE_CITY",
+      "new_sha256": "48a5ac4962acd10a97d88a151ef0d03ac77e2f60b17397a47e9d3076966e6a2b",
+      "old_sha256": "af2689cf610f5dcc6d1c2967a093d199d9a77b722cd0f8a677b9bc1299a9da94",
+      "repository_path": "data/layouts/FortreeCity/map.bin"
+    },
+    {
+      "byte_length": 2760,
+      "layout_id": "LAYOUT_JAGGED_PASS",
+      "new_sha256": "f6d532302dc5e52322b93daa7654ed0e1a0bfa95718253403a00c0feab5cd209",
+      "old_sha256": "912233ef593db8109d90c4777eb65c8171bbfd3d3c7e2d713cb7f2969a35aa15",
+      "repository_path": "data/layouts/JaggedPass/map.bin"
+    },
+    {
+      "byte_length": 800,
+      "layout_id": "LAYOUT_LAVARIDGE_TOWN",
+      "new_sha256": "677d1e1bed7fc6b0e26d8774242abe5b20ccc93e7346d096a9edbb12c7f34188",
+      "old_sha256": "a1a2850c714eb3da1fd532b2c1dfd80f45d1c6d3a52fd23fe0f0e17547c90be5",
+      "repository_path": "data/layouts/LavaridgeTown/map.bin"
+    },
+    {
+      "byte_length": 646,
+      "layout_id": "LAYOUT_LAVARIDGE_TOWN_GYM_1F",
+      "new_sha256": "061b267099e01e8048776e6a5b0b803d155f0a9c8238e8f975c168a017620fe4",
+      "old_sha256": "7e802f74bd6b0e527c0322200d55c50532be0e2b3ec29ed2f9aeecc92ab27af9",
+      "repository_path": "data/layouts/LavaridgeTown_Gym_1F/map.bin"
+    },
+    {
+      "byte_length": 646,
+      "layout_id": "LAYOUT_LAVARIDGE_TOWN_GYM_B1F",
+      "new_sha256": "52ebde7fca2912683ec6a9b4a6b07159c02a424bb0e8d4fb6640a8d8ee227217",
+      "old_sha256": "d50a38bc4d0a3a38bf1a5866277dba9ef41e43d65c78f24a03ba219b9d8262c8",
+      "repository_path": "data/layouts/LavaridgeTown_Gym_B1F/map.bin"
+    },
+    {
+      "byte_length": 6400,
+      "layout_id": "LAYOUT_LILYCOVE_CITY",
+      "new_sha256": "962e2883874a7a13363559848602548453618a41bea059549e86e501d04da734",
+      "old_sha256": "39f4fd5da845b8cd987a28f0e7df5938c7eeb08db118e171d521102b6c0c3f62",
+      "repository_path": "data/layouts/LilycoveCity/map.bin"
+    },
+    {
+      "byte_length": 800,
+      "layout_id": "LAYOUT_LITTLEROOT_TOWN",
+      "new_sha256": "bc7647904cefe5802abb1e330eef8d29022bb9c07d253bbc1a4a7e47635954ea",
+      "old_sha256": "9bc2d52ac0f515a2af3a12483e3913aee3948531f91ca0547513f53ce92acf9d",
+      "repository_path": "data/layouts/LittlerootTown/map.bin"
+    },
+    {
+      "byte_length": 8,
+      "layout_id": "LAYOUT_LITTLEROOT_EXTENSION",
+      "new_sha256": "89c89c87d738e3e7fbdd760d5f747f0a1686fea5743c94886b87e79d6ab8e980",
+      "old_sha256": null,
+      "repository_path": "data/layouts/Littleroot_Extension/border.bin"
+    },
+    {
+      "byte_length": 160,
+      "layout_id": "LAYOUT_LITTLEROOT_EXTENSION",
+      "new_sha256": "e1e64d4dfb07d390a4e139ee9db6c8793932d598fb82047e1679f26fc94c86d7",
+      "old_sha256": null,
+      "repository_path": "data/layouts/Littleroot_Extension/map.bin"
+    },
+    {
+      "byte_length": 2812,
+      "layout_id": "LAYOUT_MAGMA_HIDEOUT_1F",
+      "new_sha256": "8ad39f3d88fb936e22178bcaaa9c834c42ffd1ed88a3ae99086a80878eca8c55",
+      "old_sha256": "5b0b99ed326ba904628936f2d342ab59e3712e9d8915c299008722579d98f5e5",
+      "repository_path": "data/layouts/MagmaHideout_1F/map.bin"
+    },
+    {
+      "byte_length": 2574,
+      "layout_id": "LAYOUT_MAGMA_HIDEOUT_2F_1R",
+      "new_sha256": "6fb6c93db843220cac669ec7d1120aeff8993190cda9457820819bb7da4df3fb",
+      "old_sha256": "b5809235e4ff5a8e57be455bef3a8a254243727ce1e855e1f60dca68f6aaade6",
+      "repository_path": "data/layouts/MagmaHideout_2F_1R/map.bin"
+    },
+    {
+      "byte_length": 1600,
+      "layout_id": "LAYOUT_MAUVILLE_CITY",
+      "new_sha256": "18219d0a7436fc368ebd45f54f29156ba8e35fd89798570dd24d2056e5552e67",
+      "old_sha256": "ec1e2a33d33024c4b029b11ca991bfeee25647e860209a0d9fb65ab3a7db8b68",
+      "repository_path": "data/layouts/MauvilleCity/map.bin"
+    },
+    {
+      "byte_length": 1872,
+      "layout_id": "LAYOUT_MOSSDEEP_CITY_GYM",
+      "new_sha256": "e4b6e625b7c65cdb3b851750995d7d01a9d4184bf39ce3c553863c48f82aba44",
+      "old_sha256": "d527223d0fb51bf2ce6526c18f6f9d93741a957c4c88b1bc5357c6f27d7ddc1a",
+      "repository_path": "data/layouts/MossdeepCity_Gym/map.bin"
+    },
+    {
+      "byte_length": 836,
+      "layout_id": "LAYOUT_MT_PYRE_1F",
+      "new_sha256": "1f34482c95c0318caafd2c493f32c1fc435ead234a3ae23825402e3050722374",
+      "old_sha256": "09813771e6a2e2ceeca7eece958783aea04e620022d81b44b10f5e7b70b45753",
+      "repository_path": "data/layouts/MtPyre_1F/map.bin"
+    },
+    {
+      "byte_length": 338,
+      "layout_id": "LAYOUT_MT_PYRE_2F",
+      "new_sha256": "705c85e37cb2cebb096e92e53ae30c758c1c7784a41869b3f28837db468d9e1f",
+      "old_sha256": "90d40ce45e823ae95c3e82e592d63c3806288f3b6943b0e935808f02fb050888",
+      "repository_path": "data/layouts/MtPyre_2F/map.bin"
+    },
+    {
+      "byte_length": 338,
+      "layout_id": "LAYOUT_MT_PYRE_3F",
+      "new_sha256": "8a1b338ea25837c02b5126596d933a59c3d399338848182683517babf58814a3",
+      "old_sha256": "7bcda46ad324c9eb65818e240c5f4f2ceaef7f1a949372dc1140cc6e1b856daf",
+      "repository_path": "data/layouts/MtPyre_3F/map.bin"
+    },
+    {
+      "byte_length": 800,
+      "layout_id": "LAYOUT_OLDALE_TOWN",
+      "new_sha256": "2403b16006f15c0f92bdfb7fd352663ff09bfb9e37e3340edd456bebb734cd5b",
+      "old_sha256": "4e56863147c213125211821aabb09ea551675249e940a065720618bac79a9cfb",
+      "repository_path": "data/layouts/OldaleTown/map.bin"
+    },
+    {
+      "byte_length": 8,
+      "layout_id": "LAYOUT_PETALBURG_WOODGROVE",
+      "new_sha256": "aa298641e3346d9c7ac51454222ff057768946e61980fd82e4db65912df412fe",
+      "old_sha256": null,
+      "repository_path": "data/layouts/PetalburgWoodgrove/border.bin"
+    },
+    {
+      "byte_length": 1500,
+      "layout_id": "LAYOUT_PETALBURG_WOODGROVE",
+      "new_sha256": "ade9510109bf57abfd01babe8fc71dec061b97366226c4009e0dca68bb12afcd",
+      "old_sha256": null,
+      "repository_path": "data/layouts/PetalburgWoodgrove/map.bin"
+    },
+    {
+      "byte_length": 4224,
+      "layout_id": "LAYOUT_PETALBURG_WOODS",
+      "new_sha256": "a22882e50175bee710f4000c47d8084e0598f55291b86cf5459df19b9f85abfb",
+      "old_sha256": "053fc2e64d7065edaf0bfaa4b7504fef15ad808dc458f8b937cb3a2604495442",
+      "repository_path": "data/layouts/PetalburgWoods/map.bin"
+    },
+    {
+      "byte_length": 252,
+      "layout_id": "LAYOUT_POKEMON_CENTER_1F",
+      "new_sha256": "354381bdb10f45db1fae41bce149d6867aff4e035b62956037d280b13b7f106e",
+      "old_sha256": "e17f23a18cd85fe575d260eac560469e860217dec9d3c5b3cae3232cab0be005",
+      "repository_path": "data/layouts/PokemonCenter_1F/map.bin"
+    },
+    {
+      "byte_length": 2000,
+      "layout_id": "LAYOUT_ROUTE102",
+      "new_sha256": "38192ca2bd9ae769a11d44691253ea0cf37fed79cc010b165aeb69e370a8e069",
+      "old_sha256": "0bdc71923970bbe8ddaa3bc5793ffbaea0e79c7d08ff14b7aff7ec559570778c",
+      "repository_path": "data/layouts/Route102/map.bin"
+    },
+    {
+      "byte_length": 3520,
+      "layout_id": "LAYOUT_ROUTE103",
+      "new_sha256": "43c5bdca42ced79efd860274ce5d8ff8cad2627f48ef120980b056f1afb4b526",
+      "old_sha256": "e9acf129a6fc0bef6755e6be721887ddcddeb69fe968289d98135e9195a3d837",
+      "repository_path": "data/layouts/Route103/map.bin"
+    },
+    {
+      "byte_length": 6400,
+      "layout_id": "LAYOUT_ROUTE104",
+      "new_sha256": "1839605cbde2ea18a6f9337f9ba205e60c4bb5c1c19317b8822c967d10e1ac99",
+      "old_sha256": "4dcbb4276d1010228e45ebe2dd1e3c9c2bd5843ba127ae108968c646d41f4329",
+      "repository_path": "data/layouts/Route104/map.bin"
+    },
+    {
+      "byte_length": 3200,
+      "layout_id": "LAYOUT_ROUTE106",
+      "new_sha256": "cc8d38eb3c15e917961c5e50a2b77d113bc9fe00344e7a944ec091c2f6350213",
+      "old_sha256": "1b7db80391ceca412e992ad704ccfd8018d3d97a810d4a144033e1193ba67849",
+      "repository_path": "data/layouts/Route106/map.bin"
+    },
+    {
+      "byte_length": 2400,
+      "layout_id": "LAYOUT_ROUTE107",
+      "new_sha256": "519d3bd2dda0c6626c7bb922ccb0a365a9dfd9a55cae11cae8227bf12f36b083",
+      "old_sha256": "af88a3d526aa59d8f263514364c2ae76f333d3e0dc9222c3b1786f10f025e097",
+      "repository_path": "data/layouts/Route107/map.bin"
+    },
+    {
+      "byte_length": 2400,
+      "layout_id": "LAYOUT_ROUTE108",
+      "new_sha256": "1a575613e22581d4b3d5a639e267569e78607bc4d54f725441d686313bf8dabd",
+      "old_sha256": "ce26f4514773299ca502927ce59fa0fc2b70aba91be665f56c3d3bc8aa0bf886",
+      "repository_path": "data/layouts/Route108/map.bin"
+    },
+    {
+      "byte_length": 5040,
+      "layout_id": "LAYOUT_ROUTE109",
+      "new_sha256": "0d7a2109e00d8b4ed7e91fd69be5116fca18df474d6d4a013ff635e2af0f15ce",
+      "old_sha256": "4f6c0180928cdc3268eaef6331137696f24626c9e618361b937a1d0b9a664d23",
+      "repository_path": "data/layouts/Route109/map.bin"
+    },
+    {
+      "byte_length": 8000,
+      "layout_id": "LAYOUT_ROUTE110",
+      "new_sha256": "0fc00b72ecd682476a2fec2eaba1e42868f3667460f0186e90c941b64ea64f7e",
+      "old_sha256": "53c4da783116c4b726989d9ebb872ee4cbfaea1e148b39a4e345471e60a3d6da",
+      "repository_path": "data/layouts/Route110/map.bin"
+    },
+    {
+      "byte_length": 11200,
+      "layout_id": "LAYOUT_ROUTE111",
+      "new_sha256": "0fbb862757b5e6e6d6ed6070268715db7dc4be5ab8d67695d498ccf48c2ecf35",
+      "old_sha256": "d25bb04ec8a68b82f4af9808974187335c67c17443b0b97c46296bd6f2abfd2a",
+      "repository_path": "data/layouts/Route111/map.bin"
+    },
+    {
+      "byte_length": 4800,
+      "layout_id": "LAYOUT_ROUTE112",
+      "new_sha256": "4a29d0f434a90ce85377623fe8aee461ee1ea79b8a1bcc556461604ec8280711",
+      "old_sha256": "f47781dfb67f0661cf8665c39fe7b6d41cde4a59db5652093336a9029dca10d3",
+      "repository_path": "data/layouts/Route112/map.bin"
+    },
+    {
+      "byte_length": 4000,
+      "layout_id": "LAYOUT_ROUTE113",
+      "new_sha256": "cd2c355edecf1566dde6fd77668c7fd9d41d55923adfc39cb96d04ad254f48a9",
+      "old_sha256": "17f3dcc5809540d6e99068c980c019f4a67241e1fea276714d2f5f9b9689ee6b",
+      "repository_path": "data/layouts/Route113/map.bin"
+    },
+    {
+      "byte_length": 6400,
+      "layout_id": "LAYOUT_ROUTE114",
+      "new_sha256": "4004c22224a40a80e78fdef905a2a6b649f493a060eebd73d3132555da7eb83c",
+      "old_sha256": "2b2c0d6a1bc47c172448db6a9231522d5716d5272ac827dd0fbd23f9798d88d7",
+      "repository_path": "data/layouts/Route114/map.bin"
+    },
+    {
+      "byte_length": 6400,
+      "layout_id": "LAYOUT_ROUTE115",
+      "new_sha256": "51157ea7f01a03e7939303658a719d3ba1c85b3b50f0792c80a3d6c130308c8e",
+      "old_sha256": "5c7cc1c25391885af12d40f67c08e2cb04a9984bf2b7d9a604855d1e85ba10fc",
+      "repository_path": "data/layouts/Route115/map.bin"
+    },
+    {
+      "byte_length": 4000,
+      "layout_id": "LAYOUT_ROUTE116",
+      "new_sha256": "c48967880ad3fb2c5ee165d46cd19fd009b28b660c22de7d5928a888423161bc",
+      "old_sha256": "c38a1213697a4029db23ead73551a25a5cff0a32460bf422f4bc4378f854a9c8",
+      "repository_path": "data/layouts/Route116/map.bin"
+    },
+    {
+      "byte_length": 2400,
+      "layout_id": "LAYOUT_ROUTE117",
+      "new_sha256": "bb99bd61f46cd7c9107cbcff80c3feced83c8379a357b3d6a52550ec45cc1dce",
+      "old_sha256": "ba053345af2fadd7d934f8b8d1c896c7b64de7da050a8f399756a682c18324b6",
+      "repository_path": "data/layouts/Route117/map.bin"
+    },
+    {
+      "byte_length": 3200,
+      "layout_id": "LAYOUT_ROUTE118",
+      "new_sha256": "75baa5df2d48405a787d40c1e6ef1b7a9c0c879dcac5c12a99039eace5a12e71",
+      "old_sha256": "09f14c4e289b4bbd0629b475564a30e8528458666ee01886479a932604b14c6d",
+      "repository_path": "data/layouts/Route118/map.bin"
+    },
+    {
+      "byte_length": 11200,
+      "layout_id": "LAYOUT_ROUTE119",
+      "new_sha256": "d55d6c7d21631db7009aee2b05ceb24964ed34786f798e16cf57d77931bee3fa",
+      "old_sha256": "f6c948a0fb90925afce408b4bf1742ba56e9e6c95ffb899a348d563d1ba5f47d",
+      "repository_path": "data/layouts/Route119/map.bin"
+    },
+    {
+      "byte_length": 520,
+      "layout_id": "LAYOUT_ROUTE119_WEATHER_INSTITUTE_1F",
+      "new_sha256": "3f85a8981d43daa5cbae29c7368aba61d7b2374d271892cecaaa558cec7d833a",
+      "old_sha256": "516cc0a30b5be01cd76f13d2b11568760a77a8ab164ce85c87c34f3a2004d24c",
+      "repository_path": "data/layouts/Route119_WeatherInstitute_1F/map.bin"
+    },
+    {
+      "byte_length": 8000,
+      "layout_id": "LAYOUT_ROUTE120",
+      "new_sha256": "01d6fd39baeb36c8130bb6932aca6301c2ff5c38601165855cdcada75348e595",
+      "old_sha256": "5a05035e557bc5aa82a66e5817708a6e4d280731938f6b2840eef3a90cae4818",
+      "repository_path": "data/layouts/Route120/map.bin"
+    },
+    {
+      "byte_length": 3200,
+      "layout_id": "LAYOUT_ROUTE121",
+      "new_sha256": "d61770bb3ac7eccf89583b7d01f27a8992b9400429cd74e4087c2d52f2b8c22c",
+      "old_sha256": "d12a569334aa635dcedd83b2ffb19ea49b034a26ad57aa21a6383c84122e4efa",
+      "repository_path": "data/layouts/Route121/map.bin"
+    },
+    {
+      "byte_length": 5600,
+      "layout_id": "LAYOUT_ROUTE123",
+      "new_sha256": "1358003b4f62c04d401783eae1f02f9cbd0b7ff4f30e0af1c84fd93b6eb93ddf",
+      "old_sha256": "18ac219841ec9d2213a788cff291087d81266e8baf8c12e1b8bf5d918d4dc26e",
+      "repository_path": "data/layouts/Route123/map.bin"
+    },
+    {
+      "byte_length": 12800,
+      "layout_id": "LAYOUT_ROUTE124",
+      "new_sha256": "0304bea8e81f0a713964dc6de662b37532880bd71abf017593c757a3525b504b",
+      "old_sha256": "f0cd92f35880a375cf452fd149f04bd8031d4141d9a10de97fedaaae83c56aad",
+      "repository_path": "data/layouts/Route124/map.bin"
+    },
+    {
+      "byte_length": 6400,
+      "layout_id": "LAYOUT_ROUTE125",
+      "new_sha256": "8938e8596246a4963d017b422ed2520b759cd969233348fbc85674a9b9cdf3f0",
+      "old_sha256": "4edacf0c5d0ed044b9a265615742186db1c09db559707db4bef81c1aedd9827c",
+      "repository_path": "data/layouts/Route125/map.bin"
+    },
+    {
+      "byte_length": 12800,
+      "layout_id": "LAYOUT_ROUTE126",
+      "new_sha256": "5b2ac6bd6a9ad6cb275a4e8daca851897baceaa677289c9dce6b81ac2c680bfc",
+      "old_sha256": "f82e44e744e9135417778d9ce02b39d12d050ba8e6033b5891956a3dffbbb082",
+      "repository_path": "data/layouts/Route126/map.bin"
+    },
+    {
+      "byte_length": 12800,
+      "layout_id": "LAYOUT_ROUTE127",
+      "new_sha256": "b6be997357a598d4fc9043bdc2809f646e2729ac8823928748960d95b69ef1f1",
+      "old_sha256": "b56a8c342a119a825518e6c14d47d63b4fb72374096567cf9a64cf7d6ef7ca19",
+      "repository_path": "data/layouts/Route127/map.bin"
+    },
+    {
+      "byte_length": 9600,
+      "layout_id": "LAYOUT_ROUTE128",
+      "new_sha256": "fc284cf2cee29d47d935dce84710a5df0b7d1c03a7881079364cbaf7c2a1a49b",
+      "old_sha256": "f954f50b0996ca4c6be9c64ec1ac1a9660a50ed2e3dc554613293bde47ba422e",
+      "repository_path": "data/layouts/Route128/map.bin"
+    },
+    {
+      "byte_length": 6400,
+      "layout_id": "LAYOUT_ROUTE129",
+      "new_sha256": "ca60c03551a027530b5e21141870b184ff26af90ded26542c6a358a322df7873",
+      "old_sha256": "8f2667270702eb34efa808dbdafbee4d677e25bb2d89c24b51e577457f1011b6",
+      "repository_path": "data/layouts/Route129/map.bin"
+    },
+    {
+      "byte_length": 6400,
+      "layout_id": "LAYOUT_ROUTE130",
+      "new_sha256": "daad0c61a030d5d80d2cff6d96cf15ef549b22e73ec7b2be8d0bc8d40068a799",
+      "old_sha256": "17b985fa2c35ccafd4c15cbb3ac99c2170fb9b5ec50b0a7526e6ab72d2eb1f51",
+      "repository_path": "data/layouts/Route130/map.bin"
+    },
+    {
+      "byte_length": 4800,
+      "layout_id": "LAYOUT_ROUTE131",
+      "new_sha256": "ebcd8dde71c90eba7e485faa88c10274d542387140325393daa014e3f2f8ebe9",
+      "old_sha256": "f37c7300b40969630c780319814cd875f8aad346423be9818a76c6c32e7779d9",
+      "repository_path": "data/layouts/Route131/map.bin"
+    },
+    {
+      "byte_length": 4800,
+      "layout_id": "LAYOUT_RUSTBORO_CITY",
+      "new_sha256": "99a2d0171f710e5bf3ed1f6182cef225021bc88f5310591dc9c0726550022e5d",
+      "old_sha256": "5d1838e9e5c8f8a3bd519b0f7adaf1f01ef556deb9f8d5b46ec5996b26d51c4d",
+      "repository_path": "data/layouts/RustboroCity/map.bin"
+    },
+    {
+      "byte_length": 840,
+      "layout_id": "LAYOUT_SEAFLOOR_CAVERN_ROOM1",
+      "new_sha256": "20e63a5b8542042be431b12ae61271e17dd386170b3f3c583e96eda4b17b2987",
+      "old_sha256": "80dd58d40696d3e2285014597f0416c358b3f43c964f25cd35f49d46f55525b1",
+      "repository_path": "data/layouts/SeafloorCavern_Room1/map.bin"
+    },
+    {
+      "byte_length": 544,
+      "layout_id": "LAYOUT_SEAFLOOR_CAVERN_ROOM3",
+      "new_sha256": "2252a7722c4e917f426ba853a0eaa2f3c3a27247fe9c4a3d8cafa8ecbd979f1d",
+      "old_sha256": "6a79b55413f315143dc34112b80909826761a0e91ad33f399edc6dd33367f6e8",
+      "repository_path": "data/layouts/SeafloorCavern_Room3/map.bin"
+    },
+    {
+      "byte_length": 7200,
+      "layout_id": "LAYOUT_SOOTOPOLIS_CITY",
+      "new_sha256": "e9deb70905aa01965e7f4d047ffdb93cc70382197235f9a3d7d9d9213a228a2c",
+      "old_sha256": "620c9c896617640b73595ea98d32d68b8eb0e850ea681c7b2f51f30b8f43fe49",
+      "repository_path": "data/layouts/SootopolisCity/map.bin"
+    },
+    {
+      "byte_length": 884,
+      "layout_id": "LAYOUT_SOOTOPOLIS_CITY_GYM_1F",
+      "new_sha256": "4d90983d4688f4e7020b990816d9164cad64e8aeab54212ede381d3c28ac8983",
+      "old_sha256": "cf87d29377201dd2f825131db2e0fe06af1bb3a720e3dcb3f99077ac97169469",
+      "repository_path": "data/layouts/SootopolisCity_Gym_1F/map.bin"
+    },
+    {
+      "byte_length": 884,
+      "layout_id": "LAYOUT_SOOTOPOLIS_CITY_GYM_B1F",
+      "new_sha256": "3fbc6428301acba49bd428e58f7059b9dc5b4e10bf4e7c25cde8d309930e907c",
+      "old_sha256": "117e9500edb73620207f9179ad722bc4dcd63a0dfe5c96eaae2928f99a389c09",
+      "repository_path": "data/layouts/SootopolisCity_Gym_B1F/map.bin"
+    },
+    {
+      "byte_length": 8,
+      "layout_id": "LAYOUT_VERDANTURF_TOWN",
+      "new_sha256": "fcab713b5d6fcb439d6661423adff6965686069e03d8500b68a8625a5d84199c",
+      "old_sha256": "bad8a60123a7252ef3517596b35b2e0c7f11ef2b7b1e5ea058be2b54f26f0548",
+      "repository_path": "data/layouts/VerdanturfTown/border.bin"
+    },
+    {
+      "byte_length": 800,
+      "layout_id": "LAYOUT_VERDANTURF_TOWN",
+      "new_sha256": "d80a1591972f7a62060561977120b9b814e451d14a7ef302d73f1265969baee7",
+      "old_sha256": "1a40e9a8990e3e789b4205e8836b0ab49927c6c3e5dfe36df96c611f323af097",
+      "repository_path": "data/layouts/VerdanturfTown/map.bin"
+    },
+    {
+      "byte_length": 8,
+      "layout_id": "LAYOUT_VERDANTURF_EXTENSION",
+      "new_sha256": "c576777a25bb2580aa7d4848153600a36efc98979926e04ca88bd53fa3052268",
+      "old_sha256": null,
+      "repository_path": "data/layouts/Verdanturf_Extension/border.bin"
+    },
+    {
+      "byte_length": 400,
+      "layout_id": "LAYOUT_VERDANTURF_EXTENSION",
+      "new_sha256": "5f5087647ff0f2f8ecb20756d761512e7c936535e4a630f285c492d4bca3461b",
+      "old_sha256": null,
+      "repository_path": "data/layouts/Verdanturf_Extension/map.bin"
+    },
+    {
+      "byte_length": 4140,
+      "layout_id": "LAYOUT_VICTORY_ROAD_1F",
+      "new_sha256": "b7b84815a540069a9756583c488132005f4512dede68d1c67e4c48b09904c2bc",
+      "old_sha256": "b100693756672442b3f583a8886950d07b68bac1b6eafe07a2b5fe721d1c484e",
+      "repository_path": "data/layouts/VictoryRoad_1F/map.bin"
+    },
+    {
+      "byte_length": 2852,
+      "layout_id": "LAYOUT_VICTORY_ROAD_B1F",
+      "new_sha256": "29219b4bbeda5f4d97e77265e02b99590dc7d73ea1c6adf465905887bc05c3ad",
+      "old_sha256": "574316b10f2989df34eb3a53c3fc4bd946bb0e67bb679e15dfc91997cb47d684",
+      "repository_path": "data/layouts/VictoryRoad_B1F/map.bin"
+    },
+    {
+      "byte_length": 2852,
+      "layout_id": "LAYOUT_VICTORY_ROAD_B2F",
+      "new_sha256": "74257ad00c6885383b6b5c8f22e826fff08dd776795f2657a8d3a2178b86bd52",
+      "old_sha256": "60f525ef9b6e374604f4dcfd96ef1091b6b9bdaac2b73860b345eb75476c00c0",
+      "repository_path": "data/layouts/VictoryRoad_B2F/map.bin"
+    }
+  ]
+}
