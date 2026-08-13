@@ -17,6 +17,7 @@ from typing import Any
 LEGACY_REF = "archive/master-pre-1.16.3"
 AUDITED_LEGACY_COMMIT = "f5e81e85df6fe40ae490bf7268d0186d7f0426ed"
 BASE_REF = "024848a9e9c0ae30cbb9a269779504561d5443d3"
+CURRENT_BASELINE_COMMIT = "a68f1c7c8af8a6138a766cd98f3d3292cda14614"
 LAYOUTS_JSON = "data/layouts/layouts.json"
 CUSTOM_LAYOUT_IDS = {
     "LAYOUT_LITTLEROOT_EXTENSION",
@@ -123,8 +124,17 @@ def resolve_legacy_commit(
 
 
 def validate_source_refs(legacy_commit: str) -> None:
+    for commit in (BASE_REF, CURRENT_BASELINE_COMMIT):
+        result = subprocess.run(
+            ["git", "rev-parse", "--verify", f"{commit}^{{commit}}"],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        if result.stdout.strip() != commit:
+            raise ValueError(f"immutable source commit did not resolve exactly: {commit}")
     result = subprocess.run(
-        ["git", "merge-base", "--all", legacy_commit, "HEAD"],
+        ["git", "merge-base", "--all", legacy_commit, CURRENT_BASELINE_COMMIT],
         check=True,
         capture_output=True,
         text=True,
@@ -132,7 +142,8 @@ def validate_source_refs(legacy_commit: str) -> None:
     merge_bases = result.stdout.splitlines()
     if merge_bases != [BASE_REF]:
         raise ValueError(
-            f"unexpected merge base for {LEGACY_REF} and HEAD: {merge_bases} "
+            f"unexpected merge base for {LEGACY_REF} and {CURRENT_BASELINE_COMMIT}: "
+            f"{merge_bases} "
             f"(expected [{BASE_REF!r}])"
         )
 
@@ -169,11 +180,19 @@ def checked_binary_path(value: object, filename: str, context: str) -> str:
     return value
 
 
-def worktree_bytes(root: Path, path: str) -> bytes:
-    target = root.joinpath(*PurePosixPath(path).parts)
-    if not target.is_file():
-        raise ValueError(f"worktree binary is missing: {path}")
-    return target.read_bytes()
+def git_optional_bytes(ref: str, path: str) -> bytes | None:
+    """Read one Git path, returning None only when that path is absent."""
+    result = subprocess.run(
+        ["git", "ls-tree", "-z", "--name-only", ref, "--", path],
+        check=True,
+        capture_output=True,
+    )
+    if not result.stdout:
+        return None
+    listed_path = result.stdout.removesuffix(b"\0").decode("utf-8")
+    if listed_path != path:
+        raise RuntimeError(f"unexpected Git path while inspecting {ref}:{path}: {listed_path}")
+    return git_bytes(ref, path)
 
 
 def classify(legacy: bytes, base: bytes, current: bytes) -> str:
@@ -203,32 +222,53 @@ def write_candidate(candidate_root: Path, path: str, data: bytes) -> Path:
     return target
 
 
-def verify_preimages(
+def verify_destination_state(
     root: Path, writes: list[tuple[str, str, bytes, bytes | None]]
-) -> None:
+) -> str:
+    baseline_paths = []
+    postimage_paths = []
     mismatches = []
-    for _layout_id, path, _new_data, expected_old_data in writes:
+    for _layout_id, path, new_data, expected_old_data in writes:
         target = root.joinpath(*PurePosixPath(path).parts).resolve()
-        ensure_within(root / "data" / "layouts", target, f"preimage path {path}")
-        if expected_old_data is None:
-            if target.exists():
-                mismatches.append(f"{path}: expected absence, but the path exists")
-            continue
+        ensure_within(root / "data" / "layouts", target, f"destination path {path}")
         try:
-            current_data = target.read_bytes()
-        except (FileNotFoundError, IsADirectoryError, PermissionError) as error:
-            mismatches.append(f"{path}: could not read expected file ({error})")
+            live_data = target.read_bytes()
+        except FileNotFoundError:
+            live_data = None
+        except (IsADirectoryError, PermissionError) as error:
+            mismatches.append(f"{path}: could not read destination ({error})")
             continue
-        if current_data != expected_old_data:
+
+        if live_data == expected_old_data:
+            baseline_paths.append(path)
+        elif live_data == new_data:
+            postimage_paths.append(path)
+        else:
+            expected = (
+                "absence"
+                if expected_old_data is None
+                else f"baseline sha256 {sha256(expected_old_data)}"
+            )
+            actual = "absence" if live_data is None else f"sha256 {sha256(live_data)}"
             mismatches.append(
-                f"{path}: expected sha256 {sha256(expected_old_data)}, "
-                f"found {sha256(current_data)}"
+                f"{path}: expected {expected} or postimage sha256 {sha256(new_data)}, "
+                f"found {actual}"
             )
     if mismatches:
         raise RuntimeError(
-            "authoritative layout preimage mismatch; no files were replaced:\n- "
+            "authoritative layout destination mismatch; no candidate, report, or "
+            "authoritative files were written:\n- "
             + "\n- ".join(mismatches)
         )
+    if baseline_paths and postimage_paths:
+        raise RuntimeError(
+            "mixed authoritative layout state; no candidate, report, or authoritative "
+            "files were written:\n- baseline paths: "
+            + ", ".join(baseline_paths)
+            + "\n- postimage paths: "
+            + ", ".join(postimage_paths)
+        )
+    return "baseline" if baseline_paths else "postimage"
 
 
 def _write_fsynced_file(temporary: Path, data: bytes) -> None:
@@ -239,16 +279,52 @@ def _write_fsynced_file(temporary: Path, data: bytes) -> None:
         os.fsync(stream.fileno())
 
 
+def _preserve_failed_restoration(
+    restoration: Path,
+    target: Path,
+    old_data: bytes,
+    cleanup_paths: set[Path],
+) -> str:
+    """Keep an exact preimage after restoration itself could not be installed."""
+    cleanup_paths.discard(restoration)
+    try:
+        restoration_data = restoration.read_bytes()
+    except BaseException as validation_error:
+        return (
+            f"restoration retained at {restoration}; could not revalidate captured "
+            f"preimage: {validation_error}"
+        )
+    if restoration_data != old_data:
+        return f"restoration retained at {restoration}, but differs from captured preimage"
+    recovery = target.parent / (
+        f".{target.name}.legacy-map-layout-recovery-{uuid.uuid4().hex}.bin"
+    )
+    if os.path.lexists(recovery):
+        return (
+            f"exact preimage retained at {restoration}; recovery path unexpectedly "
+            f"exists: {recovery}"
+        )
+    try:
+        os.replace(restoration, recovery)
+    except BaseException as publication_error:
+        return (
+            f"exact preimage retained at {restoration}; recovery publication failed: "
+            f"{publication_error}"
+        )
+    return f"exact preimage preserved at recovery path {recovery}"
+
+
 def apply_writes_atomically(
     root: Path,
     writes: list[tuple[str, str, bytes, bytes | None]],
     validated_candidates: dict[str, bytes],
-) -> None:
+) -> int:
     # Fail before staging anything if classification-time inputs have changed.
-    verify_preimages(root, writes)
+    if verify_destination_state(root, writes) == "postimage":
+        return 0
 
     transaction_id = uuid.uuid4().hex
-    cleanup_paths: list[Path] = []
+    cleanup_paths: set[Path] = set()
     plans: list[tuple[Path, Path | None, Path, bytes | None, str]] = []
     for index, (_layout_id, path, _new_data, old_data) in enumerate(writes):
         target = root.joinpath(*PurePosixPath(path).parts).resolve()
@@ -268,15 +344,19 @@ def apply_writes_atomically(
         for temporary in planned_temporaries:
             if os.path.lexists(temporary):
                 raise RuntimeError(f"temporary apply path unexpectedly exists: {temporary}")
-            cleanup_paths.append(temporary)
+            cleanup_paths.add(temporary)
         plans.append((forward, restoration, target, old_data, path))
 
     try:
-        for forward, _restoration, _target, _old_data, path in plans:
+        for forward, restoration, _target, old_data, path in plans:
             _write_fsynced_file(forward, validated_candidates[path])
+            if restoration is not None:
+                assert old_data is not None
+                _write_fsynced_file(restoration, old_data)
 
         # Close the staging race before the first authoritative replacement.
-        verify_preimages(root, writes)
+        if verify_destination_state(root, writes) != "baseline":
+            raise RuntimeError("authoritative layout destinations changed while staging")
 
         rollback_plans: list[tuple[Path, Path | None, bytes | None, str]] = []
         replacing_path = "<none>"
@@ -293,14 +373,22 @@ def apply_writes_atomically(
                     else:
                         if restoration is None:
                             raise RuntimeError("missing restoration path")
-                        _write_fsynced_file(restoration, old_data)
                         os.replace(restoration, target)
                 except BaseException as rollback_error:
-                    rollback_errors.append(f"{path}: {rollback_error}")
+                    detail = f"{path}: {rollback_error}"
+                    if old_data is not None and restoration is not None:
+                        try:
+                            detail += "; " + _preserve_failed_restoration(
+                                restoration, target, old_data, cleanup_paths
+                            )
+                        except BaseException as preservation_error:
+                            detail += f"; preimage preservation failed: {preservation_error}"
+                    rollback_errors.append(detail)
 
             if not rollback_errors:
                 try:
-                    verify_preimages(root, writes)
+                    if verify_destination_state(root, writes) != "baseline":
+                        raise RuntimeError("rollback did not restore the baseline state")
                 except BaseException as rollback_error:
                     rollback_errors.append(str(rollback_error))
 
@@ -313,6 +401,9 @@ def apply_writes_atomically(
                 f"atomic apply failed while replacing {replacing_path}; "
                 "all replaced files were restored"
             ) from apply_error
+        if verify_destination_state(root, writes) != "postimage":
+            raise RuntimeError("atomic apply did not install the complete postimage state")
+        return len(writes)
     finally:
         for temporary in cleanup_paths:
             temporary.unlink(missing_ok=True)
@@ -325,10 +416,9 @@ def build_import(
     validate_source_refs(legacy_commit)
     legacy = layout_index(git_json(legacy_commit, LAYOUTS_JSON), "legacy layouts")
     base = layout_index(git_json(BASE_REF, LAYOUTS_JSON), "base layouts")
-    current_document = json.loads((root / LAYOUTS_JSON).read_text(encoding="utf-8"))
-    if not isinstance(current_document, dict):
-        raise ValueError(f"{LAYOUTS_JSON} is not a JSON object")
-    current = layout_index(current_document, "current layouts")
+    current = layout_index(
+        git_json(CURRENT_BASELINE_COMMIT, LAYOUTS_JSON), "current layouts"
+    )
 
     shared_ids = set(legacy) & set(current)
     archive_only_ids = set(legacy) - set(current)
@@ -393,7 +483,7 @@ def build_import(
         map_path = paths["blockdata_filepath"]
         map_legacy = git_bytes(legacy_commit, map_path)
         map_base = git_bytes(BASE_REF, map_path)
-        map_current = worktree_bytes(root, map_path)
+        map_current = git_bytes(CURRENT_BASELINE_COMMIT, map_path)
         map_class = classify(map_legacy, map_base, map_current)
         map_counts[map_class] += 1
         if map_class == "custom_only":
@@ -407,7 +497,7 @@ def build_import(
         border_class = classify(
             git_bytes(legacy_commit, border_path),
             git_bytes(BASE_REF, border_path),
-            worktree_bytes(root, border_path),
+            git_bytes(CURRENT_BASELINE_COMMIT, border_path),
         )
         border_classes[border_path] = border_class
         border_counts[border_class] += 1
@@ -474,13 +564,10 @@ def build_import(
     writes_with_preimages = []
     write_records = []
     for layout_id, path, data in writes:
-        old_path = root.joinpath(*PurePosixPath(path).parts)
-        if old_path.exists() and not old_path.is_file():
-            raise ValueError(f"authoritative layout target is not a file: {path}")
-        old_data = old_path.read_bytes() if old_path.exists() else None
+        old_data = git_optional_bytes(CURRENT_BASELINE_COMMIT, path)
         if path in custom_target_paths and old_data is not None:
             raise ValueError(
-                f"archive-only custom layout target unexpectedly exists: {path}"
+                f"archive-only custom layout target exists in baseline: {path}"
             )
         writes_with_preimages.append((layout_id, path, data, old_data))
         write_records.append(
@@ -492,6 +579,8 @@ def build_import(
                 "byte_length": len(data),
             }
         )
+
+    verify_destination_state(root, writes_with_preimages)
 
     report: dict[str, object] = {
         "source_refs": {
@@ -545,8 +634,8 @@ def main() -> int:
         validated_candidates[path] = candidate_data
 
     if args.apply:
-        apply_writes_atomically(root, writes, validated_candidates)
-        print(f"applied {len(writes)} validated layout binaries")
+        replacement_count = apply_writes_atomically(root, writes, validated_candidates)
+        print(f"applied {replacement_count} validated layout binaries")
     else:
         print(f"wrote {len(writes)} candidate layout binaries to {candidate_root}")
 

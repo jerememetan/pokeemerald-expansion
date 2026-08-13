@@ -165,7 +165,7 @@ Expected: exactly 61 existing `map.bin` files and `VerdanturfTown/border.bin` ch
 
 ```powershell
 $report = Get-Content -LiteralPath 'docs/superpowers/inventories/2026-08-10-legacy-map-layout-report.json' -Raw | ConvertFrom-Json
-$layoutPaths = @($report.writes | ForEach-Object { $_.path })
+$layoutPaths = @($report.writes | ForEach-Object { $_.repository_path })
 git add -- tools/migration/import_legacy_map_layouts.py docs/superpowers/inventories/2026-08-10-legacy-map-layout-report.json
 git add -- $layoutPaths
 git commit -m "feat: restore custom map layouts"

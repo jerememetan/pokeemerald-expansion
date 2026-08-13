@@ -131,7 +131,6 @@ class DestinationPlan:
     restoration: Path | None
     backup: Path | None
     recovery_hold: Path
-    installed: bool = False
     retain_backup: bool = False
     retain_recovery_hold: bool = False
     retain_restoration: bool = False
@@ -766,7 +765,6 @@ def vacate_and_install(plan: DestinationPlan) -> None:
         raise RuntimeError(
             f"{plan.name} no-clobber install found a concurrent live destination"
         ) from error
-    plan.installed = True
     fsync_directory(plan.path.parent)
     if plan.path.read_bytes() != plan.intended:
         fail(f"{plan.name} live destination differs after no-clobber install")
