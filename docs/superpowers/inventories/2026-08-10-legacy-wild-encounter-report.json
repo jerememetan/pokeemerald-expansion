@@ -1,0 +1,2808 @@
+{
+  "source_refs": {
+    "current_path": "src/data/wild_encounters.json",
+    "current_commit": "f763eadb5030b543ba5a4827f79ddbe44c01ec62",
+    "legacy_ref": "archive/master-pre-1.16.3",
+    "legacy_commit": "f5e81e85df6fe40ae490bf7268d0186d7f0426ed",
+    "legacy_path": "src/data/wild_encounters.json",
+    "base_commit": "024848a9e9c0ae30cbb9a269779504561d5443d3",
+    "base_path": "src/data/wild_encounters.json",
+    "removals_path": "docs/superpowers/inventories/2026-08-10-legacy-wild-encounter-removals.json",
+    "removals_sha256": "e99ce094a320517a39261eb7d6d3157692da9548969486f25c47be6aab447991",
+    "species_path": "include/constants/species.h",
+    "species_commit": "f763eadb5030b543ba5a4827f79ddbe44c01ec62",
+    "species_sha256": "cd07f8773c77b41b9821ac030cbc3e0ef82cc6f0740efc7608afbf5ffe78ceaf"
+  },
+  "counts": {
+    "base": 135,
+    "legacy": 145,
+    "current": 399,
+    "legacy_modified": 122,
+    "legacy_only": 10,
+    "current_only": 264,
+    "both_changed_conflicts": 0,
+    "replaced": 122,
+    "added": 10,
+    "retained_current_only": 264,
+    "removed_slots": 108,
+    "final": 409,
+    "final_gWildMonHeaders": 398
+  },
+  "replaced": [
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute101"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute102"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute103"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute104"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute105"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute110"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute111"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute112"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute113"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute114"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute116"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute117"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute118"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute124"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gPetalburgWoods"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRusturfTunnel"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gGraniteCave_1F"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gGraniteCave_B1F"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMtPyre_1F"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gVictoryRoad_1F"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gSafariZone_South"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gUnderwater_Route126"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gGraniteCave_B2F"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gFieryPath"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMeteorFalls_B1F_2R"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gJaggedPass"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute106"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute107"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute108"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute109"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute115"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gNewMauville_Inside"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute119"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute120"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute121"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute122"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute123"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMtPyre_2F"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMtPyre_3F"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMtPyre_4F"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMtPyre_5F"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMtPyre_6F"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMtPyre_Exterior"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMtPyre_Summit"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gGraniteCave_StevensRoom"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute125"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute126"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute127"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute128"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute129"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute130"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute131"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute132"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute133"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute134"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gSeafloorCavern_Room1"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gSeafloorCavern_Room2"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gSeafloorCavern_Room3"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gSeafloorCavern_Room4"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gSeafloorCavern_Room5"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gSeafloorCavern_Room6"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gSeafloorCavern_Room7"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gSeafloorCavern_Room8"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gSeafloorCavern_Entrance"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gCaveOfOrigin_Entrance"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gCaveOfOrigin_1F"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gCaveOfOrigin_UnusedRubySapphireMap1"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gCaveOfOrigin_UnusedRubySapphireMap2"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gCaveOfOrigin_UnusedRubySapphireMap3"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gNewMauville_Entrance"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gSafariZone_Southwest"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gSafariZone_North"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gSafariZone_Northwest"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gVictoryRoad_B1F"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gVictoryRoad_B2F"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMeteorFalls_1F_1R"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMeteorFalls_1F_2R"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMeteorFalls_B1F_1R"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gShoalCave_LowTideStairsRoom"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gShoalCave_LowTideLowerRoom"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gShoalCave_LowTideInnerRoom"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gShoalCave_LowTideEntranceRoom"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gLilycoveCity"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gDewfordTown"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gSlateportCity"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMossdeepCity"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gPacifidlogTown"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gEverGrandeCity"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gPetalburgCity"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gUnderwater_Route124"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gShoalCave_LowTideIceRoom"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gSkyPillar_1F"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gSootopolisCity"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gSkyPillar_3F"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gSkyPillar_5F"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gSafariZone_Southeast"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gSafariZone_Northeast"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMagmaHideout_1F"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMagmaHideout_2F_1R"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMagmaHideout_2F_2R"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMagmaHideout_3F_1R"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMagmaHideout_3F_2R"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMagmaHideout_4F"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMagmaHideout_3F_3R"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMagmaHideout_2F_3R"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMirageTower_1F"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMirageTower_2F"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMirageTower_3F"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMirageTower_4F"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gDesertUnderpass"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gArtisanCave_B1F"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gArtisanCave_1F"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gAlteringCave1"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gAlteringCave2"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gAlteringCave3"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gAlteringCave4"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gAlteringCave5"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gAlteringCave6"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gAlteringCave7"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gAlteringCave8"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gAlteringCave9"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMeteorFalls_StevensCave"
+    }
+  ],
+  "added": [
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gLittlerootTown0"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRustboroCity0"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMauvilleCity0"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gOldaleTown0"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gLavaridgeTown0"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gVerdanturf_Extension0"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gLittleroot_Extension0"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gFortreeCity0"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gScorchedSlab0"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gPetalburgWoodgrove0"
+    }
+  ],
+  "retained_current_only": [
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSevenIslandTanobyRuinsMoneanChamber_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSevenIslandTanobyRuinsMoneanChamber_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSevenIslandTanobyRuinsLiptooChamber_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSevenIslandTanobyRuinsLiptooChamber_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSevenIslandTanobyRuinsWeepthChamber_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSevenIslandTanobyRuinsWeepthChamber_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSevenIslandTanobyRuinsDilfordChamber_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSevenIslandTanobyRuinsDilfordChamber_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSevenIslandTanobyRuinsScufibChamber_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSevenIslandTanobyRuinsScufibChamber_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSevenIslandTanobyRuinsRixyChamber_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSevenIslandTanobyRuinsRixyChamber_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSevenIslandTanobyRuinsViapoisChamber_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSevenIslandTanobyRuinsViapoisChamber_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sViridianForest_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sViridianForest_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sMtMoon1F_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sMtMoon1F_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sMtMoonB1F_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sMtMoonB1F_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sMtMoonB2F_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sMtMoonB2F_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSSAnneExterior_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSSAnneExterior_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sDiglettsCaveB1F_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sDiglettsCaveB1F_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sVictoryRoad1F_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sVictoryRoad1F_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sVictoryRoad2F_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sVictoryRoad2F_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sVictoryRoad3F_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sVictoryRoad3F_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sPokemonMansion1F_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sPokemonMansion1F_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sPokemonMansion2F_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sPokemonMansion2F_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sPokemonMansion3F_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sPokemonMansion3F_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sPokemonMansionB1F_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sPokemonMansionB1F_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSafariZoneCenter_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSafariZoneCenter_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSafariZoneEast_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSafariZoneEast_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSafariZoneNorth_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSafariZoneNorth_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSafariZoneWest_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSafariZoneWest_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sCeruleanCave1F_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sCeruleanCave1F_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sCeruleanCave2F_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sCeruleanCave2F_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sCeruleanCaveB1F_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sCeruleanCaveB1F_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRockTunnel1F_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRockTunnel1F_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRockTunnelB1F_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRockTunnelB1F_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSeafoamIslands1F_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSeafoamIslands1F_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSeafoamIslandsB1F_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSeafoamIslandsB1F_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSeafoamIslandsB2F_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSeafoamIslandsB2F_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSeafoamIslandsB3F_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSeafoamIslandsB3F_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSeafoamIslandsB4F_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSeafoamIslandsB4F_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sPokemonTower3F_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sPokemonTower3F_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sPokemonTower4F_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sPokemonTower4F_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sPokemonTower5F_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sPokemonTower5F_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sPokemonTower6F_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sPokemonTower6F_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sPokemonTower7F_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sPokemonTower7F_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sPowerPlant_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sPowerPlant_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sMtEmberExterior_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sMtEmberExterior_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sMtEmberSummitPath1F_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sMtEmberSummitPath1F_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sMtEmberSummitPath2F_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sMtEmberSummitPath2F_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sMtEmberSummitPath3F_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sMtEmberSummitPath3F_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sMtEmberRubyPath1F_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sMtEmberRubyPath1F_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sMtEmberRubyPathB1F_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sMtEmberRubyPathB1F_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sMtEmberRubyPathB2F_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sMtEmberRubyPathB2F_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sMtEmberRubyPathB3F_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sMtEmberRubyPathB3F_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sMtEmberRubyPathB1FStairs_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sMtEmberRubyPathB1FStairs_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sMtEmberRubyPathB2FStairs_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sMtEmberRubyPathB2FStairs_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sThreeIslandBerryForest_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sThreeIslandBerryForest_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFourIslandIcefallCaveEntrance_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFourIslandIcefallCaveEntrance_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFourIslandIcefallCave1F_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFourIslandIcefallCave1F_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFourIslandIcefallCaveB1F_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFourIslandIcefallCaveB1F_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFourIslandIcefallCaveBack_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFourIslandIcefallCaveBack_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSixIslandPatternBush_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSixIslandPatternBush_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFiveIslandLostCaveRoom1_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFiveIslandLostCaveRoom1_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFiveIslandLostCaveRoom2_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFiveIslandLostCaveRoom2_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFiveIslandLostCaveRoom3_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFiveIslandLostCaveRoom3_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFiveIslandLostCaveRoom4_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFiveIslandLostCaveRoom4_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFiveIslandLostCaveRoom5_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFiveIslandLostCaveRoom5_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFiveIslandLostCaveRoom6_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFiveIslandLostCaveRoom6_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFiveIslandLostCaveRoom7_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFiveIslandLostCaveRoom7_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFiveIslandLostCaveRoom8_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFiveIslandLostCaveRoom8_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFiveIslandLostCaveRoom9_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFiveIslandLostCaveRoom9_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFiveIslandLostCaveRoom10_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFiveIslandLostCaveRoom10_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFiveIslandLostCaveRoom11_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFiveIslandLostCaveRoom11_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFiveIslandLostCaveRoom12_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFiveIslandLostCaveRoom12_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFiveIslandLostCaveRoom13_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFiveIslandLostCaveRoom13_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFiveIslandLostCaveRoom14_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFiveIslandLostCaveRoom14_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sOneIslandKindleRoad_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sOneIslandKindleRoad_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sOneIslandTreasureBeach_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sOneIslandTreasureBeach_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sTwoIslandCapeBrink_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sTwoIslandCapeBrink_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sThreeIslandBondBridge_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sThreeIslandBondBridge_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sThreeIslandPort_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sThreeIslandPort_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFiveIslandResortGorgeous_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFiveIslandResortGorgeous_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFiveIslandWaterLabyrinth_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFiveIslandWaterLabyrinth_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFiveIslandMeadow_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFiveIslandMeadow_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFiveIslandMemorialPillar_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFiveIslandMemorialPillar_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSixIslandOutcastIsland_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSixIslandOutcastIsland_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSixIslandGreenPath_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSixIslandGreenPath_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSixIslandWaterPath_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSixIslandWaterPath_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSixIslandRuinValley_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSixIslandRuinValley_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSevenIslandTrainerTower_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSevenIslandTrainerTower_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSevenIslandSevaultCanyonEntrance_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSevenIslandSevaultCanyonEntrance_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSevenIslandSevaultCanyon_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSevenIslandSevaultCanyon_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSevenIslandTanobyRuins_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSevenIslandTanobyRuins_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute1_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute1_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute2_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute2_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute3_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute3_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute4_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute4_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute5_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute5_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute6_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute6_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute7_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute7_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute8_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute8_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute9_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute9_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute10_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute10_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute11_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute11_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute12_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute12_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute13_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute13_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute14_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute14_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute15_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute15_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute16_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute16_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute17_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute17_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute18_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute18_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute19_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute19_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute20_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute20_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute21North_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute21North_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute21South_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute21South_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute22_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute22_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute23_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute23_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute24_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute24_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute25_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sRoute25_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sPalletTown_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sPalletTown_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sViridianCity_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sViridianCity_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sCeruleanCity_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sCeruleanCity_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sVermilionCity_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sVermilionCity_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sCeladonCity_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sCeladonCity_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFuchsiaCity_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFuchsiaCity_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sCinnabarIsland_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sCinnabarIsland_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sOneIsland_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sOneIsland_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFourIsland_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFourIsland_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFiveIsland_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sFiveIsland_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSixIslandAlteringCave_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSixIslandAlteringCave_2_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSixIslandAlteringCave_3_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSixIslandAlteringCave_4_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSixIslandAlteringCave_5_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSixIslandAlteringCave_6_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSixIslandAlteringCave_7_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSixIslandAlteringCave_8_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSixIslandAlteringCave_9_FireRed"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSixIslandAlteringCave_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSixIslandAlteringCave_2_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSixIslandAlteringCave_3_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSixIslandAlteringCave_4_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSixIslandAlteringCave_5_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSixIslandAlteringCave_6_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSixIslandAlteringCave_7_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSixIslandAlteringCave_8_LeafGreen"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "sSixIslandAlteringCave_9_LeafGreen"
+    }
+  ],
+  "removed_slots": [
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute101",
+      "map": "MAP_ROUTE101",
+      "legacy_slot": 5,
+      "min_level": 3,
+      "max_level": 3,
+      "species": "SPECIES_SKITTY"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute102",
+      "map": "MAP_ROUTE102",
+      "legacy_slot": 11,
+      "min_level": 4,
+      "max_level": 4,
+      "species": "SPECIES_PYUKUMUKU"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute103",
+      "map": "MAP_ROUTE103",
+      "legacy_slot": 11,
+      "min_level": 2,
+      "max_level": 2,
+      "species": "SPECIES_BELLSPROUT"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute104",
+      "map": "MAP_ROUTE104",
+      "legacy_slot": 2,
+      "min_level": 5,
+      "max_level": 5,
+      "species": "SPECIES_SPEAROW"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute110",
+      "map": "MAP_ROUTE110",
+      "legacy_slot": 13,
+      "min_level": 17,
+      "max_level": 17,
+      "species": "SPECIES_PINCURCHIN"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute111",
+      "map": "MAP_ROUTE111",
+      "legacy_slot": 8,
+      "min_level": 34,
+      "max_level": 34,
+      "species": "SPECIES_DUGTRIO_ALOLAN"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute112",
+      "map": "MAP_ROUTE112",
+      "legacy_slot": 1,
+      "min_level": 18,
+      "max_level": 18,
+      "species": "SPECIES_PANSEAR"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute113",
+      "map": "MAP_ROUTE113",
+      "legacy_slot": 5,
+      "min_level": 25,
+      "max_level": 25,
+      "species": "SPECIES_JIGGLYPUFF"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute114",
+      "map": "MAP_ROUTE114",
+      "legacy_slot": 5,
+      "min_level": 25,
+      "max_level": 25,
+      "species": "SPECIES_MOTHIM"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute116",
+      "map": "MAP_ROUTE116",
+      "legacy_slot": 3,
+      "min_level": 7,
+      "max_level": 8,
+      "species": "SPECIES_NINCADA"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute117",
+      "map": "MAP_ROUTE117",
+      "legacy_slot": 7,
+      "min_level": 17,
+      "max_level": 17,
+      "species": "SPECIES_YAMPER"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute118",
+      "map": "MAP_ROUTE118",
+      "legacy_slot": 4,
+      "min_level": 34,
+      "max_level": 36,
+      "species": "SPECIES_WATCHOG"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gPetalburgWoods",
+      "map": "MAP_PETALBURG_WOODS",
+      "legacy_slot": 1,
+      "min_level": 5,
+      "max_level": 5,
+      "species": "SPECIES_BLIPBUG"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRusturfTunnel",
+      "map": "MAP_RUSTURF_TUNNEL",
+      "legacy_slot": 9,
+      "min_level": 8,
+      "max_level": 9,
+      "species": "SPECIES_GIMMIGHOUL"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gGraniteCave_1F",
+      "map": "MAP_GRANITE_CAVE_1F",
+      "legacy_slot": 5,
+      "min_level": 13,
+      "max_level": 16,
+      "species": "SPECIES_INKAY"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gGraniteCave_B1F",
+      "map": "MAP_GRANITE_CAVE_B1F",
+      "legacy_slot": 5,
+      "min_level": 13,
+      "max_level": 16,
+      "species": "SPECIES_INKAY"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMtPyre_1F",
+      "map": "MAP_MT_PYRE_1F",
+      "legacy_slot": 10,
+      "min_level": 41,
+      "max_level": 44,
+      "species": "SPECIES_ROTOM"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gVictoryRoad_1F",
+      "map": "MAP_VICTORY_ROAD_1F",
+      "legacy_slot": 8,
+      "min_level": 62,
+      "max_level": 66,
+      "species": "SPECIES_GREAT_TUSK"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gSafariZone_South",
+      "map": "MAP_SAFARI_ZONE_SOUTH",
+      "legacy_slot": 3,
+      "min_level": 41,
+      "max_level": 41,
+      "species": "SPECIES_PUPITAR"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gGraniteCave_B2F",
+      "map": "MAP_GRANITE_CAVE_B2F",
+      "legacy_slot": 4,
+      "min_level": 13,
+      "max_level": 16,
+      "species": "SPECIES_MEDITITE"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gFieryPath",
+      "map": "MAP_FIERY_PATH",
+      "legacy_slot": 12,
+      "min_level": 23,
+      "max_level": 25,
+      "species": "SPECIES_STONJOURNER"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMeteorFalls_B1F_2R",
+      "map": "MAP_METEOR_FALLS_B1F_2R",
+      "legacy_slot": 9,
+      "min_level": 48,
+      "max_level": 52,
+      "species": "SPECIES_SILVALLY"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gJaggedPass",
+      "map": "MAP_JAGGED_PASS",
+      "legacy_slot": 8,
+      "min_level": 26,
+      "max_level": 31,
+      "species": "SPECIES_LICKITUNG"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute115",
+      "map": "MAP_ROUTE115",
+      "legacy_slot": 3,
+      "min_level": 27,
+      "max_level": 28,
+      "species": "SPECIES_SKITTY"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gNewMauville_Inside",
+      "map": "MAP_NEW_MAUVILLE_INSIDE",
+      "legacy_slot": 8,
+      "min_level": 32,
+      "max_level": 36,
+      "species": "SPECIES_HELIOLISK"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute119",
+      "map": "MAP_ROUTE119",
+      "legacy_slot": 1,
+      "min_level": 36,
+      "max_level": 36,
+      "species": "SPECIES_COMBEE"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute120",
+      "map": "MAP_ROUTE120",
+      "legacy_slot": 2,
+      "min_level": 36,
+      "max_level": 36,
+      "species": "SPECIES_CHANSEY"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute121",
+      "map": "MAP_ROUTE121",
+      "legacy_slot": 10,
+      "min_level": 42,
+      "max_level": 43,
+      "species": "SPECIES_CHERRIM"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute123",
+      "map": "MAP_ROUTE123",
+      "legacy_slot": 10,
+      "min_level": 54,
+      "max_level": 58,
+      "species": "SPECIES_CHANSEY"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMtPyre_2F",
+      "map": "MAP_MT_PYRE_2F",
+      "legacy_slot": 10,
+      "min_level": 41,
+      "max_level": 44,
+      "species": "SPECIES_ROTOM"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMtPyre_3F",
+      "map": "MAP_MT_PYRE_3F",
+      "legacy_slot": 10,
+      "min_level": 41,
+      "max_level": 44,
+      "species": "SPECIES_ROTOM"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMtPyre_4F",
+      "map": "MAP_MT_PYRE_4F",
+      "legacy_slot": 10,
+      "min_level": 41,
+      "max_level": 44,
+      "species": "SPECIES_ROTOM"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMtPyre_5F",
+      "map": "MAP_MT_PYRE_5F",
+      "legacy_slot": 7,
+      "min_level": 41,
+      "max_level": 44,
+      "species": "SPECIES_GOURGEIST"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMtPyre_6F",
+      "map": "MAP_MT_PYRE_6F",
+      "legacy_slot": 4,
+      "min_level": 41,
+      "max_level": 44,
+      "species": "SPECIES_GOURGEIST_SMALL"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMtPyre_Exterior",
+      "map": "MAP_MT_PYRE_EXTERIOR",
+      "legacy_slot": 6,
+      "min_level": 41,
+      "max_level": 44,
+      "species": "SPECIES_PERRSERKER"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMtPyre_Summit",
+      "map": "MAP_MT_PYRE_SUMMIT",
+      "legacy_slot": 3,
+      "min_level": 41,
+      "max_level": 44,
+      "species": "SPECIES_CHIMECHO"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gGraniteCave_StevensRoom",
+      "map": "MAP_GRANITE_CAVE_STEVENS_ROOM",
+      "legacy_slot": 10,
+      "min_level": 13,
+      "max_level": 16,
+      "species": "SPECIES_CLOBBOPUS"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRoute130",
+      "map": "MAP_ROUTE130",
+      "legacy_slot": 1,
+      "min_level": 38,
+      "max_level": 50,
+      "species": "SPECIES_OGERPON"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gSeafloorCavern_Room1",
+      "map": "MAP_SEAFLOOR_CAVERN_ROOM1",
+      "legacy_slot": 4,
+      "min_level": 45,
+      "max_level": 49,
+      "species": "SPECIES_WUGTRIO"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gSeafloorCavern_Room2",
+      "map": "MAP_SEAFLOOR_CAVERN_ROOM2",
+      "legacy_slot": 7,
+      "min_level": 45,
+      "max_level": 49,
+      "species": "SPECIES_BOMBIRDIER"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gSeafloorCavern_Room3",
+      "map": "MAP_SEAFLOOR_CAVERN_ROOM3",
+      "legacy_slot": 9,
+      "min_level": 45,
+      "max_level": 49,
+      "species": "SPECIES_CROBAT"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gSeafloorCavern_Room4",
+      "map": "MAP_SEAFLOOR_CAVERN_ROOM4",
+      "legacy_slot": 4,
+      "min_level": 45,
+      "max_level": 49,
+      "species": "SPECIES_WUGTRIO"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gSeafloorCavern_Room5",
+      "map": "MAP_SEAFLOOR_CAVERN_ROOM5",
+      "legacy_slot": 4,
+      "min_level": 45,
+      "max_level": 49,
+      "species": "SPECIES_WUGTRIO"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gSeafloorCavern_Room6",
+      "map": "MAP_SEAFLOOR_CAVERN_ROOM6",
+      "legacy_slot": 6,
+      "min_level": 45,
+      "max_level": 49,
+      "species": "SPECIES_NOCTOWL"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gSeafloorCavern_Room7",
+      "map": "MAP_SEAFLOOR_CAVERN_ROOM7",
+      "legacy_slot": 4,
+      "min_level": 45,
+      "max_level": 49,
+      "species": "SPECIES_WUGTRIO"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gSeafloorCavern_Room8",
+      "map": "MAP_SEAFLOOR_CAVERN_ROOM8",
+      "legacy_slot": 8,
+      "min_level": 45,
+      "max_level": 49,
+      "species": "SPECIES_HONCHKROW"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gCaveOfOrigin_Entrance",
+      "map": "MAP_CAVE_OF_ORIGIN_ENTRANCE",
+      "legacy_slot": 5,
+      "min_level": 48,
+      "max_level": 52,
+      "species": "SPECIES_SIGILYPH"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gCaveOfOrigin_1F",
+      "map": "MAP_CAVE_OF_ORIGIN_1F",
+      "legacy_slot": 10,
+      "min_level": 48,
+      "max_level": 52,
+      "species": "SPECIES_RHYDON"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gCaveOfOrigin_UnusedRubySapphireMap1",
+      "map": "MAP_CAVE_OF_ORIGIN_UNUSED_RUBY_SAPPHIRE_MAP1",
+      "legacy_slot": 2,
+      "min_level": 48,
+      "max_level": 52,
+      "species": "SPECIES_LYCANROC_MIDDAY"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gCaveOfOrigin_UnusedRubySapphireMap2",
+      "map": "MAP_CAVE_OF_ORIGIN_UNUSED_RUBY_SAPPHIRE_MAP2",
+      "legacy_slot": 4,
+      "min_level": 48,
+      "max_level": 52,
+      "species": "SPECIES_LYCANROC_MIDNIGHT"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gCaveOfOrigin_UnusedRubySapphireMap3",
+      "map": "MAP_CAVE_OF_ORIGIN_UNUSED_RUBY_SAPPHIRE_MAP3",
+      "legacy_slot": 1,
+      "min_level": 48,
+      "max_level": 52,
+      "species": "SPECIES_LYCANROC_DUSK"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gNewMauville_Entrance",
+      "map": "MAP_NEW_MAUVILLE_ENTRANCE",
+      "legacy_slot": 8,
+      "min_level": 32,
+      "max_level": 36,
+      "species": "SPECIES_STUNFISK"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gSafariZone_Southwest",
+      "map": "MAP_SAFARI_ZONE_SOUTHWEST",
+      "legacy_slot": 12,
+      "min_level": 41,
+      "max_level": 41,
+      "species": "SPECIES_WOBBUFFET"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gSafariZone_North",
+      "map": "MAP_SAFARI_ZONE_NORTH",
+      "legacy_slot": 6,
+      "min_level": 41,
+      "max_level": 45,
+      "species": "SPECIES_GLOOM"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gSafariZone_Northwest",
+      "map": "MAP_SAFARI_ZONE_NORTHWEST",
+      "legacy_slot": 5,
+      "min_level": 41,
+      "max_level": 45,
+      "species": "SPECIES_DODUO"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gVictoryRoad_B1F",
+      "map": "MAP_VICTORY_ROAD_B1F",
+      "legacy_slot": 6,
+      "min_level": 65,
+      "max_level": 68,
+      "species": "SPECIES_KANGASKHAN"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gVictoryRoad_B2F",
+      "map": "MAP_VICTORY_ROAD_B2F",
+      "legacy_slot": 6,
+      "min_level": 65,
+      "max_level": 69,
+      "species": "SPECIES_KANGASKHAN"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMeteorFalls_1F_1R",
+      "map": "MAP_METEOR_FALLS_1F_1R",
+      "legacy_slot": 7,
+      "min_level": 25,
+      "max_level": 26,
+      "species": "SPECIES_ELGYEM"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMeteorFalls_1F_2R",
+      "map": "MAP_METEOR_FALLS_1F_2R",
+      "legacy_slot": 5,
+      "min_level": 49,
+      "max_level": 52,
+      "species": "SPECIES_KLAWF"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMeteorFalls_B1F_1R",
+      "map": "MAP_METEOR_FALLS_B1F_1R",
+      "legacy_slot": 2,
+      "min_level": 49,
+      "max_level": 51,
+      "species": "SPECIES_STEELIX"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gShoalCave_LowTideStairsRoom",
+      "map": "MAP_SHOAL_CAVE_LOW_TIDE_STAIRS_ROOM",
+      "legacy_slot": 7,
+      "min_level": 44,
+      "max_level": 48,
+      "species": "SPECIES_SANDSLASH_ALOLAN"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gShoalCave_LowTideLowerRoom",
+      "map": "MAP_SHOAL_CAVE_LOW_TIDE_LOWER_ROOM",
+      "legacy_slot": 13,
+      "min_level": 46,
+      "max_level": 49,
+      "species": "SPECIES_IRON_BUNDLE"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gShoalCave_LowTideInnerRoom",
+      "map": "MAP_SHOAL_CAVE_LOW_TIDE_INNER_ROOM",
+      "legacy_slot": 13,
+      "min_level": 46,
+      "max_level": 49,
+      "species": "SPECIES_IRON_BUNDLE"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gShoalCave_LowTideEntranceRoom",
+      "map": "MAP_SHOAL_CAVE_LOW_TIDE_ENTRANCE_ROOM",
+      "legacy_slot": 13,
+      "min_level": 46,
+      "max_level": 49,
+      "species": "SPECIES_IRON_BUNDLE"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gLilycoveCity",
+      "map": "MAP_LILYCOVE_CITY",
+      "legacy_slot": 13,
+      "min_level": 38,
+      "max_level": 44,
+      "species": "SPECIES_FRAXURE"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gDewfordTown",
+      "map": "MAP_DEWFORD_TOWN",
+      "legacy_slot": 9,
+      "min_level": 12,
+      "max_level": 14,
+      "species": "SPECIES_STUNKY"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gEverGrandeCity",
+      "map": "MAP_EVER_GRANDE_CITY",
+      "legacy_slot": 10,
+      "min_level": 60,
+      "max_level": 65,
+      "species": "SPECIES_DITTO"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gShoalCave_LowTideIceRoom",
+      "map": "MAP_SHOAL_CAVE_LOW_TIDE_ICE_ROOM",
+      "legacy_slot": 13,
+      "min_level": 46,
+      "max_level": 49,
+      "species": "SPECIES_IRON_BUNDLE"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gSkyPillar_1F",
+      "map": "MAP_SKY_PILLAR_1F",
+      "legacy_slot": 3,
+      "min_level": 54,
+      "max_level": 56,
+      "species": "SPECIES_SIGILYPH"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gSootopolisCity",
+      "map": "MAP_SOOTOPOLIS_CITY",
+      "legacy_slot": 9,
+      "min_level": 43,
+      "max_level": 50,
+      "species": "SPECIES_CHANSEY"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gSkyPillar_3F",
+      "map": "MAP_SKY_PILLAR_3F",
+      "legacy_slot": 7,
+      "min_level": 53,
+      "max_level": 57,
+      "species": "SPECIES_ALTARIA"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gSkyPillar_5F",
+      "map": "MAP_SKY_PILLAR_5F",
+      "legacy_slot": 3,
+      "min_level": 54,
+      "max_level": 56,
+      "species": "SPECIES_GOLURK"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gSafariZone_Southeast",
+      "map": "MAP_SAFARI_ZONE_SOUTHEAST",
+      "legacy_slot": 4,
+      "min_level": 42,
+      "max_level": 47,
+      "species": "SPECIES_AUDINO"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gSafariZone_Northeast",
+      "map": "MAP_SAFARI_ZONE_NORTHEAST",
+      "legacy_slot": 7,
+      "min_level": 42,
+      "max_level": 47,
+      "species": "SPECIES_NOCTOWL"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMagmaHideout_1F",
+      "map": "MAP_MAGMA_HIDEOUT_1F",
+      "legacy_slot": 5,
+      "min_level": 42,
+      "max_level": 47,
+      "species": "SPECIES_GOLEM"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMagmaHideout_2F_1R",
+      "map": "MAP_MAGMA_HIDEOUT_2F_1R",
+      "legacy_slot": 11,
+      "min_level": 44,
+      "max_level": 48,
+      "species": "SPECIES_TYPHLOSION_HISUIAN"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMagmaHideout_2F_2R",
+      "map": "MAP_MAGMA_HIDEOUT_2F_2R",
+      "legacy_slot": 10,
+      "min_level": 42,
+      "max_level": 47,
+      "species": "SPECIES_TURTONATOR"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMagmaHideout_3F_1R",
+      "map": "MAP_MAGMA_HIDEOUT_3F_1R",
+      "legacy_slot": 11,
+      "min_level": 44,
+      "max_level": 48,
+      "species": "SPECIES_COALOSSAL"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMagmaHideout_3F_2R",
+      "map": "MAP_MAGMA_HIDEOUT_3F_2R",
+      "legacy_slot": 8,
+      "min_level": 42,
+      "max_level": 47,
+      "species": "SPECIES_NIDOKING"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMagmaHideout_4F",
+      "map": "MAP_MAGMA_HIDEOUT_4F",
+      "legacy_slot": 9,
+      "min_level": 42,
+      "max_level": 47,
+      "species": "SPECIES_NIDOQUEEN"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMagmaHideout_3F_3R",
+      "map": "MAP_MAGMA_HIDEOUT_3F_3R",
+      "legacy_slot": 3,
+      "min_level": 42,
+      "max_level": 47,
+      "species": "SPECIES_MUK"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMagmaHideout_2F_3R",
+      "map": "MAP_MAGMA_HIDEOUT_2F_3R",
+      "legacy_slot": 1,
+      "min_level": 42,
+      "max_level": 47,
+      "species": "SPECIES_LYCANROC"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMirageTower_1F",
+      "map": "MAP_MIRAGE_TOWER_1F",
+      "legacy_slot": 2,
+      "min_level": 21,
+      "max_level": 21,
+      "species": "SPECIES_TRAPINCH"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMirageTower_2F",
+      "map": "MAP_MIRAGE_TOWER_2F",
+      "legacy_slot": 13,
+      "min_level": 5,
+      "max_level": 5,
+      "species": "SPECIES_NONE"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMirageTower_3F",
+      "map": "MAP_MIRAGE_TOWER_3F",
+      "legacy_slot": 13,
+      "min_level": 5,
+      "max_level": 5,
+      "species": "SPECIES_NONE"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMirageTower_4F",
+      "map": "MAP_MIRAGE_TOWER_4F",
+      "legacy_slot": 4,
+      "min_level": 31,
+      "max_level": 34,
+      "species": "SPECIES_ARON"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gDesertUnderpass",
+      "map": "MAP_DESERT_UNDERPASS",
+      "legacy_slot": 10,
+      "min_level": 68,
+      "max_level": 74,
+      "species": "SPECIES_DITTO"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gArtisanCave_B1F",
+      "map": "MAP_ARTISAN_CAVE_B1F",
+      "legacy_slot": 8,
+      "min_level": 70,
+      "max_level": 76,
+      "species": "SPECIES_KOMMO_O"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gArtisanCave_1F",
+      "map": "MAP_ARTISAN_CAVE_1F",
+      "legacy_slot": 9,
+      "min_level": 70,
+      "max_level": 76,
+      "species": "SPECIES_HYDREIGON"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gAlteringCave1",
+      "map": "MAP_ALTERING_CAVE",
+      "legacy_slot": 2,
+      "min_level": 17,
+      "max_level": 19,
+      "species": "SPECIES_MACHOP"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gAlteringCave2",
+      "map": "MAP_ALTERING_CAVE",
+      "legacy_slot": 13,
+      "min_level": 5,
+      "max_level": 5,
+      "species": "SPECIES_NONE"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gAlteringCave3",
+      "map": "MAP_ALTERING_CAVE",
+      "legacy_slot": 13,
+      "min_level": 5,
+      "max_level": 5,
+      "species": "SPECIES_NONE"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gAlteringCave4",
+      "map": "MAP_ALTERING_CAVE",
+      "legacy_slot": 13,
+      "min_level": 5,
+      "max_level": 5,
+      "species": "SPECIES_NONE"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gAlteringCave5",
+      "map": "MAP_ALTERING_CAVE",
+      "legacy_slot": 13,
+      "min_level": 5,
+      "max_level": 5,
+      "species": "SPECIES_NONE"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gAlteringCave6",
+      "map": "MAP_ALTERING_CAVE",
+      "legacy_slot": 13,
+      "min_level": 5,
+      "max_level": 5,
+      "species": "SPECIES_NONE"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gAlteringCave7",
+      "map": "MAP_ALTERING_CAVE",
+      "legacy_slot": 13,
+      "min_level": 5,
+      "max_level": 5,
+      "species": "SPECIES_NONE"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gAlteringCave8",
+      "map": "MAP_ALTERING_CAVE",
+      "legacy_slot": 13,
+      "min_level": 5,
+      "max_level": 5,
+      "species": "SPECIES_NONE"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gAlteringCave9",
+      "map": "MAP_ALTERING_CAVE",
+      "legacy_slot": 13,
+      "min_level": 5,
+      "max_level": 5,
+      "species": "SPECIES_NONE"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMeteorFalls_StevensCave",
+      "map": "MAP_METEOR_FALLS_STEVENS_CAVE",
+      "legacy_slot": 1,
+      "min_level": 64,
+      "max_level": 73,
+      "species": "SPECIES_BRONZONG"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gRustboroCity0",
+      "map": "MAP_RUSTBORO_CITY",
+      "legacy_slot": 8,
+      "min_level": 7,
+      "max_level": 8,
+      "species": "SPECIES_CAPSAKID"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gMauvilleCity0",
+      "map": "MAP_MAUVILLE_CITY",
+      "legacy_slot": 10,
+      "min_level": 16,
+      "max_level": 16,
+      "species": "SPECIES_PACHIRISU"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gOldaleTown0",
+      "map": "MAP_OLDALE_TOWN",
+      "legacy_slot": 7,
+      "min_level": 3,
+      "max_level": 5,
+      "species": "SPECIES_NICKIT"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gLavaridgeTown0",
+      "map": "MAP_LAVARIDGE_TOWN",
+      "legacy_slot": 5,
+      "min_level": 28,
+      "max_level": 31,
+      "species": "SPECIES_HEATMOR"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gVerdanturf_Extension0",
+      "map": "MAP_VERDANTURF_EXTENSION",
+      "legacy_slot": 12,
+      "min_level": 17,
+      "max_level": 17,
+      "species": "SPECIES_RIOLU"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gLittleroot_Extension0",
+      "map": "MAP_LITTLEROOT_EXTENSION",
+      "legacy_slot": 13,
+      "min_level": 3,
+      "max_level": 5,
+      "species": "SPECIES_SNOM"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gFortreeCity0",
+      "map": "MAP_FORTREE_CITY",
+      "legacy_slot": 11,
+      "min_level": 38,
+      "max_level": 40,
+      "species": "SPECIES_ORICORIO"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gScorchedSlab0",
+      "map": "MAP_SCORCHED_SLAB",
+      "legacy_slot": 5,
+      "min_level": 38,
+      "max_level": 42,
+      "species": "SPECIES_HEATMOR"
+    },
+    {
+      "group_label": "gWildMonHeaders",
+      "base_label": "gPetalburgWoodgrove0",
+      "map": "MAP_PETALBURG_WOODGROVE",
+      "legacy_slot": 11,
+      "min_level": 12,
+      "max_level": 16,
+      "species": "SPECIES_EEVEE"
+    }
+  ],
+  "species_aliases": {
+    "distinct_count": 41,
+    "occurrence_count": 108,
+    "mappings": [
+      {
+        "legacy_species": "SPECIES_ARCANINE_HISUIAN",
+        "current_species": "SPECIES_ARCANINE_HISUI",
+        "occurrence_count": 6
+      },
+      {
+        "legacy_species": "SPECIES_AVALUGG_HISUIAN",
+        "current_species": "SPECIES_AVALUGG_HISUI",
+        "occurrence_count": 2
+      },
+      {
+        "legacy_species": "SPECIES_BASCULEGION_FEMALE",
+        "current_species": "SPECIES_BASCULEGION_F",
+        "occurrence_count": 2
+      },
+      {
+        "legacy_species": "SPECIES_BASCULEGION_MALE",
+        "current_species": "SPECIES_BASCULEGION_M",
+        "occurrence_count": 1
+      },
+      {
+        "legacy_species": "SPECIES_BRAVIARY_HISUIAN",
+        "current_species": "SPECIES_BRAVIARY_HISUI",
+        "occurrence_count": 1
+      },
+      {
+        "legacy_species": "SPECIES_CORSOLA_GALARIAN",
+        "current_species": "SPECIES_CORSOLA_GALAR",
+        "occurrence_count": 1
+      },
+      {
+        "legacy_species": "SPECIES_DARMANITAN_GALARIAN",
+        "current_species": "SPECIES_DARMANITAN_GALAR",
+        "occurrence_count": 2
+      },
+      {
+        "legacy_species": "SPECIES_ELECTRODE_HISUIAN",
+        "current_species": "SPECIES_ELECTRODE_HISUI",
+        "occurrence_count": 1
+      },
+      {
+        "legacy_species": "SPECIES_FARFETCHD_GALARIAN",
+        "current_species": "SPECIES_FARFETCHD_GALAR",
+        "occurrence_count": 1
+      },
+      {
+        "legacy_species": "SPECIES_FLORGES_WHITE_FLOWER",
+        "current_species": "SPECIES_FLORGES_WHITE",
+        "occurrence_count": 1
+      },
+      {
+        "legacy_species": "SPECIES_GEODUDE_ALOLAN",
+        "current_species": "SPECIES_GEODUDE_ALOLA",
+        "occurrence_count": 3
+      },
+      {
+        "legacy_species": "SPECIES_GOLEM_ALOLAN",
+        "current_species": "SPECIES_GOLEM_ALOLA",
+        "occurrence_count": 1
+      },
+      {
+        "legacy_species": "SPECIES_GRIMER_ALOLAN",
+        "current_species": "SPECIES_GRIMER_ALOLA",
+        "occurrence_count": 3
+      },
+      {
+        "legacy_species": "SPECIES_GROWLITHE_HISUIAN",
+        "current_species": "SPECIES_GROWLITHE_HISUI",
+        "occurrence_count": 1
+      },
+      {
+        "legacy_species": "SPECIES_INDEEDEE_FEMALE",
+        "current_species": "SPECIES_INDEEDEE_F",
+        "occurrence_count": 1
+      },
+      {
+        "legacy_species": "SPECIES_INDEEDEE_MALE",
+        "current_species": "SPECIES_INDEEDEE_M",
+        "occurrence_count": 1
+      },
+      {
+        "legacy_species": "SPECIES_LILLIGANT_HISUIAN",
+        "current_species": "SPECIES_LILLIGANT_HISUI",
+        "occurrence_count": 1
+      },
+      {
+        "legacy_species": "SPECIES_MAROWAK_ALOLAN",
+        "current_species": "SPECIES_MAROWAK_ALOLA",
+        "occurrence_count": 8
+      },
+      {
+        "legacy_species": "SPECIES_MEOWSTIC_FEMALE",
+        "current_species": "SPECIES_MEOWSTIC_F",
+        "occurrence_count": 4
+      },
+      {
+        "legacy_species": "SPECIES_MEOWSTIC_MALE",
+        "current_species": "SPECIES_MEOWSTIC_M",
+        "occurrence_count": 4
+      },
+      {
+        "legacy_species": "SPECIES_MUK_ALOLAN",
+        "current_species": "SPECIES_MUK_ALOLA",
+        "occurrence_count": 4
+      },
+      {
+        "legacy_species": "SPECIES_NINETALES_ALOLAN",
+        "current_species": "SPECIES_NINETALES_ALOLA",
+        "occurrence_count": 2
+      },
+      {
+        "legacy_species": "SPECIES_PERSIAN_ALOLAN",
+        "current_species": "SPECIES_PERSIAN_ALOLA",
+        "occurrence_count": 2
+      },
+      {
+        "legacy_species": "SPECIES_PONYTA_GALARIAN",
+        "current_species": "SPECIES_PONYTA_GALAR",
+        "occurrence_count": 1
+      },
+      {
+        "legacy_species": "SPECIES_QWILFISH_HISUIAN",
+        "current_species": "SPECIES_QWILFISH_HISUI",
+        "occurrence_count": 2
+      },
+      {
+        "legacy_species": "SPECIES_RAICHU_ALOLAN",
+        "current_species": "SPECIES_RAICHU_ALOLA",
+        "occurrence_count": 1
+      },
+      {
+        "legacy_species": "SPECIES_RATTATA_ALOLAN",
+        "current_species": "SPECIES_RATTATA_ALOLA",
+        "occurrence_count": 1
+      },
+      {
+        "legacy_species": "SPECIES_SANDSLASH_ALOLAN",
+        "current_species": "SPECIES_SANDSLASH_ALOLA",
+        "occurrence_count": 3
+      },
+      {
+        "legacy_species": "SPECIES_SLIGGOO_HISUIAN",
+        "current_species": "SPECIES_SLIGGOO_HISUI",
+        "occurrence_count": 5
+      },
+      {
+        "legacy_species": "SPECIES_SLOWBRO_GALARIAN",
+        "current_species": "SPECIES_SLOWBRO_GALAR",
+        "occurrence_count": 6
+      },
+      {
+        "legacy_species": "SPECIES_SLOWKING_GALARIAN",
+        "current_species": "SPECIES_SLOWKING_GALAR",
+        "occurrence_count": 5
+      },
+      {
+        "legacy_species": "SPECIES_SLOWPOKE_GALARIAN",
+        "current_species": "SPECIES_SLOWPOKE_GALAR",
+        "occurrence_count": 1
+      },
+      {
+        "legacy_species": "SPECIES_STUNFISK_GALARIAN",
+        "current_species": "SPECIES_STUNFISK_GALAR",
+        "occurrence_count": 5
+      },
+      {
+        "legacy_species": "SPECIES_TAUROS_PALDEAN_BLAZE_BREED",
+        "current_species": "SPECIES_TAUROS_PALDEA_BLAZE",
+        "occurrence_count": 2
+      },
+      {
+        "legacy_species": "SPECIES_URSHIFU_RAPID_STRIKE_STYLE",
+        "current_species": "SPECIES_URSHIFU_RAPID_STRIKE",
+        "occurrence_count": 2
+      },
+      {
+        "legacy_species": "SPECIES_URSHIFU_SINGLE_STRIKE_STYLE",
+        "current_species": "SPECIES_URSHIFU_SINGLE_STRIKE",
+        "occurrence_count": 2
+      },
+      {
+        "legacy_species": "SPECIES_VOLTORB_HISUIAN",
+        "current_species": "SPECIES_VOLTORB_HISUI",
+        "occurrence_count": 1
+      },
+      {
+        "legacy_species": "SPECIES_WEEZING_GALARIAN",
+        "current_species": "SPECIES_WEEZING_GALAR",
+        "occurrence_count": 8
+      },
+      {
+        "legacy_species": "SPECIES_WOOPER_PALDEAN",
+        "current_species": "SPECIES_WOOPER_PALDEA",
+        "occurrence_count": 4
+      },
+      {
+        "legacy_species": "SPECIES_ZIGZAGOON_GALARIAN",
+        "current_species": "SPECIES_ZIGZAGOON_GALAR",
+        "occurrence_count": 1
+      },
+      {
+        "legacy_species": "SPECIES_ZOROARK_HISUIAN",
+        "current_species": "SPECIES_ZOROARK_HISUI",
+        "occurrence_count": 5
+      }
+    ]
+  },
+  "old_sha256": "e0f695fc6cbd6bb8ceddf83c76ad69ca2a4f529d8c95167e228dc5e9812b9f18",
+  "candidate_sha256": "a7efda9c5480d6abeb84b5e7a4e2f3f3c6917f5ac55f7f44b68b395385b3da04"
+}
