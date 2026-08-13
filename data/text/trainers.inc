@@ -4815,3 +4815,20 @@ NewMauville_Inside_Text_Leaf2Defeated:
 NewMauville_Inside_Text_Leaf2PostBattle:
 	.string "RED... I wonder where he is.\n"
 	.string "Are you stronger than him as well?$"
+
+VerdanturfExtension_LeafIntro:
+	.string "Nice to Meet you! I'm Leaf.\n"
+	.string "I'm from a faraway region called KANTO.\p"
+	.string "You're a strong trainer, aren't you?\p"
+	.string "Let's battle!$"
+
+VerdanturfExtension_LeafDefeat:
+	.string "Wow! You're strong indeed!\n"
+	.string "Let's battle again in the near future!\p"
+	.string "Next time, I will win!$"
+
+VerdanturfExtension_LeafPostBattle:
+	.string "There's another strong trainer that\n"
+	.string "came too HEONN too.\p"
+	.string "He's name is....\n"
+	.string "...Red$"

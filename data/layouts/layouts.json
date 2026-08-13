@@ -9323,6 +9323,45 @@
       "border_filepath": "data/layouts/OneIsland_KindleRoad_EmberSpa_Frlg/border.bin",
       "blockdata_filepath": "data/layouts/OneIsland_KindleRoad_EmberSpa_Frlg/map.bin",
       "layout_version": "frlg"
+    },
+    {
+      "id": "LAYOUT_VERDANTURF_EXTENSION",
+      "name": "Verdanturf_Extension_Layout",
+      "width": 10,
+      "height": 20,
+      "border_width": 2,
+      "border_height": 2,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Mauville",
+      "border_filepath": "data/layouts/Verdanturf_Extension/border.bin",
+      "blockdata_filepath": "data/layouts/Verdanturf_Extension/map.bin",
+      "layout_version": "emerald"
+    },
+    {
+      "id": "LAYOUT_LITTLEROOT_EXTENSION",
+      "name": "Littleroot_Extension_Layout",
+      "width": 8,
+      "height": 10,
+      "border_width": 2,
+      "border_height": 2,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Petalburg",
+      "border_filepath": "data/layouts/Littleroot_Extension/border.bin",
+      "blockdata_filepath": "data/layouts/Littleroot_Extension/map.bin",
+      "layout_version": "emerald"
+    },
+    {
+      "id": "LAYOUT_PETALBURG_WOODGROVE",
+      "name": "PetalburgWoodgrove_Layout",
+      "width": 25,
+      "height": 30,
+      "border_width": 2,
+      "border_height": 2,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Petalburg",
+      "border_filepath": "data/layouts/PetalburgWoodgrove/border.bin",
+      "blockdata_filepath": "data/layouts/PetalburgWoodgrove/map.bin",
+      "layout_version": "emerald"
     }
   ]
 }

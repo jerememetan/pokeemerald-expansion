@@ -22,10 +22,11 @@
 - Create `docs/superpowers/inventories/2026-08-10-legacy-wild-encounter-removals.json` — 108 reviewed removal records.
 - Create `docs/superpowers/inventories/2026-08-10-legacy-map-layout-report.json` — binary import hashes and classification evidence.
 - Create `docs/superpowers/inventories/2026-08-10-legacy-wild-encounter-report.json` — replaced, added, retained, and removed-slot evidence.
-- Modify `data/layouts/layouts.json` — register three Emerald layouts immediately before the first FRLG layout.
+- Modify `data/layouts/layouts.json` — append three Emerald layouts without renumbering existing layouts.
 - Modify `data/maps/map_groups.json` — append two maps to Towns and Routes and one map to Dungeons without renumbering existing entries.
 - Create `data/maps/{Littleroot_Extension,Verdanturf_Extension,PetalburgWoodgrove}/map.json` — adapted current-schema custom map sources.
 - Create `data/maps/{Littleroot_Extension,Verdanturf_Extension,PetalburgWoodgrove}/scripts.inc` — current authored script sources.
+- Modify `data/event_scripts.s` — include the three new authored map scripts in their matching map-group sections.
 - Modify `data/maps/{LittlerootTown,VerdanturfTown,PetalburgWoods}/map.json` — only the reciprocal access edges.
 - Modify `data/text/trainers.inc` — only the three Verdanturf Leaf dialogue labels required by the restored object.
 - Modify 61 existing `data/layouts/*/map.bin` files and `data/layouts/VerdanturfTown/border.bin` through the validated importer.
@@ -178,6 +179,7 @@ Expected: the commit contains no map registration, scripts, or encounter data.
 
 - Modify: `data/layouts/layouts.json`
 - Modify: `data/maps/map_groups.json`
+- Modify: `data/event_scripts.s`
 - Create: `data/maps/Littleroot_Extension/{map.json,scripts.inc}`
 - Create: `data/maps/Verdanturf_Extension/{map.json,scripts.inc}`
 - Create: `data/maps/PetalburgWoodgrove/{map.json,scripts.inc}`
@@ -188,7 +190,7 @@ Expected: the commit contains no map registration, scripts, or encounter data.
 
 - [ ] **Step 1: Register current-schema layout entries**
 
-Immediately before the first FRLG entry in `data/layouts/layouts.json`, insert the three archived entries in Verdanturf, Littleroot, and Woodgrove order. Each entry must add:
+Append the three archived entries to the end of the `data/layouts/layouts.json` array in Verdanturf, Littleroot, and Woodgrove order so every existing layout retains its numeric ID. Each entry must add:
 
 ```json
 "border_width": 2,
@@ -241,6 +243,8 @@ Verdanturf_Extension_EventScript_Leaf::
 	end
 ```
 
+In `data/event_scripts.s`, append the Verdanturf and Littleroot script includes to the end of the Towns and Routes map-script section in map-group order, and append the Woodgrove script include to the end of the Dungeons section. Do not reorder existing includes.
+
 Append only the archived `VerdanturfExtension_LeafIntro`, `VerdanturfExtension_LeafDefeat`, and `VerdanturfExtension_LeafPostBattle` string blocks to `data/text/trainers.inc`. Preserve their archived text byte-for-byte; do not import neighboring trainer text.
 
 - [ ] **Step 5: Add only reciprocal access edges**
@@ -268,7 +272,7 @@ Expected: `mapjson` generates all three maps, all reciprocal constants resolve, 
 Stage only the authored map sources in this batch:
 
 ```powershell
-git add data/layouts/layouts.json data/maps/map_groups.json data/maps/Littleroot_Extension/map.json data/maps/Littleroot_Extension/scripts.inc data/maps/Verdanturf_Extension/map.json data/maps/Verdanturf_Extension/scripts.inc data/maps/PetalburgWoodgrove/map.json data/maps/PetalburgWoodgrove/scripts.inc data/maps/LittlerootTown/map.json data/maps/VerdanturfTown/map.json data/maps/PetalburgWoods/map.json data/text/trainers.inc
+git add data/layouts/layouts.json data/maps/map_groups.json data/event_scripts.s data/maps/Littleroot_Extension/map.json data/maps/Littleroot_Extension/scripts.inc data/maps/Verdanturf_Extension/map.json data/maps/Verdanturf_Extension/scripts.inc data/maps/PetalburgWoodgrove/map.json data/maps/PetalburgWoodgrove/scripts.inc data/maps/LittlerootTown/map.json data/maps/VerdanturfTown/map.json data/maps/PetalburgWoods/map.json data/text/trainers.inc
 git commit -m "feat: register custom extension maps"
 ```
 

@@ -1,0 +1,2 @@
+Littleroot_Extension_MapScripts::
+	.byte 0
