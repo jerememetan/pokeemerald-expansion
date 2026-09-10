@@ -196,3 +196,34 @@ Route123_Text_RouteSignMtPyre:
 Route123_Text_BerryMastersHouse:
 	.string "BERRY MASTER'S HOUSE$"
 
+Route123_EventScript_BadgeChecker::
+	lock
+	faceplayer
+	goto_if_unset FLAG_BADGE08_GET, Route123_EventScript_PeekAtBadge
+	msgbox Route123_Text_PeekAgain, MSGBOX_DEFAULT
+	closemessage
+	goto Route123_EventScript_StartRedBattle
+
+Route123_EventScript_PeekAtBadge::
+	msgbox Route123_Text_PeekAtBadge, MSGBOX_DEFAULT
+	release
+	end
+
+Route123_EventScript_StartRedBattle::
+	trainerbattle_single TRAINER_RED, AlteringCave_Text_RedIntro, AlteringCave_Text_RedDefeat
+	msgbox AlteringCave_Text_RedDefeat, MSGBOX_DEFAULT
+	fadescreen FADE_TO_BLACK
+	removeobject VAR_LAST_TALKED
+	fadescreen FADE_FROM_BLACK
+	setflag FLAG_ROUTE123_BADGECHECKED
+	release
+	end
+
+Route123_Text_PeekAtBadge:
+	.string "...\p"
+	.string "(RED peeks at your BADGES...)\n"
+	.string "(He looks uninterested in you.)$"
+
+Route123_Text_PeekAgain:
+	.string "...\p"
+	.string "(RED peeks at your BADGES...)$"

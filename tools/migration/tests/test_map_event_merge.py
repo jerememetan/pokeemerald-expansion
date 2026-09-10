@@ -1,4 +1,11 @@
 import copy
+import hashlib
+import json
+import os
+from pathlib import Path
+import shutil
+import sys
+import tempfile
 import unittest
 
 from tools.migration.map_event_merge import (
@@ -10,11 +17,19 @@ from tools.migration.map_event_merge import (
     align_side,
     behavior_signature,
     exact_signature,
+    extract_legacy_item_and_quantity,
     extract_legacy_item,
     merge_added_event,
     merge_base_event,
     merge_category,
+    resolve_reviewed_event,
+    validate_resolution_consumption,
 )
+
+MIGRATION_TOOLS = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(MIGRATION_TOOLS))
+import merge_legacy_map_events as merge_tool
+sys.path.pop(0)
 
 
 def object_event(x=4, y=5, script="Map_EventScript_Npc", **changes):
@@ -1069,6 +1084,7 @@ class ItemBallAdapterTests(unittest.TestCase):
         )
         self.assertEqual(adapted["trainer_sight_or_berry_tree_id"], "ITEM_ELIXIR")
         self.assertEqual(adapted["script"], "Common_EventScript_FindItem")
+        self.assertEqual(adapted["movement_range_x"], 1)
         self.assertEqual(adapted["flag"], "FLAG_ITEM_ROUTE_119_ELIXIR")
         self.assertEqual((adapted["x"], adapted["y"], adapted["elevation"]), (13, 17, 3))
         self.assertEqual(original, snapshot)
@@ -1102,6 +1118,823 @@ class ItemBallAdapterTests(unittest.TestCase):
             extract_legacy_item(
                 "// finditem ITEM_POTION\n/* finditem ITEM_ELIXIR */\n"
             )
+
+    def test_adapts_explicit_item_quantity(self):
+        adapted = adapt_item_ball(
+            object_event(movement_range_x=0),
+            "Map_EventScript_Item::\n    finditem ITEM_GREAT_BALL, 5\n",
+        )
+        self.assertEqual(
+            (adapted["trainer_sight_or_berry_tree_id"], adapted["movement_range_x"]),
+            ("ITEM_GREAT_BALL", 5),
+        )
+
+    def test_accepts_maximum_packed_item_quantity(self):
+        adapted = adapt_item_ball(
+            object_event(movement_range_x=0),
+            "Map_EventScript_Item::\n    finditem ITEM_GREAT_BALL, 15\n",
+        )
+        self.assertEqual(adapted["movement_range_x"], 15)
+
+    def test_rejects_item_quantities_that_overflow_packed_field(self):
+        for quantity in (16, 999999999999999999999999):
+            with self.subTest(quantity=quantity), self.assertRaisesRegex(
+                ValueError, "1..15"
+            ):
+                extract_legacy_item_and_quantity(
+                    f"finditem ITEM_GREAT_BALL, {quantity}\n"
+                )
+
+    def test_candidate_bounds_validate_item_quantity_without_walking_radius(self):
+        item = object_event(
+            x=9,
+            script="Common_EventScript_FindItem",
+            movement_range_x=15,
+        )
+        self.assertIsNone(merge_tool.candidate_event_bounds_error(item, 10, 10))
+        item["movement_range_x"] = 16
+        self.assertEqual(
+            merge_tool.candidate_event_bounds_error(item, 10, 10),
+            "item quantity movement_range_x must be an integer in 0..15, got 16",
+        )
+
+    def test_candidate_bounds_require_packed_object_movement_ranges(self):
+        event = object_event(movement_range_x=15, movement_range_y=15)
+        self.assertIsNone(merge_tool.candidate_event_bounds_error(event, 10, 10))
+        for field, value in (
+            ("movement_range_x", 16),
+            ("movement_range_y", 16),
+            ("movement_range_x", -1),
+            ("movement_range_y", True),
+            ("movement_range_x", "1"),
+        ):
+            with self.subTest(field=field, value=value):
+                invalid = object_event(movement_range_x=0, movement_range_y=0)
+                invalid[field] = value
+                self.assertEqual(
+                    merge_tool.candidate_event_bounds_error(invalid, 10, 10),
+                    f"{field} must be an integer in 0..15, got {value!r}",
+                )
+
+    def test_extract_item_quantity_rejects_invalid_nonpositive_or_extra_operands(self):
+        for command in (
+            "finditem ITEM_POTION, 0\n",
+            "finditem ITEM_POTION, -1\n",
+            "finditem ITEM_POTION, nope\n",
+            "finditem ITEM_POTION, 2, 3\n",
+        ):
+            with self.subTest(command=command), self.assertRaises(ValueError):
+                extract_legacy_item_and_quantity(command)
+
+
+class ReviewedResolutionConstructionTests(unittest.TestCase):
+    def test_every_unresolved_id_requires_exactly_one_resolution(self):
+        with self.assertRaises(UnresolvedConflictError):
+            validate_resolution_consumption({"one", "two"}, {"one": {}})
+        with self.assertRaises(ValueError):
+            validate_resolution_consumption({"one"}, {"one": {}, "stale": {}})
+
+    def test_merge_fields_requires_exact_coverage_and_valid_result(self):
+        archive = object_event(x=8, local_id="1")
+        current = object_event(x=4, local_id="2")
+        entry = {"decision": "merge_fields", "field_sources": {"x": "archive", "local_id": "current"}}
+        merged = resolve_reviewed_event("object_events", archive, current, entry)
+        self.assertEqual((merged[0]["x"], merged[0]["local_id"]), (8, "2"))
+        with self.assertRaises(ValueError):
+            resolve_reviewed_event(
+                "object_events", archive, current,
+                {"decision": "merge_fields", "field_sources": {"x": "archive"}},
+            )
+
+    def test_keep_both_copies_in_archive_then_current_order(self):
+        archive = object_event(script="Archive")
+        current = object_event(script="Current")
+        events = resolve_reviewed_event(
+            "object_events", archive, current,
+            {"decision": "keep_both", "field_sources": {}},
+        )
+        self.assertEqual([event["script"] for event in events], ["Archive", "Current"])
+        events[0]["script"] = "mutated"
+        self.assertEqual(archive["script"], "Archive")
+
+    def test_use_current_and_delete_are_exact(self):
+        current = object_event(script="Current")
+        self.assertEqual(
+            resolve_reviewed_event(
+                "object_events", None, current,
+                {"decision": "use_current", "field_sources": {}},
+            ),
+            [current],
+        )
+        self.assertEqual(
+            resolve_reviewed_event(
+                "object_events", None, current,
+                {"decision": "delete", "field_sources": {}},
+            ),
+            [],
+        )
+
+    def test_invalid_or_stale_decision_fails(self):
+        with self.assertRaises(ValueError):
+            resolve_reviewed_event(
+                "object_events", object_event(), object_event(),
+                {"decision": "current_equivalent", "field_sources": {}},
+            )
+
+
+class DependencyCurrentEquivalentTests(unittest.TestCase):
+    def setUp(self):
+        self.current_block = "Current_EventScript_Renamed::\n\tend\n"
+        self.current_hash = hashlib.sha256(self.current_block.encode()).hexdigest()
+        self.source = {
+            "label": "Legacy_EventScript_Source",
+            "classification": "archived-only",
+            "normalized_blocks": {"base": None, "legacy": "Legacy::\n\tend\n", "current": None},
+            "normalized_block_sha256": {
+                "base": None,
+                "legacy": hashlib.sha256(b"Legacy::\n\tend\n").hexdigest(),
+                "current": None,
+            },
+            "owners": {
+                "base": None,
+                "legacy": "data/maps/TestMap/scripts.inc",
+                "current": None,
+            },
+            "references": [{"source": "legacy", "map": "TestMap"}],
+            "block_labels": {"base": [], "legacy": ["Legacy_EventScript_Source"], "current": []},
+            "item_equivalence": [],
+        }
+        self.target = {
+            "label": "Current_EventScript_Renamed",
+            "classification": "current-only",
+            "normalized_blocks": {"base": None, "legacy": None, "current": self.current_block},
+            "normalized_block_sha256": {
+                "base": None,
+                "legacy": None,
+                "current": self.current_hash,
+            },
+            "owners": {
+                "base": None,
+                "legacy": None,
+                "current": "data/maps/TestMap/scripts.inc",
+            },
+            "references": [{"source": "current", "map": "TestMap"}],
+            "block_labels": {"base": [], "legacy": [], "current": ["Current_EventScript_Renamed"]},
+            "item_equivalence": [],
+        }
+        self.issue = {
+            "id": "dependency:Legacy_EventScript_Source",
+            "issue_type": "dependency",
+            "map": "TestMap",
+            "category": "dependency",
+            "base_index": None,
+            "archive_index": 0,
+            "current_index": None,
+            "evidence": self.source,
+        }
+        self.entry = {
+            "id": self.issue["id"],
+            "map": "TestMap",
+            "category": "dependency",
+            "base_index": None,
+            "archive_index": 0,
+            "current_index": None,
+            "decision": "current_equivalent",
+            "field_sources": {},
+            "evidence": "Pinned renamed current behavior is equivalent.",
+            "current_label": self.target["label"],
+            "current_sha256": self.current_hash,
+        }
+
+    def validate(self, entry=None, dependencies=None):
+        return merge_tool.validate_resolution_entries(
+            [entry or self.entry],
+            {self.issue["id"]: self.issue},
+            dependencies=dependencies or {
+                self.source["label"]: self.source,
+                self.target["label"]: self.target,
+            },
+        )
+
+    def test_accepts_exact_renamed_current_label_and_hash(self):
+        self.assertEqual(self.validate(), [self.entry])
+
+    def test_rejects_tampered_renamed_current_hash(self):
+        entry = copy.deepcopy(self.entry)
+        entry["current_sha256"] = "0" * 64
+        with self.assertRaisesRegex(ValueError, "hash differs"):
+            self.validate(entry)
+
+    def test_rejects_nonexistent_renamed_current_label(self):
+        entry = copy.deepcopy(self.entry)
+        entry["current_label"] = "Missing_EventScript"
+        with self.assertRaisesRegex(ValueError, "target does not exist"):
+            self.validate(entry)
+
+    def test_report_record_proves_both_sides_of_renamed_equivalence(self):
+        record = merge_tool.dependency_report_record(
+            self.entry,
+            self.source,
+            {
+                self.source["label"]: self.source,
+                self.target["label"]: self.target,
+            },
+        )
+        self.assertEqual(record["label"], self.source["label"])
+        self.assertEqual(record["source_owner"], "data/maps/TestMap/scripts.inc")
+        self.assertEqual(
+            record["source_sha256"],
+            self.source["normalized_block_sha256"]["legacy"],
+        )
+        self.assertEqual(record["disposition"], "current_equivalent")
+        self.assertEqual(record["current_label"], self.target["label"])
+        self.assertEqual(record["target_owner"], "data/maps/TestMap/scripts.inc")
+        self.assertEqual(record["current_sha256"], self.current_hash)
+        self.assertEqual(record["target_sha256"], self.current_hash)
+        self.assertEqual(record["resolution_evidence"], self.entry["evidence"])
+
+
+class CandidateBundlePublicationTests(unittest.TestCase):
+    NEW_FILES = {
+        "data/maps/NewMap/map.json": json.dumps(
+            {
+                "layout": "LAYOUT_NEW_MAP",
+                "object_events": [],
+                "warp_events": [],
+                "coord_events": [],
+                "bg_events": [],
+            },
+            sort_keys=True,
+        ).encode(),
+    }
+    NEW_REPORT = json.dumps(
+        {
+            "mode": "candidate-only",
+            "candidate_map_count": 1,
+            "candidate_maps": ["NewMap"],
+            "candidate_sha256": {
+                "data/maps/NewMap/map.json": hashlib.sha256(
+                    NEW_FILES["data/maps/NewMap/map.json"]
+                ).hexdigest()
+            },
+        },
+        sort_keys=True,
+    ).encode()
+
+    def write_candidate(self, root, contents=None):
+        if contents is None:
+            contents = json.dumps(
+                {
+                    "layout": "LAYOUT_OLD_MAP",
+                    "object_events": [],
+                    "warp_events": [],
+                    "coord_events": [],
+                    "bg_events": [],
+                },
+                sort_keys=True,
+            ).encode()
+        path = root / "candidates" / "data" / "maps" / "OldMap" / "map.json"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(contents)
+
+    def snapshot(self, root):
+        candidate = root / "candidates"
+        report = root / "report.json"
+        files = (
+            {
+                path.relative_to(candidate).as_posix(): path.read_bytes()
+                for path in candidate.rglob("*")
+                if path.is_file()
+            }
+            if candidate.exists()
+            else None
+        )
+        return files, report.read_bytes() if report.exists() else None
+
+    def assert_no_transaction_debris(self, root):
+        self.assertFalse(
+            [
+                path.name
+                for path in root.iterdir()
+                if ".stage." in path.name or ".backup." in path.name
+            ]
+        )
+
+    def test_success_replaces_complete_tree_and_removes_stale_managed_map(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.write_candidate(root)
+            (root / "report.json").write_bytes(b"old report")
+            merge_tool.publish_candidate_bundle(
+                root / "candidates", self.NEW_FILES, root / "report.json", self.NEW_REPORT
+            )
+            self.assertEqual(self.snapshot(root), (self.NEW_FILES, self.NEW_REPORT))
+            self.assert_no_transaction_debris(root)
+
+    def test_success_handles_absent_prior_tree_and_report(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            merge_tool.publish_candidate_bundle(
+                root / "candidates", self.NEW_FILES, root / "report.json", self.NEW_REPORT
+            )
+            self.assertEqual(self.snapshot(root), (self.NEW_FILES, self.NEW_REPORT))
+            self.assert_no_transaction_debris(root)
+
+    def test_fault_matrix_restores_exact_prior_state(self):
+        phases = (
+            "after_staging",
+            "before_candidate_install",
+            "after_candidate_install",
+            "before_report_install",
+            "after_report_install",
+        )
+        for candidate_exists in (False, True):
+            for report_exists in (False, True):
+                for phase in phases:
+                    with self.subTest(
+                        candidate_exists=candidate_exists,
+                        report_exists=report_exists,
+                        phase=phase,
+                    ), tempfile.TemporaryDirectory() as directory:
+                        root = Path(directory)
+                        if candidate_exists:
+                            self.write_candidate(root)
+                        if report_exists:
+                            (root / "report.json").write_bytes(b"old report")
+                        before = self.snapshot(root)
+
+                        def fault(actual_phase, _path):
+                            if actual_phase == phase:
+                                raise RuntimeError(f"fault at {phase}")
+
+                        with self.assertRaisesRegex(RuntimeError, f"fault at {phase}"):
+                            merge_tool.publish_candidate_bundle(
+                                root / "candidates",
+                                self.NEW_FILES,
+                                root / "report.json",
+                                self.NEW_REPORT,
+                                fault=fault,
+                            )
+                        self.assertEqual(self.snapshot(root), before)
+                        self.assert_no_transaction_debris(root)
+
+    def test_keyboard_interrupt_restores_prior_state(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.write_candidate(root)
+            before = self.snapshot(root)
+
+            def interrupt(phase, _path):
+                if phase == "after_candidate_install":
+                    raise KeyboardInterrupt
+
+            with self.assertRaises(KeyboardInterrupt):
+                merge_tool.publish_candidate_bundle(
+                    root / "candidates",
+                    self.NEW_FILES,
+                    root / "report.json",
+                    self.NEW_REPORT,
+                    fault=interrupt,
+                )
+            self.assertEqual(self.snapshot(root), before)
+            self.assert_no_transaction_debris(root)
+
+    def test_unexpected_candidate_content_rejects_before_writes(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.write_candidate(root)
+            unexpected = root / "candidates" / "notes.txt"
+            unexpected.write_text("user data")
+            (root / "report.json").write_bytes(b"old report")
+            before = self.snapshot(root)
+            with self.assertRaisesRegex(ValueError, "unexpected managed candidate content"):
+                merge_tool.publish_candidate_bundle(
+                    root / "candidates",
+                    self.NEW_FILES,
+                    root / "report.json",
+                    self.NEW_REPORT,
+                )
+            self.assertEqual(self.snapshot(root), before)
+            self.assert_no_transaction_debris(root)
+
+    def test_rollback_failure_retains_and_names_recovery_copy(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.write_candidate(root)
+
+            def fault(phase, _path):
+                if phase == "after_candidate_install":
+                    raise RuntimeError("publication failed")
+
+            def fail_restore(source, destination):
+                if ".backup." in source.name and destination == root / "candidates":
+                    raise OSError("rollback blocked")
+                os.rename(source, destination)
+
+            with self.assertRaisesRegex(RuntimeError, "recovery copies retained") as raised:
+                merge_tool.publish_candidate_bundle(
+                    root / "candidates",
+                    self.NEW_FILES,
+                    root / "report.json",
+                    self.NEW_REPORT,
+                    fault=fault,
+                    move=fail_restore,
+                )
+            backups = [path for path in root.iterdir() if ".backup." in path.name]
+            self.assertEqual(len(backups), 1)
+            self.assertTrue(backups[0].is_dir())
+            self.assertIn(str(backups[0]), str(raised.exception))
+
+    def test_report_rollback_failure_still_restores_candidate_tree(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.write_candidate(root)
+            (root / "report.json").write_bytes(b"old report")
+            old_candidates, _ = self.snapshot(root)
+
+            def fault(phase, _path):
+                if phase == "after_report_install":
+                    raise RuntimeError("publication failed")
+
+            def fail_report_removal(source, destination):
+                if (
+                    source == root / "report.json"
+                    and source.read_bytes() == self.NEW_REPORT
+                    and destination.name.startswith(".report.json.")
+                ):
+                    raise OSError("report rollback blocked")
+                os.rename(source, destination)
+
+            with self.assertRaisesRegex(RuntimeError, "recovery copies retained"):
+                merge_tool.publish_candidate_bundle(
+                    root / "candidates",
+                    self.NEW_FILES,
+                    root / "report.json",
+                    self.NEW_REPORT,
+                    fault=fault,
+                    move=fail_report_removal,
+                )
+            self.assertEqual(self.snapshot(root)[0], old_candidates)
+            self.assertTrue(
+                [path for path in root.iterdir() if ".report.json.backup." in path.name]
+            )
+
+    def test_report_must_describe_exact_candidate_tree_before_publication(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            before = self.snapshot(root)
+            with self.assertRaisesRegex(ValueError, "candidate report"):
+                merge_tool.publish_candidate_bundle(
+                    root / "candidates",
+                    self.NEW_FILES,
+                    root / "report.json",
+                    b"{}",
+                )
+            self.assertEqual(self.snapshot(root), before)
+
+    def test_candidate_and_report_paths_cannot_overlap(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            with self.assertRaisesRegex(ValueError, "paths collide"):
+                merge_tool.publish_candidate_bundle(
+                    root / "candidates",
+                    self.NEW_FILES,
+                    root / "candidates" / "report.json",
+                    self.NEW_REPORT,
+                )
+
+    def test_report_change_after_staging_aborts_and_preserves_latest_state(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.write_candidate(root)
+            (root / "report.json").write_bytes(b"old report")
+
+            def mutate_report(phase, _path):
+                if phase == "after_staging":
+                    (root / "report.json").write_bytes(b"concurrent report")
+
+            with self.assertRaisesRegex(RuntimeError, "changed while staging"):
+                merge_tool.publish_candidate_bundle(
+                    root / "candidates",
+                    self.NEW_FILES,
+                    root / "report.json",
+                    self.NEW_REPORT,
+                    fault=mutate_report,
+                )
+            self.assertEqual(self.snapshot(root)[1], b"concurrent report")
+            self.assertIn("data/maps/OldMap/map.json", self.snapshot(root)[0])
+            self.assert_no_transaction_debris(root)
+
+    def test_candidate_changes_after_staging_abort_and_preserve_latest_tree(self):
+        mutations = ("content", "unexpected")
+        for mutation in mutations:
+            with self.subTest(mutation=mutation), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                self.write_candidate(root)
+                (root / "report.json").write_bytes(b"old report")
+
+                def mutate_candidate(phase, _path):
+                    if phase != "after_staging":
+                        return
+                    if mutation == "content":
+                        self.write_candidate(root, self.NEW_FILES["data/maps/NewMap/map.json"])
+                    else:
+                        (root / "candidates" / "notes.txt").write_bytes(b"concurrent note")
+
+                mutate_candidate("after_staging", None)
+                expected = self.snapshot(root)
+                # Restore the initial state so the mutation occurs inside publication.
+                if mutation == "content":
+                    self.write_candidate(root)
+                else:
+                    (root / "candidates" / "notes.txt").unlink()
+
+                with self.assertRaisesRegex(RuntimeError, "changed while staging"):
+                    merge_tool.publish_candidate_bundle(
+                        root / "candidates",
+                        self.NEW_FILES,
+                        root / "report.json",
+                        self.NEW_REPORT,
+                        fault=mutate_candidate,
+                    )
+                self.assertEqual(self.snapshot(root), expected)
+                self.assert_no_transaction_debris(root)
+
+    def test_absent_destinations_created_after_staging_are_preserved(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+
+            def create_destinations(phase, _path):
+                if phase == "after_staging":
+                    self.write_candidate(root)
+                    (root / "report.json").write_bytes(b"concurrent report")
+
+            with self.assertRaisesRegex(RuntimeError, "changed while staging"):
+                merge_tool.publish_candidate_bundle(
+                    root / "candidates",
+                    self.NEW_FILES,
+                    root / "report.json",
+                    self.NEW_REPORT,
+                    fault=create_destinations,
+                )
+            self.assertIn("data/maps/OldMap/map.json", self.snapshot(root)[0])
+            self.assertEqual(self.snapshot(root)[1], b"concurrent report")
+            self.assert_no_transaction_debris(root)
+
+    def test_existing_destinations_removed_after_staging_remain_absent(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.write_candidate(root)
+            (root / "report.json").write_bytes(b"old report")
+
+            def remove_destinations(phase, _path):
+                if phase == "after_staging":
+                    shutil.rmtree(root / "candidates")
+                    (root / "report.json").unlink()
+
+            with self.assertRaisesRegex(RuntimeError, "changed while staging"):
+                merge_tool.publish_candidate_bundle(
+                    root / "candidates",
+                    self.NEW_FILES,
+                    root / "report.json",
+                    self.NEW_REPORT,
+                    fault=remove_destinations,
+                )
+            self.assertEqual(self.snapshot(root), (None, None))
+            self.assert_no_transaction_debris(root)
+
+    def test_report_created_before_install_is_not_overwritten(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.write_candidate(root)
+            before_candidates = self.snapshot(root)[0]
+
+            def create_report(phase, _path):
+                if phase == "before_report_install":
+                    (root / "report.json").write_bytes(b"concurrent report")
+
+            with self.assertRaises(FileExistsError):
+                merge_tool.publish_candidate_bundle(
+                    root / "candidates",
+                    self.NEW_FILES,
+                    root / "report.json",
+                    self.NEW_REPORT,
+                    fault=create_report,
+                    move=os.replace,
+                )
+            self.assertEqual(self.snapshot(root), (before_candidates, b"concurrent report"))
+            self.assert_no_transaction_debris(root)
+
+    def test_report_changed_before_install_preserves_old_report_recovery_copy(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.write_candidate(root)
+            (root / "report.json").write_bytes(b"old report")
+            before_candidates = self.snapshot(root)[0]
+
+            def replace_report(phase, _path):
+                if phase == "before_report_install":
+                    (root / "report.json").write_bytes(b"concurrent report")
+
+            with self.assertRaisesRegex(RuntimeError, "recovery copies retained") as raised:
+                merge_tool.publish_candidate_bundle(
+                    root / "candidates",
+                    self.NEW_FILES,
+                    root / "report.json",
+                    self.NEW_REPORT,
+                    fault=replace_report,
+                    move=os.replace,
+                )
+            self.assertEqual(self.snapshot(root), (before_candidates, b"concurrent report"))
+            debris = [
+                path
+                for path in root.iterdir()
+                if ".stage." in path.name or ".backup." in path.name
+            ]
+            self.assertEqual(len(debris), 1)
+            self.assertIn(".report.json.backup.", debris[0].name)
+            self.assertEqual(debris[0].read_bytes(), b"old report")
+            self.assertIn(str(debris[0]), str(raised.exception))
+            self.assertIn(
+                "cannot restore prior report without overwriting it",
+                str(raised.exception),
+            )
+
+
+class FrozenDependencyPostimageSpecTests(unittest.TestCase):
+    def test_frozen_specs_cover_all_authored_closures_and_owner_files(self):
+        specs = merge_tool.DEPENDENCY_POSTIMAGE_SPECS
+        self.assertEqual(len(specs), 11)
+        dependency_ids = {
+            dependency["id"]
+            for spec in specs.values()
+            for dependency in spec["dependencies"]
+        }
+        literal_ids = {
+            literal["id"]
+            for spec in specs.values()
+            for literal in spec["required_literals"]
+        }
+        self.assertEqual(len(dependency_ids), 14)
+        self.assertEqual(
+            literal_ids,
+            {
+                "constant:FLAG_ROUTE120_BADGECHECKED",
+                "constant:FLAG_ROUTE123_BADGECHECKED",
+                "constant:FLAG_RECEIVED_CAMERUPTITE",
+            },
+        )
+
+
+class DependencyPostimageValidationTests(unittest.TestCase):
+    def setUp(self):
+        self.baseline = b"Root::\n\tmsgbox OldText\n\tend\nOldText:\n\t.string \"old$\"\n"
+        self.direct = b"Root::\n\tmsgbox NewText\n\tend\nNewText:\n\t.string \"new$\"\n"
+        self.adapted = b"Root::\n\tmsgbox NewText\n\tend\nNewText:\n\t.string \"adapted$\"\n"
+        direct_block = merge_tool.expand_label_block(
+            "Root", merge_tool.parse_label_blocks(self.direct, "direct")
+        )[0]
+        adapted_block = merge_tool.expand_label_block(
+            "Root", merge_tool.parse_label_blocks(self.adapted, "adapted")
+        )[0]
+        self.source = {
+            "id": "dependency:Root",
+            "label": "Root",
+            "owners": {"legacy": "scripts.inc", "current": "scripts.inc"},
+            "normalized_blocks": {"legacy": direct_block, "current": None},
+            "normalized_block_sha256": {
+                "legacy": hashlib.sha256(direct_block.encode()).hexdigest(),
+                "current": None,
+            },
+            "block_labels": {"legacy": ["Root"], "current": []},
+            "item_equivalence": [],
+        }
+        self.resolution = {
+            "id": "dependency:Root",
+            "decision": "use_archive",
+            "evidence": "reviewed",
+        }
+        self.direct_spec = {
+            "scripts.inc": {
+                "old_sha256": hashlib.sha256(self.baseline).hexdigest(),
+                "new_sha256": hashlib.sha256(self.direct).hexdigest(),
+                "dependencies": [
+                    {
+                        "id": "dependency:Root",
+                        "target_label": "Root",
+                        "kind": "direct_legacy",
+                        "target_sha256": hashlib.sha256(direct_block.encode()).hexdigest(),
+                        "rationale": "Exact reviewed legacy closure.",
+                    }
+                ],
+                "required_literals": [],
+            }
+        }
+        self.adapted_spec = copy.deepcopy(self.direct_spec)
+        self.adapted_spec["scripts.inc"]["new_sha256"] = hashlib.sha256(
+            self.adapted
+        ).hexdigest()
+        self.adapted_spec["scripts.inc"]["dependencies"][0].update(
+            kind="current_adaptation",
+            target_sha256=hashlib.sha256(adapted_block.encode()).hexdigest(),
+            rationale="Reviewed current syntax adaptation.",
+        )
+
+    def validate(self, actual, spec=None, dependencies=None, resolutions=None):
+        return merge_tool.validate_dependency_postimages(
+            {"scripts.inc": actual},
+            {"scripts.inc": self.baseline},
+            (
+                {self.resolution["id"]: self.resolution}
+                if resolutions is None
+                else resolutions
+            ),
+            {self.source["label"]: self.source} if dependencies is None else dependencies,
+            self.direct_spec if spec is None else spec,
+        )
+
+    def test_accepts_exact_direct_and_reviewed_adaptation_postimages(self):
+        direct = self.validate(self.direct)
+        self.assertEqual(direct["missing_dependencies"], [])
+        self.assertEqual(
+            direct["dependency_records"][0]["actual_target_sha256"],
+            self.source["normalized_block_sha256"]["legacy"],
+        )
+        adapted = self.validate(self.adapted, self.adapted_spec)
+        self.assertEqual(adapted["missing_dependencies"], [])
+        self.assertEqual(
+            adapted["dependency_records"][0]["adaptation_kind"],
+            "current_adaptation",
+        )
+
+    def test_missing_patch_and_unrelated_edit_are_reported_from_whole_postimage(self):
+        missing = self.validate(self.baseline)
+        self.assertIn("dependency:Root", missing["missing_dependencies"])
+        unrelated = self.validate(self.direct + b"@ unrelated\n")
+        self.assertIn("dependency:Root", unrelated["missing_dependencies"])
+
+    def test_changed_or_removed_target_block_is_reported(self):
+        changed = self.validate(self.direct.replace(b'"new$"', b'"wrong$"'))
+        self.assertIn("dependency:Root", changed["missing_dependencies"])
+        removed = self.validate(b"Other::\n\tend\n")
+        self.assertIn("dependency:Root", removed["missing_dependencies"])
+
+    def test_missing_required_constant_is_reported(self):
+        baseline = b"#define FLAG_UNUSED 0x22\n"
+        actual = b"#define FLAG_REQUIRED 0x22\n"
+        spec = {
+            "scripts.inc": {
+                "old_sha256": hashlib.sha256(baseline).hexdigest(),
+                "new_sha256": hashlib.sha256(actual).hexdigest(),
+                "dependencies": [],
+                "required_literals": [
+                    {
+                        "id": "constant:FLAG_REQUIRED",
+                        "text": "#define FLAG_REQUIRED 0x22",
+                        "rationale": "Reviewed unused flag reuse.",
+                    }
+                ],
+            }
+        }
+        valid = merge_tool.validate_dependency_postimages(
+            {"scripts.inc": actual},
+            {"scripts.inc": baseline},
+            {},
+            {},
+            spec,
+        )
+        self.assertEqual(valid["missing_dependencies"], [])
+        missing = merge_tool.validate_dependency_postimages(
+            {"scripts.inc": baseline},
+            {"scripts.inc": baseline},
+            {},
+            {},
+            spec,
+        )
+        self.assertIn("constant:FLAG_REQUIRED", missing["missing_dependencies"])
+
+    def test_candidate_item_adapter_needs_no_source_file_write(self):
+        item_source = copy.deepcopy(self.source)
+        item_source["label"] = "Legacy_Item"
+        item_source["id"] = "dependency:Legacy_Item"
+        item_source["item_equivalence"] = [{"archive_label": "Legacy_Item"}]
+        item_resolution = {
+            "id": "dependency:Legacy_Item",
+            "decision": "use_archive",
+            "evidence": "adapt into candidate object event",
+        }
+        result = merge_tool.validate_dependency_postimages(
+            {},
+            {},
+            {item_resolution["id"]: item_resolution},
+            {item_source["label"]: item_source},
+            {},
+        )
+        self.assertEqual(result["missing_dependencies"], [])
+        self.assertEqual(
+            result["dependency_records"][0]["adaptation_kind"],
+            "candidate_item_adapter",
+        )
 
 
 if __name__ == "__main__":

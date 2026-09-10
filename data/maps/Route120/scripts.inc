@@ -427,3 +427,33 @@ Route120_Text_RouteSignFortree:
 Route120_Text_RouteSign121:
 	.string "{RIGHT_ARROW} ROUTE 121\n"
 	.string "{LEFT_ARROW} ROUTE 120$"
+
+Route120_EventScript_BadgeCheck::
+	lock
+	faceplayer
+	goto_if_unset FLAG_BADGE06_GET, Route120_EventScript_BadgeCheckNotEnoughBadges
+	msgbox Route120_Text_SixBadgesGoodLuck, MSGBOX_DEFAULT
+	closemessage
+	fadescreen FADE_TO_BLACK
+	removeobject VAR_LAST_TALKED
+	fadescreen FADE_FROM_BLACK
+	setflag FLAG_ROUTE120_BADGECHECKED
+	release
+	end
+
+Route120_EventScript_BadgeCheckNotEnoughBadges::
+	msgbox Route120_Text_NotEnoughBadges, MSGBOX_DEFAULT
+	release
+	end
+
+Route120_Text_NotEnoughBadges:
+	.string "Past this route there is a tough \n"
+	.string "gauntlet of TRAINERS.\p"
+	.string "If you can defeat a strong TRAINER\n"
+	.string "like WINONA, I will let you pass.$"
+
+Route120_Text_SixBadgesGoodLuck:
+	.string "Is that...\n"
+	.string "Six BADGES?!\p"
+	.string "Very well. I shall let you through.\n"
+	.string "All the best ahead. Goodbye!$"

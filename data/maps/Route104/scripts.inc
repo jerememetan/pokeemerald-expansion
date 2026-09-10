@@ -258,7 +258,7 @@ Route104_EventScript_ExpertF::
 	faceplayer
 	goto_if_set FLAG_RECEIVED_CHESTO_BERRY_ROUTE_104, Route104_EventScript_ReceivedBerry
 	msgbox Route104_Text_PlantBerriesInSoilTakeThis, MSGBOX_DEFAULT
-	giveitem ITEM_CHESTO_BERRY
+	giveitem ITEM_CHESTO_BERRY, 5
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
 	setflag FLAG_RECEIVED_CHESTO_BERRY_ROUTE_104
 	msgbox Route104_Text_TrainersOftenMakeMonHoldBerries, MSGBOX_DEFAULT
@@ -275,7 +275,7 @@ Route104_EventScript_WhiteHerbFlorist::
 	faceplayer
 	goto_if_set FLAG_RECEIVED_WHITE_HERB, Route104_EventScript_ReceivedWhiteHerb
 	msgbox Route104_Text_DontNeedThisTakeIt, MSGBOX_DEFAULT
-	giveitem ITEM_WHITE_HERB
+	giveitem ITEM_WHITE_HERB, 5
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
 	setflag FLAG_RECEIVED_WHITE_HERB
 	release
@@ -334,7 +334,7 @@ Route104_EventScript_Boy2::
 	end
 
 Route104_EventScript_ReceivedBulletSeed::
-	msgbox Route104_Text_TMsAreOneTimeUse, MSGBOX_DEFAULT
+	msgbox Route104_Text_TMsCanBeReused, MSGBOX_DEFAULT
 	release
 	end
 
@@ -1031,12 +1031,9 @@ Route104_Text_LikeFillingMouthWithSeedsTakeThis:
 	.string "Use it on a POKéMON, and it will learn\n"
 	.string "a move for firing seeds rapidly.$"
 
-Route104_Text_TMsAreOneTimeUse:
-	.string "A word of advice!\p"
-	.string "A TM, TECHNICAL MACHINE, is good only\n"
-	.string "for one-time use.\p"
-	.string "Once you use it, it's gone.\n"
-	.string "Think twice before using it!$"
+Route104_Text_TMsCanBeReused:
+	.string "By the way, a TM, TECHNICAL MACHINE,\n"
+	.string "can be used as many times as you want!$"
 
 Route104_Text_DontNeedThisTakeIt:
 	.string "This FLOWER SHOP started selling\n"

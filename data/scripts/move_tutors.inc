@@ -131,7 +131,7 @@ MoveTutor_EventScript_DynamicPunchTaught::
 SootopolisCity_PokemonCenter_1F_EventScript_DoubleEdgeTutor::
 	lock
 	faceplayer
-	move_tutor MOVE_DOUBLE_EDGE, MoveTutor_Text_DoubleEdgeTeach, MoveTutor_Text_DoubleEdgeWhichMon, MoveTutor_EventScript_DoubleEdgeDeclined, MoveTutor_EventScript_DoubleEdgeTaught, FLAG_MOVE_TUTOR_TAUGHT_DOUBLE_EDGE
+	move_tutor MOVE_DOUBLE_EDGE, MoveTutor_Text_DoubleEdgeTeach, MoveTutor_Text_DoubleEdgeWhichMon, MoveTutor_EventScript_DoubleEdgeDeclined, MoveTutor_EventScript_DoubleEdgeTaught
 	end
 
 MoveTutor_EventScript_DoubleEdgeDeclined::
@@ -140,6 +140,7 @@ MoveTutor_EventScript_DoubleEdgeDeclined::
 	end
 
 MoveTutor_EventScript_DoubleEdgeTaught::
+	setflag FLAG_MOVE_TUTOR_TAUGHT_DOUBLE_EDGE
 	msgbox MoveTutor_Text_DoubleEdgeTaught, MSGBOX_DEFAULT
 	release
 	end

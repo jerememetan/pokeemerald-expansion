@@ -147,7 +147,7 @@ Route111_EventScript_Girl::
 	dotimebasedevents
 	goto_if_set FLAG_DAILY_ROUTE_111_RECEIVED_BERRY, Route111_EventScript_ReceivedBerry
 	msgbox Route111_Text_WateredPlantsEveryDayTakeBerry, MSGBOX_DEFAULT
-	giveitem ITEM_RAZZ_BERRY
+	giveitem ITEM_RAZZ_BERRY, 5
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
 	setflag FLAG_DAILY_ROUTE_111_RECEIVED_BERRY
 	special GetPlayerBigGuyGirlString
@@ -714,4 +714,3 @@ Route111_Text_TrainerHillSign:
 	.string "{RIGHT_ARROW} TRAINER HILL ENTRANCE\p"
 	.string "“Scale the heights, you hot-blooded\n"
 	.string "TRAINERS!”$"
-

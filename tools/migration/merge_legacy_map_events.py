@@ -1,12 +1,14 @@
-"""Audit pinned legacy map events without writing candidates or source data."""
+"""Audit and generate reviewed legacy map-event migration candidates."""
 
 from __future__ import annotations
 
 import argparse
+import copy
 import hashlib
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -20,9 +22,12 @@ from map_event_merge import (
     align_three_way,
     behavior_signature,
     exact_signature,
-    extract_legacy_item,
+    extract_legacy_item_and_quantity,
+    adapt_item_ball,
     merge_added_event,
     merge_base_event,
+    resolve_reviewed_event,
+    validate_resolution_consumption,
 )
 
 
@@ -41,6 +46,92 @@ RESOLUTION_INVENTORY = Path(
 REPORT_INVENTORY = Path(
     "docs/superpowers/inventories/2026-08-17-legacy-map-event-report.json"
 )
+
+# Frozen against CURRENT_BASELINE_COMMIT and the reviewed Task 4 working-tree
+# postimages. Whole-file hashes reject both missing changes and unrelated edits;
+# closure hashes prove that each selected behavior landed at its intended label.
+DEPENDENCY_POSTIMAGE_SPECS = {
+    "data/maps/EverGrandeCity_PokemonLeague_1F/scripts.inc": {
+        "old_sha256": "4ad7306b9c19a193234a50698335d12277ecfb9602c5a5438a207631e90026f4",
+        "new_sha256": "5209b0a7d493ede9f539543821e55c11a4064fa383a01e77d84154a5dc22e9f8",
+        "dependencies": [{"id": "dependency:EverGrandeCity_PokemonLeague_1F_EventScript_Clerk", "target_label": "EverGrandeCity_PokemonLeague_1F_EventScript_Clerk", "kind": "current_adaptation", "target_sha256": "aa5834985de0e937c43771692c0e3dcd0b694740f17c547b1bab1c05e0e88012", "rationale": "Legacy expanded shop inventory expressed with the current mart macro."}],
+        "required_literals": [],
+    },
+    "data/maps/OldaleTown/scripts.inc": {
+        "old_sha256": "21e4ed52e4a4dfe6a7f641bbb55f91e01abaf081266e7747f367c1411aca50ba",
+        "new_sha256": "42723024a67fcb28b4f71b760c56a0311fe897b561df56d79a9b03e91612595a",
+        "dependencies": [{"id": "dependency:OldaleTown_EventScript_MartEmployee", "target_label": "OldaleTown_EventScript_MartEmployee", "kind": "current_adaptation", "target_sha256": "a16d8e7a4807a2b5d3116b67e1eab0e69ced4868e9abcb8e5449dc2327b56d21", "rationale": "Legacy five-Potion gift expressed with the current item-give macro."}],
+        "required_literals": [],
+    },
+    "data/maps/Route104/scripts.inc": {
+        "old_sha256": "66a308b973b9c39331f141fd8eff010f9162dd018d6d6babbbf692f8c7c7bf88",
+        "new_sha256": "b1158108f33dddbd080b2273f44d8b6ea80de1b55127e33f8214d15e882f96b4",
+        "dependencies": [
+            {"id": "dependency:Route104_EventScript_Boy2", "target_label": "Route104_EventScript_Boy2", "kind": "direct_legacy", "target_sha256": "2b479192cd9b6cd5063d88a838d7dbfe55c82696ca96221c5ebae6c15cf81b29", "rationale": "Exact reviewed legacy reusable-TM dialogue closure."},
+            {"id": "dependency:Route104_EventScript_ExpertF", "target_label": "Route104_EventScript_ExpertF", "kind": "direct_legacy", "target_sha256": "1bce34743a157d239a27a8240754480b4fa80e2d27d8f51d4c4f82827da4c2c6", "rationale": "Exact reviewed legacy five-Chesto-Berry closure."},
+            {"id": "dependency:Route104_EventScript_WhiteHerbFlorist", "target_label": "Route104_EventScript_WhiteHerbFlorist", "kind": "direct_legacy", "target_sha256": "5e94ef3b635a22b6142327dfe50368c8b74d83036e9df6b5e6183709af76179d", "rationale": "Exact reviewed legacy five-White-Herb closure."},
+        ],
+        "required_literals": [],
+    },
+    "data/maps/Route111/scripts.inc": {
+        "old_sha256": "05c97b54a8a41a6a3ac61762a9c4f4287d8c245be32c2b8a8d2d5122aca301a9",
+        "new_sha256": "54d020f266bb9b19b70e2f8407acdc1d6c5264b9d06234a34d20b0b09dc6259f",
+        "dependencies": [{"id": "dependency:Route111_EventScript_Girl", "target_label": "Route111_EventScript_Girl", "kind": "direct_legacy", "target_sha256": "b7ffafcac5a8f709ed2ae8e23883f000f1558edc30775092b54e36acd5c7c099", "rationale": "Exact reviewed legacy five-Razz-Berry closure."}],
+        "required_literals": [],
+    },
+    "data/maps/Route120/scripts.inc": {
+        "old_sha256": "f198facc670a4c5e18ed8c6cac6eb3467bf9c7b7b9754ed07a12a89bb3fa34d5",
+        "new_sha256": "093f63d9d4a9230e62860fc331e7231b57f58c62cb0ea0d6cddf6ce9deaabb95",
+        "dependencies": [{"id": "dependency:Route120_EventScript_BadgeCheck", "target_label": "Route120_EventScript_BadgeCheck", "kind": "current_adaptation", "target_sha256": "4f404705a436935ec8cab359577bc759ef746be8b2dce6ab8a0f0dcea0f24519", "rationale": "Legacy six-badge gate and Red battle adapted to current local-id syntax."}],
+        "required_literals": [],
+    },
+    "data/maps/Route123/scripts.inc": {
+        "old_sha256": "38ee3124b082969df3f7b6cdedf00d0e8ae19a7f7e76225ba2cb9c09ac86dbe1",
+        "new_sha256": "47f59c38687fd88f16f85f517a8c22cf019296cd87e1a23348de537a9d5a6c13",
+        "dependencies": [{"id": "dependency:Route123_EventScript_BadgeChecker", "target_label": "Route123_EventScript_BadgeChecker", "kind": "current_adaptation", "target_sha256": "179787711346ad0ff7e8ac3d051ad36b1a1bd07c28070cb261e0b2a05340a529", "rationale": "Legacy eight-badge gate and Red battle adapted to current local-id syntax."}],
+        "required_literals": [],
+    },
+    "data/maps/RustboroCity/scripts.inc": {
+        "old_sha256": "58da962a0a271596e4ad5d0f17d1040865863ef1f5be54e5c1316ba5f7b8ddaa",
+        "new_sha256": "9942fb4586e8eb45fd5327d94c5f52a5f28e5b765725ece4a2773160360341b7",
+        "dependencies": [{"id": "dependency:RustboroCity_EventScript_Rival", "target_label": "RustboroCity_EventScript_Rival", "kind": "current_adaptation", "target_sha256": "29cd346fe272c156e4048be56352a7e337563a5507316f97b5954c855672ebef", "rationale": "Legacy mandatory rival battle preserved while retaining current trainer macros."}],
+        "required_literals": [],
+    },
+    "data/maps/SootopolisCity/scripts.inc": {
+        "old_sha256": "cf776e017a7593c593f9962e02e18928444b3f8c469491ebf204a2c5cdf8df67",
+        "new_sha256": "ce17580eb487855b6e8b3b94b448a46c6d55b65ae20f49ab5aac400406df9f64",
+        "dependencies": [
+            {"id": "dependency:SootopolisCity_EventScript_Kiri", "target_label": "SootopolisCity_EventScript_Kiri", "kind": "current_adaptation", "target_sha256": "4824a62bd437e5f32c86e3a094e9adeefd34dd3bbf4d789e7cccada2c77e7a58", "rationale": "Legacy five-berry gifts expressed with current item-give macros."},
+            {"id": "dependency:SootopolisCity_EventScript_Maxie", "target_label": "SootopolisCity_EventScript_Maxie", "kind": "current_adaptation", "target_sha256": "24f26f0a1d5c1ae4b110158e55aafc2976f1290dd1392f7376fa6f685bfd83b1", "rationale": "Legacy Cameruptite gift merged into the current Maxie/Archie departure flow."},
+        ],
+        "required_literals": [],
+    },
+    "data/scripts/field_move_scripts.inc": {
+        "old_sha256": "61483d2eecafc9ea2e4695bd81fe6691864c831a950eabb8eae5814cce469dbe",
+        "new_sha256": "57db6410dc8bd40f8a18f6d7019507dfa8a58c414db3e0e5d1215fdd8789afed",
+        "dependencies": [
+            {"id": "dependency:EventScript_CutTree", "target_label": "EventScript_CutTree", "kind": "current_adaptation", "target_sha256": "3f3a3862dbaeab37d680cca263fd7ba56606d61c9b682fd54282642e9724091e", "rationale": "Legacy badge-plus-HM gate preserved in the current follower-aware Cut flow."},
+            {"id": "dependency:EventScript_RockSmash", "target_label": "EventScript_RockSmash", "kind": "current_adaptation", "target_sha256": "182f8b9c90135c16b76ed14c8c3265910a663934bb96690d0aa69ef62ee3aeb9", "rationale": "Legacy badge-plus-HM gate preserved in the current follower-aware Rock Smash flow."},
+        ],
+        "required_literals": [],
+    },
+    "data/scripts/move_tutors.inc": {
+        "old_sha256": "51603d2dc63d7919c40b0d4782ca8cbacbcbc39948a90b1186cc4f0c38910088",
+        "new_sha256": "dd7306bb83f68dfcbb144c152f0211f9b76c18ecd049d5d78795fe69de4822d0",
+        "dependencies": [{"id": "dependency:SootopolisCity_PokemonCenter_1F_EventScript_DoubleEdgeTutor", "target_label": "SootopolisCity_PokemonCenter_1F_EventScript_DoubleEdgeTutor", "kind": "current_adaptation", "target_sha256": "b43ddbfd07d3bb41d1153cacaad27b5793b4910c57d8870f9dcd66b85abfd38a", "rationale": "Legacy repeatable tutor entry retained with the current tutor macros."}],
+        "required_literals": [],
+    },
+    "include/constants/flags.h": {
+        "old_sha256": "8edc96def953819e714c709b47169067c0f830468db190f9a23560e6091648cf",
+        "new_sha256": "05c1ce13071a6ee47ba3b37f8ae4e9b975facb12a93602d5de66ec59053bd151",
+        "dependencies": [],
+        "required_literals": [
+            {"id": "constant:FLAG_ROUTE120_BADGECHECKED", "text": "#define FLAG_ROUTE120_BADGECHECKED 0x22", "rationale": "Reviewed reuse of an upstream unused flag."},
+            {"id": "constant:FLAG_ROUTE123_BADGECHECKED", "text": "#define FLAG_ROUTE123_BADGECHECKED 0x24", "rationale": "Reviewed reuse of an upstream unused flag."},
+            {"id": "constant:FLAG_RECEIVED_CAMERUPTITE", "text": "#define FLAG_RECEIVED_CAMERUPTITE  0x265", "rationale": "Reviewed reuse of an upstream unused flag."},
+        ],
+    },
+}
 EXPECTED_SHARED_LAYOUTS = 61
 EXPECTED_SCOPED_MAPS = 75
 EXPECTED_ARCHIVE_CHANGED_MAPS = 69
@@ -333,7 +424,8 @@ def _extract_item_evidence(block: str, label: str) -> tuple[str, bool]:
     """Extract an item, noting whether the approved one-item adapter can preserve it."""
 
     try:
-        return extract_legacy_item(block), True
+        item, quantity = extract_legacy_item_and_quantity(block)
+        return item, quantity == 1
     except ValueError as strict_error:
         without_blocks = re.sub(r"/\*.*?\*/", "", block, flags=re.DOTALL)
         active = re.sub(r"(?m)(?://|@).*$", "", without_blocks)
@@ -1397,6 +1489,326 @@ def publish_evidence_pair(
             temporary.unlink(missing_ok=True)
 
 
+def _canonical_candidate_map_bytes(data: bytes, context: str) -> None:
+    try:
+        document = json.loads(data.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as error:
+        raise ValueError(f"{context} is not valid candidate map JSON: {error}") from error
+    if not isinstance(document, dict):
+        raise ValueError(f"{context} candidate map must be an object")
+    required = {"layout", *EVENT_CATEGORIES}
+    if not required.issubset(document):
+        raise ValueError(
+            f"{context} candidate map lacks canonical fields: {sorted(required - document.keys())}"
+        )
+    if not isinstance(document["layout"], str) or any(
+        not isinstance(document[category], list) for category in EVENT_CATEGORIES
+    ):
+        raise ValueError(f"{context} candidate map has invalid canonical field types")
+
+
+def _validate_candidate_file_set(files: dict[str, bytes]) -> None:
+    if not isinstance(files, dict):
+        raise TypeError("candidate files must be a path-to-bytes object")
+    for relative, data in files.items():
+        parts = PurePosixPath(relative).parts if isinstance(relative, str) else ()
+        if (
+            len(parts) != 4
+            or parts[:2] != ("data", "maps")
+            or parts[3] != "map.json"
+            or not re.fullmatch(r"[A-Za-z0-9_]+", parts[2])
+        ):
+            raise ValueError(f"invalid managed candidate path: {relative!r}")
+        if not isinstance(data, bytes):
+            raise TypeError(f"candidate data must be bytes: {relative}")
+        _canonical_candidate_map_bytes(data, f"candidate {relative}")
+
+
+def _validate_candidate_report_bytes(report_data: bytes, files: dict[str, bytes]) -> None:
+    try:
+        report = json.loads(report_data.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as error:
+        raise ValueError(f"candidate report is not valid JSON: {error}") from error
+    if not isinstance(report, dict) or report.get("mode") != "candidate-only":
+        raise ValueError("candidate report must be a candidate-only JSON object")
+    expected_hashes = {
+        relative: sha256(data) for relative, data in sorted(files.items())
+    }
+    expected_maps = sorted(PurePosixPath(relative).parts[2] for relative in files)
+    if (
+        report.get("candidate_sha256") != expected_hashes
+        or report.get("candidate_map_count") != len(files)
+        or report.get("candidate_maps") != expected_maps
+    ):
+        raise ValueError("candidate report does not describe the exact candidate tree")
+
+
+def _validate_existing_candidate_tree(candidate_dir: Path) -> None:
+    if not candidate_dir.exists():
+        return
+    if not candidate_dir.is_dir() or candidate_dir.is_symlink():
+        raise ValueError(f"candidate path is not a managed directory: {candidate_dir}")
+    files = [path for path in candidate_dir.rglob("*") if path.is_file()]
+    relative_files = {path.relative_to(candidate_dir).as_posix() for path in files}
+    expected_dirs = {Path("data"), Path("data/maps")}
+    for relative in relative_files:
+        parts = PurePosixPath(relative).parts
+        if (
+            len(parts) != 4
+            or parts[:2] != ("data", "maps")
+            or parts[3] != "map.json"
+            or not re.fullmatch(r"[A-Za-z0-9_]+", parts[2])
+        ):
+            raise ValueError(f"unexpected managed candidate content: {candidate_dir / relative}")
+        expected_dirs.add(Path("data/maps") / parts[2])
+    actual_dirs = {
+        path.relative_to(candidate_dir)
+        for path in candidate_dir.rglob("*")
+        if path.is_dir() and not path.is_symlink()
+    }
+    unexpected = sorted(
+        str(path.relative_to(candidate_dir))
+        for path in candidate_dir.rglob("*")
+        if path.is_symlink()
+        or (path.is_dir() and path.relative_to(candidate_dir) not in expected_dirs)
+    )
+    unexpected.extend(str(path) for path in sorted(actual_dirs - expected_dirs))
+    if unexpected:
+        raise ValueError(f"unexpected managed candidate content: {unexpected}")
+    for path in files:
+        _canonical_candidate_map_bytes(
+            path.read_bytes(), f"existing candidate {path.relative_to(candidate_dir).as_posix()}"
+        )
+
+
+def _fsync_directory(path: Path) -> None:
+    try:
+        descriptor = os.open(path, os.O_RDONLY)
+    except OSError:
+        return
+    try:
+        os.fsync(descriptor)
+    except OSError:
+        pass
+    finally:
+        os.close(descriptor)
+
+
+def _reserved_absent_path(parent: Path, prefix: str, directory: bool) -> Path:
+    if directory:
+        path = Path(tempfile.mkdtemp(prefix=prefix, dir=parent))
+        path.rmdir()
+        return path
+    descriptor, name = tempfile.mkstemp(prefix=prefix, dir=parent)
+    os.close(descriptor)
+    path = Path(name)
+    path.unlink()
+    return path
+
+
+def _remove_temporary(path: Path) -> None:
+    if not os.path.lexists(path):
+        return
+    if path.is_dir() and not path.is_symlink():
+        shutil.rmtree(path)
+    else:
+        path.unlink()
+
+
+def _path_snapshot(path: Path) -> tuple[object, ...]:
+    """Capture exact path existence, type, and recursive contents."""
+
+    if not os.path.lexists(path):
+        return ("absent",)
+    if path.is_symlink():
+        return ("symlink", os.readlink(path))
+    if path.is_file():
+        return ("file", path.read_bytes())
+    if path.is_dir():
+        return (
+            "directory",
+            tuple(
+                (entry.name, _path_snapshot(path / entry.name))
+                for entry in sorted(os.scandir(path), key=lambda entry: entry.name)
+            ),
+        )
+    return ("other", path.lstat().st_mode)
+
+
+def publish_candidate_bundle(
+    candidate_dir: Path,
+    candidate_files: dict[str, bytes],
+    report_path: Path,
+    report_data: bytes,
+    *,
+    fault: Callable[[str, Path], None] | None = None,
+    move: Callable[[Path, Path], None] = os.rename,
+) -> None:
+    """Atomically publish a complete managed candidate tree and its report."""
+
+    candidate_dir = candidate_dir.resolve()
+    report_path = report_path.resolve()
+    if candidate_dir == report_path or candidate_dir in report_path.parents or report_path in candidate_dir.parents:
+        raise ValueError("candidate/report publication paths collide")
+    if not isinstance(report_data, bytes):
+        raise TypeError("report data must be bytes")
+    _validate_candidate_file_set(candidate_files)
+    _validate_candidate_report_bytes(report_data, candidate_files)
+    candidate_preimage = _path_snapshot(candidate_dir)
+    _validate_existing_candidate_tree(candidate_dir)
+    if not candidate_dir.parent.is_dir() or not report_path.parent.is_dir():
+        raise ValueError("candidate and report parents must already exist")
+    report_preimage = _path_snapshot(report_path)
+    _destination_preimage(report_path)
+    if _path_snapshot(candidate_dir) != candidate_preimage:
+        raise RuntimeError(f"candidate destination changed before staging: {candidate_dir}")
+    if _path_snapshot(report_path) != report_preimage:
+        raise RuntimeError(f"report destination changed before staging: {report_path}")
+
+    staged_candidate = Path(
+        tempfile.mkdtemp(prefix=f".{candidate_dir.name}.stage.", dir=candidate_dir.parent)
+    )
+    candidate_backup = _reserved_absent_path(
+        candidate_dir.parent, f".{candidate_dir.name}.backup.", True
+    )
+    report_backup = _reserved_absent_path(
+        report_path.parent, f".{report_path.name}.backup.", False
+    )
+    staged_report: Path | None = None
+    candidate_backed_up = False
+    candidate_installed = False
+    report_backed_up = False
+    report_installed = False
+    temporaries = {staged_candidate, candidate_backup, report_backup}
+    try:
+        for relative, data in sorted(candidate_files.items()):
+            destination = staged_candidate / Path(*PurePosixPath(relative).parts)
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            with destination.open("wb") as stream:
+                stream.write(data)
+                stream.flush()
+                os.fsync(stream.fileno())
+        for directory in sorted(
+            (path for path in staged_candidate.rglob("*") if path.is_dir()),
+            key=lambda path: len(path.parts),
+            reverse=True,
+        ):
+            _fsync_directory(directory)
+        _fsync_directory(staged_candidate)
+        staged_report = _stage_file(report_path, report_data, "candidate report")
+        temporaries.add(staged_report)
+        if fault is not None:
+            fault("after_staging", staged_candidate)
+
+        if os.path.lexists(candidate_dir):
+            move(candidate_dir, candidate_backup)
+            candidate_backed_up = True
+            candidate_current = _path_snapshot(candidate_backup)
+        else:
+            candidate_current = ("absent",)
+        if candidate_current != candidate_preimage:
+            raise RuntimeError(
+                f"candidate destination changed while staging: {candidate_dir}"
+            )
+        if fault is not None:
+            fault("before_candidate_install", candidate_dir)
+        move(staged_candidate, candidate_dir)
+        candidate_installed = True
+        if fault is not None:
+            fault("after_candidate_install", candidate_dir)
+
+        if os.path.lexists(report_path):
+            move(report_path, report_backup)
+            report_backed_up = True
+            report_current = _path_snapshot(report_backup)
+        else:
+            report_current = ("absent",)
+        if report_current != report_preimage:
+            raise RuntimeError(f"report destination changed while staging: {report_path}")
+        if fault is not None:
+            fault("before_report_install", report_path)
+        os.link(staged_report, report_path)
+        report_installed = True
+        staged_report.unlink()
+        if fault is not None:
+            fault("after_report_install", report_path)
+        if report_path.read_bytes() != report_data:
+            raise RuntimeError("published candidate report verification failed")
+        _validate_existing_candidate_tree(candidate_dir)
+        published = {
+            path.relative_to(candidate_dir).as_posix(): path.read_bytes()
+            for path in candidate_dir.rglob("map.json")
+        }
+        if published != candidate_files:
+            raise RuntimeError("published candidate tree verification failed")
+    except BaseException as publication_error:
+        rollback_errors: list[str] = []
+        if report_installed and staged_report is not None:
+            try:
+                move(report_path, staged_report)
+                report_installed = False
+            except BaseException as rollback_error:
+                rollback_errors.append(f"remove published report: {rollback_error}")
+        if report_backed_up:
+            try:
+                if os.path.lexists(report_path):
+                    raise RuntimeError(
+                        "report destination is occupied; cannot restore prior report "
+                        "without overwriting it"
+                    )
+                move(report_backup, report_path)
+                report_backed_up = False
+            except BaseException as rollback_error:
+                rollback_errors.append(f"restore prior report: {rollback_error}")
+        if candidate_installed:
+            try:
+                move(candidate_dir, staged_candidate)
+                candidate_installed = False
+            except BaseException as rollback_error:
+                rollback_errors.append(f"remove published candidate tree: {rollback_error}")
+        if candidate_backed_up:
+            try:
+                if os.path.lexists(candidate_dir):
+                    raise RuntimeError("published candidate tree still occupies destination")
+                move(candidate_backup, candidate_dir)
+                candidate_backed_up = False
+            except BaseException as rollback_error:
+                rollback_errors.append(f"restore prior candidate tree: {rollback_error}")
+        if rollback_errors:
+            recovery_copies = {
+                path
+                for path, needed in (
+                    (candidate_backup, candidate_backed_up),
+                    (report_backup, report_backed_up),
+                )
+                if needed and os.path.lexists(path)
+            }
+            for temporary in temporaries - recovery_copies:
+                try:
+                    _remove_temporary(temporary)
+                except BaseException as cleanup_error:
+                    rollback_errors.append(
+                        f"clean transaction temporary {temporary}: {cleanup_error}"
+                    )
+                    recovery_copies.add(temporary)
+            retained = sorted(str(path) for path in recovery_copies)
+            raise RuntimeError(
+                "candidate/report publication failed and rollback failed; "
+                "recovery copies retained: "
+                + ", ".join(retained)
+                + f"; rollback errors: {rollback_errors}"
+            ) from publication_error
+        for temporary in temporaries:
+            _remove_temporary(temporary)
+        raise
+    else:
+        for temporary in temporaries:
+            _remove_temporary(temporary)
+        _fsync_directory(candidate_dir.parent)
+        if report_path.parent != candidate_dir.parent:
+            _fsync_directory(report_path.parent)
+
+
 def build_audit(root: Path, commits: dict[str, str], layout_report_data: bytes) -> tuple[dict[str, object], dict[str, dict[str, object]]]:
     try:
         layout_report = json.loads(layout_report_data.decode("utf-8"))
@@ -1545,6 +1957,604 @@ def build_audit(root: Path, commits: dict[str, str], layout_report_data: bytes) 
     return audit, known
 
 
+def _reviewed_event_units(
+    category: str,
+    category_audit: dict[str, object],
+    arrays: dict[str, list[dict[str, object]]],
+    resolutions: dict[str, dict[str, object]],
+    ambiguity_groups: dict[str, dict[str, object]],
+) -> tuple[list[dict[str, object]], list[dict[str, object]]]:
+    """Construct reviewed units while retaining current order as the backbone."""
+
+    units: list[dict[str, object]] = []
+    records: list[dict[str, object]] = []
+    for alignment in category_audit["alignments"]:
+        if alignment["method"] == "ambiguous":
+            group = ambiguity_groups[alignment["id"]]
+            selections = [resolutions[identifier] for identifier in group["slot_ids"]]
+        else:
+            selections = [resolutions[alignment["id"]]] if alignment["disposition"] == "unresolved" else [None]
+        for selection in selections:
+            if selection is None:
+                base_index = alignment["base_index"]
+                archive_index = alignment["archive_index"]
+                current_index = alignment["current_index"]
+                base = arrays["base"][base_index] if base_index is not None else None
+                archive = arrays["legacy"][archive_index] if archive_index is not None else None
+                current = arrays["current"][current_index] if current_index is not None else None
+                result = (
+                    merge_base_event(category, base, archive, current)
+                    if base is not None
+                    else merge_added_event(category, archive, current)
+                )
+                if result.conflict is not None:
+                    raise UnresolvedConflictError([alignment["id"]])
+                events = [] if result.event is None else [result.event]
+                disposition = result.disposition
+                identifier = alignment["id"]
+            else:
+                identifier = selection["id"]
+                archive_index = selection["archive_index"]
+                current_index = selection["current_index"]
+                archive = arrays["legacy"][archive_index] if archive_index is not None else None
+                current = arrays["current"][current_index] if current_index is not None else None
+                events = resolve_reviewed_event(category, archive, current, selection)
+                disposition = f"reviewed_{selection['decision']}"
+            units.append(
+                {
+                    "id": identifier,
+                    "archive_index": archive_index,
+                    "current_index": current_index,
+                    "events": copy.deepcopy(events),
+                    "disposition": disposition,
+                }
+            )
+
+    current_backbone = sorted(
+        (unit for unit in units if unit["current_index"] is not None),
+        key=lambda unit: unit["current_index"],
+    )
+    ordered = list(current_backbone)
+    for unit in sorted(
+        (unit for unit in units if unit["archive_index"] is not None and unit["current_index"] is None),
+        key=lambda unit: unit["archive_index"],
+    ):
+        prior = [
+            index for index, existing in enumerate(ordered)
+            if existing["archive_index"] is not None
+            and existing["archive_index"] < unit["archive_index"]
+        ]
+        if prior:
+            insertion = max(prior) + 1
+        else:
+            later = [
+                index for index, existing in enumerate(ordered)
+                if existing["archive_index"] is not None
+                and existing["archive_index"] > unit["archive_index"]
+            ]
+            insertion = min(later) if later else len(ordered)
+        ordered.insert(insertion, unit)
+    ordered.extend(unit for unit in units if unit not in ordered)
+    output: list[dict[str, object]] = []
+    for unit in ordered:
+        output.extend(copy.deepcopy(unit["events"]))
+        records.append(
+            {
+                "id": unit["id"],
+                "disposition": unit["disposition"],
+                "output_count": len(unit["events"]),
+            }
+        )
+    return output, records
+
+
+def _adapt_reviewed_item_events(
+    events: list[dict[str, object]],
+    dependency_by_label: dict[str, dict[str, object]],
+    dependency_resolutions: dict[str, dict[str, object]],
+) -> list[dict[str, object]]:
+    output: list[dict[str, object]] = []
+    for event in events:
+        label = event.get("script")
+        dependency = dependency_by_label.get(label) if isinstance(label, str) else None
+        resolution = dependency_resolutions.get(f"dependency:{label}")
+        legacy_block = dependency["normalized_blocks"]["legacy"] if dependency else None
+        if (
+            resolution is not None
+            and resolution["decision"] == "use_archive"
+            and isinstance(legacy_block, str)
+            and re.search(r"(?m)^\s*finditem\b", legacy_block)
+        ):
+            output.append(adapt_item_ball(event, legacy_block))
+        else:
+            output.append(copy.deepcopy(event))
+    return output
+
+
+def dependency_report_record(
+    resolution: dict[str, object],
+    dependency: dict[str, object],
+    dependencies: dict[str, dict[str, object]],
+) -> dict[str, object]:
+    """Project one validated dependency decision into deterministic evidence."""
+
+    identifier = resolution["id"]
+    label = dependency["label"]
+    decision = resolution["decision"]
+    is_item_adapter = any(
+        item.get("archive_label") == label
+        for item in dependency["item_equivalence"]
+    )
+    if decision == "current_equivalent":
+        current_label = resolution["current_label"]
+        target = dependencies[current_label]
+        current_owner = target["owners"]["current"]
+        current_sha256 = target["normalized_block_sha256"]["current"]
+        return {
+            "id": identifier,
+            "label": label,
+            "source_label": label,
+            "decision": decision,
+            "disposition": "current_equivalent",
+            "source_owner": dependency["owners"]["legacy"],
+            "source_sha256": dependency["normalized_block_sha256"]["legacy"],
+            "current_label": current_label,
+            "current_owner": current_owner,
+            "target_owner": current_owner,
+            "current_sha256": current_sha256,
+            "target_sha256": current_sha256,
+            "block_labels": dependency["block_labels"]["legacy"],
+            "authored": False,
+            "resolution_evidence": resolution["evidence"],
+            "missing_dependencies": [],
+        }
+
+    source = "legacy" if decision == "use_archive" else "current"
+    target_owner = dependency["owners"].get("current") or dependency["owners"].get("legacy")
+    authored = decision == "use_archive" and not is_item_adapter
+    return {
+        "id": identifier,
+        "label": label,
+        "source_label": label,
+        "decision": decision,
+        "disposition": (
+            "candidate_item_adapter"
+            if is_item_adapter
+            else f"selected_{source}"
+        ),
+        "source_owner": dependency["owners"].get(source),
+        "target_owner": target_owner,
+        "source_sha256": dependency["normalized_block_sha256"].get(source),
+        "target_sha256": dependency["normalized_block_sha256"].get("current"),
+        "block_labels": dependency["block_labels"].get(source, []),
+        "authored": authored,
+        "resolution_evidence": resolution["evidence"],
+        "missing_dependencies": [],
+    }
+
+
+def validate_dependency_postimages(
+    actual_files: dict[str, bytes],
+    baseline_files: dict[str, bytes],
+    resolutions: dict[str, dict[str, object]],
+    dependencies: dict[str, dict[str, object]],
+    specs: dict[str, dict[str, object]],
+) -> dict[str, object]:
+    """Validate reviewed dependency closures and exact owner postimages."""
+
+    missing: set[str] = set()
+    records: list[dict[str, object]] = []
+    writes: list[dict[str, object]] = []
+    specified_ids: set[str] = set()
+    for path, spec in sorted(specs.items()):
+        transformations = spec["dependencies"]
+        literal_specs = spec["required_literals"]
+        path_ids = {
+            transformation["id"] for transformation in transformations
+        } | {literal["id"] for literal in literal_specs}
+        specified_ids.update(transformation["id"] for transformation in transformations)
+        baseline = baseline_files.get(path)
+        actual = actual_files.get(path)
+        if baseline is None or sha256(baseline) != spec["old_sha256"]:
+            raise ValueError(f"dependency spec baseline hash differs for {path}")
+        if actual is None or sha256(actual) != spec["new_sha256"]:
+            missing.update(path_ids)
+        parsed: dict[str, str] = {}
+        if actual is not None:
+            try:
+                parsed = parse_label_blocks(actual, f"dependency target {path}")
+            except ValueError:
+                missing.update(path_ids)
+        for transformation in transformations:
+            identifier = transformation["id"]
+            label = identifier.removeprefix("dependency:")
+            dependency = dependencies.get(label)
+            resolution = resolutions.get(identifier)
+            errors: list[str] = []
+            if dependency is None:
+                errors.append("missing source dependency inventory")
+            if resolution is None or resolution.get("decision") != "use_archive":
+                errors.append("missing reviewed use_archive resolution")
+            target_label = transformation["target_label"]
+            try:
+                target_block, target_labels = expand_label_block(target_label, parsed)
+            except ValueError as error:
+                target_block, target_labels = "", []
+                errors.append(str(error))
+            actual_target_hash = sha256(target_block.encode("utf-8")) if target_block else None
+            if actual_target_hash != transformation["target_sha256"]:
+                errors.append("actual target closure hash differs from reviewed postimage")
+            source_hash = (
+                dependency["normalized_block_sha256"]["legacy"]
+                if dependency is not None
+                else None
+            )
+            if transformation["kind"] == "direct_legacy" and actual_target_hash != source_hash:
+                errors.append("direct legacy target closure differs from selected source")
+            if errors:
+                missing.add(identifier)
+            records.append(
+                {
+                    "id": identifier,
+                    "label": label,
+                    "source_label": label,
+                    "source_owner": dependency["owners"]["legacy"] if dependency else None,
+                    "source_sha256": source_hash,
+                    "decision": "use_archive",
+                    "disposition": "selected_legacy",
+                    "actual_target_label": target_label,
+                    "target_owner": path,
+                    "actual_target_sha256": actual_target_hash,
+                    "target_sha256": actual_target_hash,
+                    "target_block_labels": target_labels,
+                    "adaptation_kind": transformation["kind"],
+                    "adaptation_rationale": transformation["rationale"],
+                    "authored": True,
+                    "resolution_evidence": resolution.get("evidence") if resolution else None,
+                    "missing_dependencies": errors,
+                }
+            )
+        for literal in literal_specs:
+            if actual is None or literal["text"].encode("utf-8") not in actual:
+                missing.add(literal["id"])
+        writes.append(
+            {
+                "path": path,
+                "labels": sorted(path_ids),
+                "source": "exact reviewed dependency postimage",
+                "old_sha256": sha256(baseline),
+                "new_sha256": sha256(actual) if actual is not None else None,
+                "target_sha256": sha256(actual) if actual is not None else None,
+            }
+        )
+
+    for identifier, resolution in sorted(resolutions.items()):
+        if identifier in specified_ids:
+            continue
+        label = identifier.removeprefix("dependency:")
+        dependency = dependencies.get(label)
+        if dependency is None:
+            missing.add(identifier)
+            continue
+        is_item_adapter = any(
+            item.get("archive_label") == label
+            for item in dependency["item_equivalence"]
+        )
+        decision = resolution["decision"]
+        if is_item_adapter and decision == "use_archive":
+            record = dependency_report_record(resolution, dependency, dependencies)
+            record.update(
+                {
+                    "actual_target_label": "Common_EventScript_FindItem",
+                    "adaptation_kind": "candidate_item_adapter",
+                    "adaptation_rationale": (
+                        "Legacy finditem operands are stored in the candidate object template."
+                    ),
+                    "missing_dependencies": [],
+                }
+            )
+            records.append(record)
+        elif decision in {"use_current", "current_equivalent"}:
+            record = dependency_report_record(resolution, dependency, dependencies)
+            record.update(
+                {
+                    "actual_target_label": record.get("current_label", label),
+                    "actual_target_sha256": record.get("current_sha256", record["target_sha256"]),
+                    "adaptation_kind": (
+                        "renamed_current_equivalent"
+                        if decision == "current_equivalent"
+                        else "retained_current"
+                    ),
+                    "adaptation_rationale": resolution["evidence"],
+                    "missing_dependencies": [],
+                }
+            )
+            records.append(record)
+        else:
+            missing.add(identifier)
+    return {
+        "dependency_records": sorted(records, key=lambda record: record["id"]),
+        "dependency_writes": writes,
+        "missing_dependencies": sorted(missing),
+    }
+
+
+def candidate_event_bounds_error(
+    event: dict[str, object], width: int, height: int
+) -> str | None:
+    """Return the exact packed-field/coordinate error for one event."""
+
+    x, y = event.get("x"), event.get("y")
+    if (
+        not isinstance(x, int)
+        or isinstance(x, bool)
+        or not isinstance(y, int)
+        or isinstance(y, bool)
+        or x < 0
+        or x >= width
+        or y < 0
+        or y >= height
+    ):
+        return f"coordinates must be integers inside {width}x{height}, got ({x!r}, {y!r})"
+    range_x = event.get("movement_range_x", 0)
+    range_y = event.get("movement_range_y", 0)
+    if event.get("script") == "Common_EventScript_FindItem":
+        if (
+            not isinstance(range_x, int)
+            or isinstance(range_x, bool)
+            or not 0 <= range_x <= 15
+        ):
+            return (
+                "item quantity movement_range_x must be an integer in 0..15, "
+                f"got {range_x!r}"
+            )
+    elif (
+        not isinstance(range_x, int)
+        or isinstance(range_x, bool)
+        or not 0 <= range_x <= 15
+    ):
+        return f"movement_range_x must be an integer in 0..15, got {range_x!r}"
+    if (
+        not isinstance(range_y, int)
+        or isinstance(range_y, bool)
+        or not 0 <= range_y <= 15
+    ):
+        return f"movement_range_y must be an integer in 0..15, got {range_y!r}"
+    return None
+
+
+def generate_candidates_and_report(
+    root: Path,
+    audit: dict[str, object],
+    documents: dict[str, dict[str, dict[str, list[dict[str, object]]]]],
+    resolutions: dict[str, object],
+    sources: Sources,
+) -> tuple[dict[str, object], dict[str, bytes]]:
+    entries = resolutions["resolutions"]
+    by_id = {entry["id"]: entry for entry in entries}
+    unresolved_ids = set(audit.get("resolution_ids", ())) or {
+        item["id"] for item in audit["unresolved"]
+    }
+    validate_resolution_consumption(unresolved_ids, by_id)
+    event_resolutions = {key: value for key, value in by_id.items() if value["category"] != "dependency"}
+    dependency_resolutions = {key: value for key, value in by_id.items() if value["category"] == "dependency"}
+    groups = {group["id"]: group for group in audit["ambiguity_groups"]}
+    dependency_by_label = {item["label"]: item for item in audit["dependencies"]}
+    candidate_hashes: dict[str, str] = {}
+    map_validations: list[dict[str, object]] = []
+    disposition_counts: Counter[str] = Counter()
+    item_records: list[dict[str, object]] = []
+    candidate_documents: dict[str, dict[str, object]] = {}
+    candidate_files: dict[str, bytes] = {}
+    authoritative_before = {
+        map_audit["map"]: sha256(
+            (root / "data" / "maps" / map_audit["map"] / "map.json").read_bytes()
+        )
+        for map_audit in audit["maps"]
+    }
+    changed_maps: list[str] = []
+    for map_audit in audit["maps"]:
+        map_name = map_audit["map"]
+        path = f"data/maps/{map_name}/map.json"
+        current_document = sources.json("current", path)
+        candidate = copy.deepcopy(current_document)
+        category_records: dict[str, object] = {}
+        for category in EVENT_CATEGORIES:
+            merged, records = _reviewed_event_units(
+                category,
+                map_audit["categories"][category],
+                {
+                    source: documents[map_name][source][category]
+                    for source in SOURCE_COMMITS
+                },
+                event_resolutions,
+                groups,
+            )
+            if category == "object_events":
+                merged = _adapt_reviewed_item_events(
+                    merged, dependency_by_label, dependency_resolutions
+                )
+                for event in merged:
+                    if event.get("script") == "Common_EventScript_FindItem" and isinstance(event.get("trainer_sight_or_berry_tree_id"), str) and event["trainer_sight_or_berry_tree_id"].startswith("ITEM_"):
+                        item_records.append(
+                            {
+                                "map": map_name,
+                                "flag": event.get("flag"),
+                                "item": event["trainer_sight_or_berry_tree_id"],
+                                "quantity": event.get("movement_range_x"),
+                            }
+                        )
+            candidate[category] = merged
+            category_records[category] = records
+            disposition_counts.update(record["disposition"] for record in records)
+        if any(candidate[key] != current_document[key] for key in EVENT_CATEGORIES):
+            changed_maps.append(map_name)
+            relative = f"data/maps/{map_name}/map.json"
+            data = _json_bytes(candidate)
+            candidate_files[relative] = data
+            candidate_hashes[relative] = sha256(data)
+        candidate_documents[map_name] = candidate
+        map_validations.append(
+            {
+                "map": map_name,
+                "layout_preserved": candidate.get("layout") == current_document.get("layout"),
+                "non_event_fields_preserved": all(
+                    candidate.get(key) == value
+                    for key, value in current_document.items()
+                    if key not in EVENT_CATEGORIES
+                ),
+                "categories": category_records,
+            }
+        )
+
+    layout_by_id = {
+        layout["id"]: layout
+        for layout in sources.json("current", "data/layouts/layouts.json")["layouts"]
+    }
+    duplicate_identities: list[dict[str, object]] = []
+    out_of_bounds: list[dict[str, object]] = []
+    invalid_item_quantities: list[dict[str, object]] = []
+    local_id_duplicates: list[dict[str, object]] = []
+    for map_name, document in candidate_documents.items():
+        layout = layout_by_id[document["layout"]]
+        width, height = layout["width"], layout["height"]
+        for category in EVENT_CATEGORIES:
+            seen_exact: dict[str, int] = {}
+            for index, event in enumerate(document[category]):
+                signature = exact_signature(event)
+                if signature in seen_exact:
+                    duplicate_identities.append(
+                        {"map": map_name, "category": category, "indices": [seen_exact[signature], index]}
+                    )
+                else:
+                    seen_exact[signature] = index
+                bounds_error = candidate_event_bounds_error(event, width, height)
+                if bounds_error is not None:
+                    record = {
+                        "map": map_name,
+                        "category": category,
+                        "index": index,
+                        "reason": bounds_error,
+                    }
+                    if bounds_error.startswith("item quantity "):
+                        invalid_item_quantities.append(record)
+                    else:
+                        out_of_bounds.append(record)
+            local_ids = [event["local_id"] for event in document[category] if "local_id" in event]
+            duplicate_local_ids = sorted(
+                value for value, count in Counter(local_ids).items() if count > 1
+            )
+            if duplicate_local_ids:
+                local_id_duplicates.append(
+                    {"map": map_name, "category": category, "local_ids": duplicate_local_ids}
+                )
+    if duplicate_identities:
+        raise ValueError(f"duplicate event identities: {duplicate_identities}")
+    if out_of_bounds:
+        raise ValueError(f"out-of-bounds events: {out_of_bounds}")
+    if invalid_item_quantities:
+        raise ValueError(f"invalid packed item quantities: {invalid_item_quantities}")
+    if local_id_duplicates:
+        raise ValueError(f"duplicate local IDs: {local_id_duplicates}")
+    if len(item_records) != 44 or len([item for item in item_records if item["quantity"] == 5]) != 6:
+        raise ValueError("custom item wrapper count/quantity invariant differs")
+    woodgrove_warps = [
+        event for event in candidate_documents["PetalburgWoods"]["warp_events"]
+        if event.get("dest_map") == "MAP_PETALBURG_WOODGROVE"
+    ]
+    if not woodgrove_warps or any(event.get("elevation") != 3 for event in woodgrove_warps):
+        raise ValueError("PetalburgWoods Woodgrove access must retain elevation 3")
+    authoritative_after = {
+        map_name: sha256((root / "data" / "maps" / map_name / "map.json").read_bytes())
+        for map_name in authoritative_before
+    }
+    if authoritative_after != authoritative_before:
+        raise RuntimeError("authoritative map JSON changed during candidate generation")
+
+    custom_validations = []
+    for record in audit["scope"]["custom_maps"]:
+        custom_validations.append(
+            {
+                "map": record["map"],
+                "validation_only": True,
+                "event_arrays_equal": record["event_arrays_equal"],
+                "blob_sha256": record["blob_sha256"],
+            }
+        )
+    dependency_validation = validate_dependency_postimages(
+        {
+            path: (root / path).read_bytes()
+            for path in DEPENDENCY_POSTIMAGE_SPECS
+            if (root / path).is_file()
+        },
+        {
+            path: sources.bytes("current", path)
+            for path in DEPENDENCY_POSTIMAGE_SPECS
+        },
+        dependency_resolutions,
+        dependency_by_label,
+        DEPENDENCY_POSTIMAGE_SPECS,
+    )
+    missing_dependencies = dependency_validation["missing_dependencies"]
+    if missing_dependencies:
+        raise ValueError(
+            f"missing or altered reviewed dependencies: {missing_dependencies}"
+        )
+    dependency_records = dependency_validation["dependency_records"]
+    dependency_writes = dependency_validation["dependency_writes"]
+    named_automatic = {}
+    for label in (
+        "Route104_EventScript_Darian",
+        "Route120_EventScript_Callie",
+        "RustboroCity_EventScript_Boy1",
+        "SootopolisCity_EventScript_Archie",
+    ):
+        dependency = dependency_by_label[label]
+        named_automatic[label] = {
+            "classification": dependency["classification"],
+            "current_owner": dependency["owners"]["current"],
+            "current_sha256": dependency["normalized_block_sha256"]["current"],
+            "disposition": "retained_current",
+        }
+    quantity_five = [item for item in item_records if item["quantity"] == 5]
+    report = {
+        "schema_version": 1,
+        "mode": "candidate-only",
+        "source_commits": audit["source_commits"],
+        "invariants": {
+            "scoped_map_count": len(map_validations),
+            "archive_changed_map_count": audit["scope"]["archive_changed_map_count"],
+            "resolution_count": len(entries),
+            "unresolved_count": 0,
+            "unused_resolution_count": 0,
+            "ambiguity_group_count": len(groups),
+            "duplicate_event_identity_count": 0,
+            "out_of_bounds_event_count": 0,
+            "invalid_item_quantity_count": len(invalid_item_quantities),
+            "duplicate_local_id_count": 0,
+            "missing_dependency_count": len(missing_dependencies),
+            "custom_item_wrapper_count": len(item_records),
+            "quantity_five_item_count": len(quantity_five),
+        },
+        "candidate_map_count": len(changed_maps),
+        "candidate_maps": changed_maps,
+        "candidate_sha256": dict(sorted(candidate_hashes.items())),
+        "authoritative_map_sha256_aggregate": sha256(
+            json.dumps(authoritative_before, sort_keys=True, separators=(",", ":")).encode()
+        ),
+        "woodgrove_access_warps": woodgrove_warps,
+        "event_disposition_counts": dict(sorted(disposition_counts.items())),
+        "map_validations": map_validations,
+        "custom_map_validations": custom_validations,
+        "item_wrappers": item_records,
+        "quantity_five_items": quantity_five,
+        "dependencies": dependency_records,
+        "named_current_dependency_validations": named_automatic,
+        "dependency_writes": dependency_writes,
+    }
+    return report, candidate_files
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--candidate-dir", required=True, type=Path)
@@ -1554,10 +2564,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--audit-only", action="store_true")
     parser.add_argument("--apply", action="store_true")
     args = parser.parse_args(argv)
-    if not args.audit_only or args.apply:
-        parser.error("this task implements only --audit-only without --apply")
+    if args.apply:
+        parser.error("--apply is reserved for Task 5; candidate generation never writes authoritative maps")
     root = repository_root()
-    _candidate, audit_path, resolutions_path, _report = _validate_paths(root, args)
+    candidate_path, audit_path, resolutions_path, report_path = _validate_paths(root, args)
     commits = {name: resolve_commit(ref) for name, ref in SOURCE_COMMITS.items()}
     for name, expected in SOURCE_COMMITS.items():
         if commits[name] != expected:
@@ -1579,11 +2589,37 @@ def main(argv: list[str] | None = None) -> int:
     audit["unresolved"] = [item for item in audit["unresolved"] if item["id"] not in resolved_ids]
     audit["unresolved_count"] = len(audit["unresolved"])
     audit["resolution_ids"] = sorted(resolved_ids)
-    resolution_data = _resolution_bytes(resolutions)
-    audit_data = _json_bytes(audit)
-    publish_evidence_pair(
-        audit_path, audit_data, resolutions_path, resolution_data
-    )
+    if args.audit_only:
+        resolution_data = _resolution_bytes(resolutions)
+        audit_data = _json_bytes(audit)
+        publish_evidence_pair(
+            audit_path, audit_data, resolutions_path, resolution_data
+        )
+    else:
+        if audit["unresolved_count"]:
+            raise UnresolvedConflictError(item["id"] for item in audit["unresolved"])
+        sources = Sources(commits)
+        documents: dict[str, dict[str, dict[str, list[dict[str, object]]]]] = {}
+        for map_audit in audit["maps"]:
+            map_name = map_audit["map"]
+            path = f"data/maps/{map_name}/map.json"
+            documents[map_name] = {
+                source: _event_arrays(sources.json(source, path), f"{source}:{path}")
+                for source in SOURCE_COMMITS
+            }
+        report, candidate_files = generate_candidates_and_report(
+            root, audit, documents, resolutions, sources
+        )
+        publish_candidate_bundle(
+            candidate_path, candidate_files, report_path, _json_bytes(report)
+        )
+        print(
+            f"candidates: maps={report['candidate_map_count']} "
+            f"items={report['invariants']['custom_item_wrapper_count']} "
+            f"quantity-five={report['invariants']['quantity_five_item_count']}"
+        )
+        print(f"report file: {report_path}")
+        return 0
     print(
         f"audit: layouts={EXPECTED_SHARED_LAYOUTS} maps={EXPECTED_SCOPED_MAPS} "
         f"archive-changed={EXPECTED_ARCHIVE_CHANGED_MAPS} unresolved={audit['unresolved_count']}"

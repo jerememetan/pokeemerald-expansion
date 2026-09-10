@@ -718,14 +718,14 @@ SootopolisCity_EventScript_KiriGiveBerry::
 	end
 
 SootopolisCity_EventScript_GiveFigyBerry::
-	giveitem ITEM_FIGY_BERRY
+	giveitem ITEM_FIGY_BERRY, 5
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
 	msgbox SootopolisCity_Text_WhatKindOfWishInYourName, MSGBOX_DEFAULT
 	release
 	end
 
 SootopolisCity_EventScript_GiveIapapaBerry::
-	giveitem ITEM_IAPAPA_BERRY
+	giveitem ITEM_IAPAPA_BERRY, 5
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
 	msgbox SootopolisCity_Text_WhatKindOfWishInYourName, MSGBOX_DEFAULT
 	release
@@ -1337,6 +1337,7 @@ SootopolisCity_EventScript_Maxie::
 SootopolisCity_EventScript_MaxieRayquaza::
 	msgbox SootopolisCity_Text_AfterAllOurScheming, MSGBOX_DEFAULT
 	setflag FLAG_MET_MAXIE_SOOTOPOLIS
+	goto_if_unset FLAG_RECEIVED_CAMERUPTITE, SootopolisCity_EventScript_GiveCameruptite
 	goto_if_set FLAG_MET_ARCHIE_SOOTOPOLIS, SootopolisCity_EventScript_MaxieArchieLeave
 	releaseall
 	end
@@ -1585,6 +1586,20 @@ SootopolisCity_Text_AfterAllOurScheming:
 	.string "again as if nothing had happened…\p"
 	.string "Fu…\n"
 	.string "Fuhahaha…$"
+
+SootopolisCity_EventScript_GiveCameruptite::
+	msgbox SootopolisCity_Text_TakeThisMegaStone, MSGBOX_DEFAULT
+	giveitem ITEM_CAMERUPTITE
+	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
+	setflag FLAG_RECEIVED_CAMERUPTITE
+	goto_if_set FLAG_MET_ARCHIE_SOOTOPOLIS, SootopolisCity_EventScript_MaxieArchieLeave
+	releaseall
+	end
+
+SootopolisCity_Text_TakeThisMegaStone:
+	.string "As an apology, take this stone.\n"
+	.string "I won't be needing it anymore.\l"
+	.string "Fuhaha...$"
 
 SootopolisCity_Text_KyogreCalmDown:
 	.string "ARCHIE: KYOGRE! What's wrong?!\n"

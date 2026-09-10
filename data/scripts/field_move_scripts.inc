@@ -1,15 +1,13 @@
 @ Interact with cuttable tree
 EventScript_CutTree::
 	lockall
-	checkfieldmove FIELD_MOVE_CUT, TRUE
-	goto_if_eq VAR_RESULT, PARTY_SIZE, EventScript_CheckTreeCantCut
-	setfieldeffectargument 0, VAR_RESULT
-	bufferpartymonnick STR_VAR_1, VAR_RESULT
-	buffermovename STR_VAR_2, MOVE_CUT
+	goto_if_unset FLAG_BADGE01_GET, EventScript_CheckTreeCantCut
+	goto_if_unset FLAG_RECEIVED_HM_CUT, EventScript_CheckTreeCantCut
 	msgbox Text_WantToCut, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, EventScript_CancelCut
-	msgbox Text_MonUsedFieldMove, MSGBOX_DEFAULT
 	closemessage
+	setvar VAR_0x8004, FALSE
+	goto EventScript_CutTreeDown
 EventScript_CutTreeCommon:
 	isfollowerfieldmoveuser VAR_0x8004
 	setfieldeffectargument 3, VAR_0x8004 @ skip pose if so
@@ -63,15 +61,13 @@ EventScript_UseRockSmash::
 @ Interact with smashable rock
 EventScript_RockSmash::
 	lockall
-	checkfieldmove FIELD_MOVE_ROCK_SMASH, TRUE
-	goto_if_eq VAR_RESULT, PARTY_SIZE, EventScript_CantSmashRock
-	setfieldeffectargument 0, VAR_RESULT
-	bufferpartymonnick STR_VAR_1, VAR_RESULT
-	buffermovename STR_VAR_2, MOVE_ROCK_SMASH
+	goto_if_unset FLAG_BADGE03_GET, EventScript_CantSmashRock
+	goto_if_unset FLAG_RECEIVED_HM_ROCK_SMASH, EventScript_CantSmashRock
 	msgbox Text_WantToSmash, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, EventScript_CancelSmash
-	msgbox Text_MonUsedFieldMove, MSGBOX_DEFAULT
 	closemessage
+	setvar VAR_0x8004, FALSE
+	goto EventScript_SmashRock
 EventScript_RockSmashCommon:
 	@ check if follower should use the field move
 	isfollowerfieldmoveuser VAR_0x8004

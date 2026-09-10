@@ -31,7 +31,10 @@ __all__ = [
     "build_ordered_candidates",
     "merge_category",
     "extract_legacy_item",
+    "extract_legacy_item_and_quantity",
     "adapt_item_ball",
+    "resolve_reviewed_event",
+    "validate_resolution_consumption",
 ]
 
 
@@ -196,7 +199,8 @@ _MISSING = object()
 _BLOCK_COMMENT_RE = re.compile(r"/\*.*?\*/", re.DOTALL)
 _LINE_COMMENT_RE = re.compile(r"(?m)(?://|@).*$")
 _FINDITEM_RE = re.compile(
-    r"(?m)^[ \t]*finditem[ \t]+(ITEM_[A-Za-z0-9_]+)[ \t]*$"
+    r"(?m)^[ \t]*finditem[ \t]+(ITEM_[A-Za-z0-9_]+)"
+    r"(?:[ \t]*,[ \t]*([+-]?[0-9]+))?[ \t]*$"
 )
 
 
@@ -997,6 +1001,12 @@ def merge_category(
 def extract_legacy_item(script_block: str) -> str:
     """Return the unique ITEM_* operand from a finditem command or fail."""
 
+    return extract_legacy_item_and_quantity(script_block)[0]
+
+
+def extract_legacy_item_and_quantity(script_block: str) -> tuple[str, int]:
+    """Return the unique active finditem operand and positive quantity."""
+
     without_block_comments = _BLOCK_COMMENT_RE.sub(
         lambda match: "".join(
             "\n" if character == "\n" else " " for character in match.group()
@@ -1005,17 +1015,97 @@ def extract_legacy_item(script_block: str) -> str:
     )
     active_text = _LINE_COMMENT_RE.sub("", without_block_comments)
     operands = _FINDITEM_RE.findall(active_text)
-    if len(operands) != 1:
+    active_commands = re.findall(r"(?m)^[ \t]*finditem\b[^\n]*$", active_text)
+    if len(active_commands) != 1 or len(operands) != 1:
         raise ValueError(
-            f"expected exactly one finditem ITEM_* operand, found {len(operands)}"
+            "expected exactly one valid finditem ITEM_* command, "
+            f"found {len(active_commands)} command(s) and {len(operands)} operand(s)"
         )
-    return operands[0]
+    item, quantity_text = operands[0]
+    quantity = int(quantity_text) if quantity_text else 1
+    if not 1 <= quantity <= 15:
+        raise ValueError(f"finditem quantity must be in packed range 1..15, got {quantity}")
+    return item, quantity
 
 
 def adapt_item_ball(
     event: dict[str, object], script_block: str
 ) -> dict[str, object]:
     adapted = copy.deepcopy(event)
+    item, quantity = extract_legacy_item_and_quantity(script_block)
     adapted["script"] = "Common_EventScript_FindItem"
-    adapted["trainer_sight_or_berry_tree_id"] = extract_legacy_item(script_block)
+    adapted["trainer_sight_or_berry_tree_id"] = item
+    adapted["movement_range_x"] = quantity
     return adapted
+
+
+def validate_resolution_consumption(
+    unresolved_ids: set[str], resolutions: dict[str, object]
+) -> None:
+    """Fail unless reviewed resolutions cover the unresolved set exactly once."""
+
+    supplied = set(resolutions)
+    missing = sorted(unresolved_ids - supplied)
+    if missing:
+        raise UnresolvedConflictError(missing)
+    stale = sorted(supplied - unresolved_ids)
+    if stale:
+        raise ValueError(f"unknown/unused resolution IDs: {stale}")
+
+
+def resolve_reviewed_event(
+    category: str,
+    archive: dict[str, object] | None,
+    current: dict[str, object] | None,
+    resolution: dict[str, object],
+) -> list[dict[str, object]]:
+    """Construct the exact event sequence selected by one reviewed decision."""
+
+    decision = resolution.get("decision")
+    field_sources = resolution.get("field_sources")
+    if not isinstance(field_sources, dict):
+        raise ValueError("reviewed resolution field_sources must be an object")
+    if decision != "merge_fields" and field_sources:
+        raise ValueError(f"field_sources must be empty for {decision}")
+    if decision == "use_archive":
+        selected = archive
+    elif decision in {"use_current", "deduplicate"}:
+        selected = current
+    elif decision == "delete":
+        return []
+    elif decision == "keep_both":
+        if archive is None or current is None:
+            raise ValueError("keep_both requires archive and current events")
+        for event in (archive, current):
+            _validate_resolution_event(category, event)
+        return [copy.deepcopy(archive), copy.deepcopy(current)]
+    elif decision == "merge_fields":
+        if archive is None or current is None:
+            raise ValueError("merge_fields requires archive and current events")
+        differing = {
+            field
+            for field in set(archive) | set(current)
+            if archive.get(field, _MISSING) != current.get(field, _MISSING)
+        }
+        if set(field_sources) != differing:
+            raise ValueError(
+                "merge_fields field coverage differs: "
+                f"got={sorted(field_sources)}, expected={sorted(differing)}"
+            )
+        if any(source not in {"archive", "current"} for source in field_sources.values()):
+            raise ValueError("merge_fields has invalid field source")
+        merged: dict[str, object] = {}
+        for field in sorted(set(archive) | set(current)):
+            owner = field_sources.get(field, "archive")
+            source = archive if owner == "archive" else current
+            value = source.get(field, _MISSING)
+            if value is not _MISSING:
+                merged[field] = copy.deepcopy(value)
+        _validate_resolution_event(category, merged)
+        return [merged]
+    else:
+        raise ValueError(f"unsupported reviewed event decision: {decision!r}")
+    if selected is None:
+        raise ValueError(f"{decision} selects an absent event")
+    _validate_resolution_event(category, selected)
+    return [copy.deepcopy(selected)]
