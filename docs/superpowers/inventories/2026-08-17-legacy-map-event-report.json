@@ -72,7 +72,7 @@
     "VictoryRoad_B2F"
   ],
   "candidate_sha256": {
-    "data/maps/AquaHideout_B1F/map.json": "eaa80889b8a388a1838e9f99963d77cabe8117136a3c7cbc2d3222bdf1c65ae6",
+    "data/maps/AquaHideout_B1F/map.json": "51e579bc3003c9b0c933c3a5148bf32ac7df07cde0def7769c943fe593ec4240",
     "data/maps/BattleFrontier_PokemonCenter_1F/map.json": "ec4ef609bdb96fb9acd76403dd3b6c7340ea0502ca41c78fc6aef1c1edfe5a84",
     "data/maps/DewfordTown/map.json": "a7cd115628c8d927b42e6c2ea6ef105bec85cebb7b9cdf949db708dcab863c6a",
     "data/maps/DewfordTown_PokemonCenter_1F/map.json": "128081cd4750dded3bbe09323c31a780ae9c7f232374b4daa3063c3ee2bc4070",
@@ -84,7 +84,7 @@
     "data/maps/JaggedPass/map.json": "32aa4f7212f4d901a3674e4e365ecc0fd1dd0473fc5f74f224b25c1edfe5eb00",
     "data/maps/LavaridgeTown_Gym_1F/map.json": "a033870a99cfef1bda6d142845ff6039d00546e50eb40dea78ea2b79f7105a72",
     "data/maps/LavaridgeTown_Gym_B1F/map.json": "90bec1da96013d2777887857e46f423de405425610e77865f0293e4e0a8e6df8",
-    "data/maps/LilycoveCity/map.json": "77584f647f7c426b5413a48bc672dec1d21dbb5b5005ce31fb9cb779a5272588",
+    "data/maps/LilycoveCity/map.json": "85d4b8ad231674e03d9ce6f68943f2a1fca074c6bcc3d57389e61dc84c9e6abe",
     "data/maps/LilycoveCity_PokemonCenter_1F/map.json": "60e9aeb51357b73848c5082b053f23cafb463f4eecc1d11aece5c921751cb7fb",
     "data/maps/MagmaHideout_1F/map.json": "ee31eed8d7a643a3a56fbfbc1e991f596fbf08059210fd510db06311b82836c6",
     "data/maps/MagmaHideout_2F_1R/map.json": "88062d1b5efd102882b4bd54970cc1a873ee70b1ef92b83a5a27a250de31e835",
@@ -94,32 +94,32 @@
     "data/maps/MossdeepCity_PokemonCenter_1F/map.json": "f47245e8a7e5ea206a3149be0694c8fd5a294806089f3082b0a2d12171dd5274",
     "data/maps/MtPyre_1F/map.json": "5673139c916e6f01dbfe5c04a48ba7a93e57e7833ac20b44b911d3b095f597b9",
     "data/maps/MtPyre_2F/map.json": "88ca4a4f90ead92456e23df02aeb68dfdc5db304dd85db487127ad240caa63d5",
-    "data/maps/MtPyre_3F/map.json": "3bc948bce56101bd1c650bb4724ee2b6994e21fcfe09881fac83cecc782a702f",
+    "data/maps/MtPyre_3F/map.json": "9484d959f9d022821cdfe0f10ffc0e481b6c4e203f6aed14c30b82326f0f96b3",
     "data/maps/OldaleTown_PokemonCenter_1F/map.json": "d7939ada5db54381411ab492645c72a06e00d29634435d574598b27f84792e90",
     "data/maps/PacifidlogTown_PokemonCenter_1F/map.json": "bb919367da8a7d53a5c95de68b7a753e6e3e275ffac92fcdbcd8f0f75a869ab3",
     "data/maps/PetalburgCity_PokemonCenter_1F/map.json": "0dc093765989e95574ec6bf819847f85f781fcc5ae3135badc37e5dbef0ce944",
-    "data/maps/PetalburgWoods/map.json": "faaec24cd8e26b25b4b852af827e49282325754c51a7bd65f26404078e205274",
+    "data/maps/PetalburgWoods/map.json": "a517f503947a4d6a624dc52ddc6700ce85a7569c335db9372cb697b27d0c8c1b",
     "data/maps/Route102/map.json": "000d12fe0961d58ec6d00ebbe4ab482c058ddf566add18699f563ca3b15c3430",
     "data/maps/Route103/map.json": "9f9d7f3cd815378a9af5a0b8f11e5cd776bd072b6640a2bf0a389dc9d70871ba",
     "data/maps/Route104/map.json": "5ce24e0f3f232d4e90b34cb925f68761d265900ec7b54bb81411640805673b5c",
     "data/maps/Route106/map.json": "f811bc5000d40857a926d92b144ef895b6fdaf900db9bae58d950c639c659bf8",
     "data/maps/Route107/map.json": "768bdf878a96022ce630c945cff79fee177d9d06d3b0e4d3848b1270370ae5f2",
-    "data/maps/Route108/map.json": "ad61719639757ed75269359d26d6f49d9d38bc31f1a0efcea2ace67e652033dc",
+    "data/maps/Route108/map.json": "87972b399ab4f97396199af17a3a2b6b192960f5ff84c22ca5e0d92ad780ffd4",
     "data/maps/Route109/map.json": "69ec2df14cec68ccdb402020c01c5590e10ac29a0d1ff7f315ef1736a67fddde",
     "data/maps/Route110/map.json": "023cbe0f5a8c2073c8eb94eca2b1443687cede21ec1133135a7da81d17524197",
-    "data/maps/Route111/map.json": "fb5a538b158f7fbfa8554017f73fc0c184325b1c82e5910b2d9000a5172e40ab",
-    "data/maps/Route112/map.json": "979acede1cfc40c4a6c1c35353a4223a00cdbf259a505cdece102f071fc93109",
-    "data/maps/Route113/map.json": "587f6829e744d7d6b5efd5a185b322ca16b0b53512c4899af9afa9772bd75467",
-    "data/maps/Route114/map.json": "7eaa975949daaed367064d04daf35ce9bd7254e4c9d6f3729fbb5d7cd00bd610",
-    "data/maps/Route115/map.json": "2af067ae13b95a8f8cf5431e58402727329fe7d378963f949eb26422e1e245ca",
-    "data/maps/Route116/map.json": "96b3398a3ea250e0a729114464601d15229fce406ba6b649c7b40cca96bf1529",
+    "data/maps/Route111/map.json": "3017bbced2090fd7263a9fceb2029cd7e53ef53bfa069483102408e38804aba0",
+    "data/maps/Route112/map.json": "939b1e587a09a13363f652bf163c0031ed2cba61dd18a2b8fca9b364be7bc873",
+    "data/maps/Route113/map.json": "4b5c22219354dbdbe15f8c5236a5a525cfef1559a91aa1584c6f46edad126f95",
+    "data/maps/Route114/map.json": "6d722f66d0fac429ef6d85000b042644e79a485044548979757a1146d66cd90a",
+    "data/maps/Route115/map.json": "6ec68e754ea89c1b0ffbe450c12ee47312dfd2a665f00dbd2092fac69137f7f2",
+    "data/maps/Route116/map.json": "f7ba2aaaee06965450f42b728143c93f39177662d3cd78c4432a5c5b41dfec70",
     "data/maps/Route117/map.json": "efe837b77e19ea9e6f8f10cc9047b1e397bb4173dcf157bfadf4351248f8d246",
     "data/maps/Route118/map.json": "7314ee501a8457bf6b0bdf5a7dee0bb9fc4e4c91fe8d0b0bf897c42c11628501",
-    "data/maps/Route119/map.json": "1471337bc2cfb3471154c5381c69fa2272c3c498733e0d2f4da23a5b3af24cda",
+    "data/maps/Route119/map.json": "12fd20aa31c7be475ff60ddcd4d626d537bc443fbf66706d9a40c5dc876af39f",
     "data/maps/Route119_WeatherInstitute_1F/map.json": "7dc6d29481eb117031e77a860d316049eb32f78ee6cf3a19659a26ee666584b4",
-    "data/maps/Route120/map.json": "b5e0275d2dea0d5272d9385204d56bc0913eb2c71bf754b9767c7c27e23622d8",
+    "data/maps/Route120/map.json": "c623d01ba8069cccd929115511087f30842187ea72d1a87ea6f5a4b5a9dc88df",
     "data/maps/Route121/map.json": "11af702f987db18ff47e4eccb593fb84892b94918e0b913cfd37e5f04cb0ff53",
-    "data/maps/Route123/map.json": "cf10c76c2c291023ecaf8fdc9fa113fd46ee52b29a2d0375602768b759019386",
+    "data/maps/Route123/map.json": "a986ac9fe79aabeeb2919f24c2d016b22381967f29ad53b0f62569e6e87cda3b",
     "data/maps/Route124/map.json": "f91cba239a8df8b16c4a5f885009d5f15ad088eeea4e12461ed42e4731f7f1a0",
     "data/maps/Route125/map.json": "09ba5dba462f61a3b72fe1738cbbb485e7da666fb5d326fed0d0adb057f66d62",
     "data/maps/Route126/map.json": "480899f6e16dccb68d918fe60a95cd7268dc4f984caef35f6cf4b6154dc63035",
@@ -137,9 +137,170 @@
     "data/maps/SootopolisCity_Gym_B1F/map.json": "6587044fec26028c16bfe1cf35b4eafb3c20e687d756473c1fa67ba79d7acd75",
     "data/maps/SootopolisCity_PokemonCenter_1F/map.json": "ba79bdc177733ec3ae5e184177df6b02fd92bd60a7c2cbe5bfb025d63f0543f5",
     "data/maps/VerdanturfTown_PokemonCenter_1F/map.json": "1e3287ca8ac95c831e4abb31ef468ee41c0e75e7d5aab4e0750456ceb5583604",
-    "data/maps/VictoryRoad_1F/map.json": "302dd5361cb681854d4e2d53fded47aa1299ea3beee92b6ec4ff08f9d9d4b9d4",
-    "data/maps/VictoryRoad_B1F/map.json": "eb9dab6960e561d33da962e2c5211c05fcf9fc6032fa09547762ef262cd03fc9",
-    "data/maps/VictoryRoad_B2F/map.json": "00e44900db4f2439d4cb7f102fbece883d7123dbcfcf9d97d3ba76645e6cd1e5"
+    "data/maps/VictoryRoad_1F/map.json": "36ac1ba53295bafc99929cffcb55d7661989cd7c87aab7da45798e7692f57131",
+    "data/maps/VictoryRoad_B1F/map.json": "e74f2a3c808ff85753fb90a2086827aaa7c8dae2a889f731018b1b5b93361096",
+    "data/maps/VictoryRoad_B2F/map.json": "7efef5676b75fdc722f824906e48fdba5fcd5aeb4964921b1767cc22ed7c5489"
+  },
+  "candidate_upgrade": {
+    "corrected_file_count": 17,
+    "corrected_files": [
+      {
+        "corrected_sha256": "51e579bc3003c9b0c933c3a5148bf32ac7df07cde0def7769c943fe593ec4240",
+        "path": "data/maps/AquaHideout_B1F/map.json",
+        "prior_sha256": "eaa80889b8a388a1838e9f99963d77cabe8117136a3c7cbc2d3222bdf1c65ae6"
+      },
+      {
+        "corrected_sha256": "85d4b8ad231674e03d9ce6f68943f2a1fca074c6bcc3d57389e61dc84c9e6abe",
+        "path": "data/maps/LilycoveCity/map.json",
+        "prior_sha256": "77584f647f7c426b5413a48bc672dec1d21dbb5b5005ce31fb9cb779a5272588"
+      },
+      {
+        "corrected_sha256": "9484d959f9d022821cdfe0f10ffc0e481b6c4e203f6aed14c30b82326f0f96b3",
+        "path": "data/maps/MtPyre_3F/map.json",
+        "prior_sha256": "3bc948bce56101bd1c650bb4724ee2b6994e21fcfe09881fac83cecc782a702f"
+      },
+      {
+        "corrected_sha256": "a517f503947a4d6a624dc52ddc6700ce85a7569c335db9372cb697b27d0c8c1b",
+        "path": "data/maps/PetalburgWoods/map.json",
+        "prior_sha256": "faaec24cd8e26b25b4b852af827e49282325754c51a7bd65f26404078e205274"
+      },
+      {
+        "corrected_sha256": "87972b399ab4f97396199af17a3a2b6b192960f5ff84c22ca5e0d92ad780ffd4",
+        "path": "data/maps/Route108/map.json",
+        "prior_sha256": "ad61719639757ed75269359d26d6f49d9d38bc31f1a0efcea2ace67e652033dc"
+      },
+      {
+        "corrected_sha256": "3017bbced2090fd7263a9fceb2029cd7e53ef53bfa069483102408e38804aba0",
+        "path": "data/maps/Route111/map.json",
+        "prior_sha256": "fb5a538b158f7fbfa8554017f73fc0c184325b1c82e5910b2d9000a5172e40ab"
+      },
+      {
+        "corrected_sha256": "939b1e587a09a13363f652bf163c0031ed2cba61dd18a2b8fca9b364be7bc873",
+        "path": "data/maps/Route112/map.json",
+        "prior_sha256": "979acede1cfc40c4a6c1c35353a4223a00cdbf259a505cdece102f071fc93109"
+      },
+      {
+        "corrected_sha256": "4b5c22219354dbdbe15f8c5236a5a525cfef1559a91aa1584c6f46edad126f95",
+        "path": "data/maps/Route113/map.json",
+        "prior_sha256": "587f6829e744d7d6b5efd5a185b322ca16b0b53512c4899af9afa9772bd75467"
+      },
+      {
+        "corrected_sha256": "6d722f66d0fac429ef6d85000b042644e79a485044548979757a1146d66cd90a",
+        "path": "data/maps/Route114/map.json",
+        "prior_sha256": "7eaa975949daaed367064d04daf35ce9bd7254e4c9d6f3729fbb5d7cd00bd610"
+      },
+      {
+        "corrected_sha256": "6ec68e754ea89c1b0ffbe450c12ee47312dfd2a665f00dbd2092fac69137f7f2",
+        "path": "data/maps/Route115/map.json",
+        "prior_sha256": "2af067ae13b95a8f8cf5431e58402727329fe7d378963f949eb26422e1e245ca"
+      },
+      {
+        "corrected_sha256": "f7ba2aaaee06965450f42b728143c93f39177662d3cd78c4432a5c5b41dfec70",
+        "path": "data/maps/Route116/map.json",
+        "prior_sha256": "96b3398a3ea250e0a729114464601d15229fce406ba6b649c7b40cca96bf1529"
+      },
+      {
+        "corrected_sha256": "12fd20aa31c7be475ff60ddcd4d626d537bc443fbf66706d9a40c5dc876af39f",
+        "path": "data/maps/Route119/map.json",
+        "prior_sha256": "1471337bc2cfb3471154c5381c69fa2272c3c498733e0d2f4da23a5b3af24cda"
+      },
+      {
+        "corrected_sha256": "c623d01ba8069cccd929115511087f30842187ea72d1a87ea6f5a4b5a9dc88df",
+        "path": "data/maps/Route120/map.json",
+        "prior_sha256": "b5e0275d2dea0d5272d9385204d56bc0913eb2c71bf754b9767c7c27e23622d8"
+      },
+      {
+        "corrected_sha256": "a986ac9fe79aabeeb2919f24c2d016b22381967f29ad53b0f62569e6e87cda3b",
+        "path": "data/maps/Route123/map.json",
+        "prior_sha256": "cf10c76c2c291023ecaf8fdc9fa113fd46ee52b29a2d0375602768b759019386"
+      },
+      {
+        "corrected_sha256": "36ac1ba53295bafc99929cffcb55d7661989cd7c87aab7da45798e7692f57131",
+        "path": "data/maps/VictoryRoad_1F/map.json",
+        "prior_sha256": "302dd5361cb681854d4e2d53fded47aa1299ea3beee92b6ec4ff08f9d9d4b9d4"
+      },
+      {
+        "corrected_sha256": "e74f2a3c808ff85753fb90a2086827aaa7c8dae2a889f731018b1b5b93361096",
+        "path": "data/maps/VictoryRoad_B1F/map.json",
+        "prior_sha256": "eb9dab6960e561d33da962e2c5211c05fcf9fc6032fa09547762ef262cd03fc9"
+      },
+      {
+        "corrected_sha256": "7efef5676b75fdc722f824906e48fdba5fcd5aeb4964921b1767cc22ed7c5489",
+        "path": "data/maps/VictoryRoad_B2F/map.json",
+        "prior_sha256": "00e44900db4f2439d4cb7f102fbece883d7123dbcfcf9d97d3ba76645e6cd1e5"
+      }
+    ],
+    "prior_candidate_sha256": {
+      "data/maps/AquaHideout_B1F/map.json": "eaa80889b8a388a1838e9f99963d77cabe8117136a3c7cbc2d3222bdf1c65ae6",
+      "data/maps/BattleFrontier_PokemonCenter_1F/map.json": "ec4ef609bdb96fb9acd76403dd3b6c7340ea0502ca41c78fc6aef1c1edfe5a84",
+      "data/maps/DewfordTown/map.json": "a7cd115628c8d927b42e6c2ea6ef105bec85cebb7b9cdf949db708dcab863c6a",
+      "data/maps/DewfordTown_PokemonCenter_1F/map.json": "128081cd4750dded3bbe09323c31a780ae9c7f232374b4daa3063c3ee2bc4070",
+      "data/maps/EverGrandeCity/map.json": "157287238455483433ea27e623141b9bcc04fbc449efb28949acaf6a1dc47a6c",
+      "data/maps/EverGrandeCity_PokemonCenter_1F/map.json": "bd93cbd2c810673cb6372ebc9f7e90de706712194c3b6bf428ce63c9c4485b35",
+      "data/maps/EverGrandeCity_PokemonLeague_1F/map.json": "c996f091023dba09b59d1b59d7a4c5f42efb27cffd575ba079a7f1f9a02275ee",
+      "data/maps/FallarborTown_PokemonCenter_1F/map.json": "79f647972430d4ea8af6b18d7eb6444e1e57c8491f9d43b7e5df5a6f3b77ce06",
+      "data/maps/FortreeCity_PokemonCenter_1F/map.json": "f92caecfc001435752f23b10dee7bff787afbee144d746e48b73ec3f1fab02bf",
+      "data/maps/JaggedPass/map.json": "32aa4f7212f4d901a3674e4e365ecc0fd1dd0473fc5f74f224b25c1edfe5eb00",
+      "data/maps/LavaridgeTown_Gym_1F/map.json": "a033870a99cfef1bda6d142845ff6039d00546e50eb40dea78ea2b79f7105a72",
+      "data/maps/LavaridgeTown_Gym_B1F/map.json": "90bec1da96013d2777887857e46f423de405425610e77865f0293e4e0a8e6df8",
+      "data/maps/LilycoveCity/map.json": "77584f647f7c426b5413a48bc672dec1d21dbb5b5005ce31fb9cb779a5272588",
+      "data/maps/LilycoveCity_PokemonCenter_1F/map.json": "60e9aeb51357b73848c5082b053f23cafb463f4eecc1d11aece5c921751cb7fb",
+      "data/maps/MagmaHideout_1F/map.json": "ee31eed8d7a643a3a56fbfbc1e991f596fbf08059210fd510db06311b82836c6",
+      "data/maps/MagmaHideout_2F_1R/map.json": "88062d1b5efd102882b4bd54970cc1a873ee70b1ef92b83a5a27a250de31e835",
+      "data/maps/MauvilleCity/map.json": "1a2994e9af102d891d15a26948f2d6cf8378bd21d8452e724561fee1cd6f3286",
+      "data/maps/MauvilleCity_PokemonCenter_1F/map.json": "f6cf236e2574706c061cdde1c68ac6e5361128ccc13b51d67a54a63b26ba1600",
+      "data/maps/MossdeepCity_Gym/map.json": "62bd928813d9949f1725fbda3eb6e76ff70b46ef41776f997de4fd276666a5ac",
+      "data/maps/MossdeepCity_PokemonCenter_1F/map.json": "f47245e8a7e5ea206a3149be0694c8fd5a294806089f3082b0a2d12171dd5274",
+      "data/maps/MtPyre_1F/map.json": "5673139c916e6f01dbfe5c04a48ba7a93e57e7833ac20b44b911d3b095f597b9",
+      "data/maps/MtPyre_2F/map.json": "88ca4a4f90ead92456e23df02aeb68dfdc5db304dd85db487127ad240caa63d5",
+      "data/maps/MtPyre_3F/map.json": "3bc948bce56101bd1c650bb4724ee2b6994e21fcfe09881fac83cecc782a702f",
+      "data/maps/OldaleTown_PokemonCenter_1F/map.json": "d7939ada5db54381411ab492645c72a06e00d29634435d574598b27f84792e90",
+      "data/maps/PacifidlogTown_PokemonCenter_1F/map.json": "bb919367da8a7d53a5c95de68b7a753e6e3e275ffac92fcdbcd8f0f75a869ab3",
+      "data/maps/PetalburgCity_PokemonCenter_1F/map.json": "0dc093765989e95574ec6bf819847f85f781fcc5ae3135badc37e5dbef0ce944",
+      "data/maps/PetalburgWoods/map.json": "faaec24cd8e26b25b4b852af827e49282325754c51a7bd65f26404078e205274",
+      "data/maps/Route102/map.json": "000d12fe0961d58ec6d00ebbe4ab482c058ddf566add18699f563ca3b15c3430",
+      "data/maps/Route103/map.json": "9f9d7f3cd815378a9af5a0b8f11e5cd776bd072b6640a2bf0a389dc9d70871ba",
+      "data/maps/Route104/map.json": "5ce24e0f3f232d4e90b34cb925f68761d265900ec7b54bb81411640805673b5c",
+      "data/maps/Route106/map.json": "f811bc5000d40857a926d92b144ef895b6fdaf900db9bae58d950c639c659bf8",
+      "data/maps/Route107/map.json": "768bdf878a96022ce630c945cff79fee177d9d06d3b0e4d3848b1270370ae5f2",
+      "data/maps/Route108/map.json": "ad61719639757ed75269359d26d6f49d9d38bc31f1a0efcea2ace67e652033dc",
+      "data/maps/Route109/map.json": "69ec2df14cec68ccdb402020c01c5590e10ac29a0d1ff7f315ef1736a67fddde",
+      "data/maps/Route110/map.json": "023cbe0f5a8c2073c8eb94eca2b1443687cede21ec1133135a7da81d17524197",
+      "data/maps/Route111/map.json": "fb5a538b158f7fbfa8554017f73fc0c184325b1c82e5910b2d9000a5172e40ab",
+      "data/maps/Route112/map.json": "979acede1cfc40c4a6c1c35353a4223a00cdbf259a505cdece102f071fc93109",
+      "data/maps/Route113/map.json": "587f6829e744d7d6b5efd5a185b322ca16b0b53512c4899af9afa9772bd75467",
+      "data/maps/Route114/map.json": "7eaa975949daaed367064d04daf35ce9bd7254e4c9d6f3729fbb5d7cd00bd610",
+      "data/maps/Route115/map.json": "2af067ae13b95a8f8cf5431e58402727329fe7d378963f949eb26422e1e245ca",
+      "data/maps/Route116/map.json": "96b3398a3ea250e0a729114464601d15229fce406ba6b649c7b40cca96bf1529",
+      "data/maps/Route117/map.json": "efe837b77e19ea9e6f8f10cc9047b1e397bb4173dcf157bfadf4351248f8d246",
+      "data/maps/Route118/map.json": "7314ee501a8457bf6b0bdf5a7dee0bb9fc4e4c91fe8d0b0bf897c42c11628501",
+      "data/maps/Route119/map.json": "1471337bc2cfb3471154c5381c69fa2272c3c498733e0d2f4da23a5b3af24cda",
+      "data/maps/Route119_WeatherInstitute_1F/map.json": "7dc6d29481eb117031e77a860d316049eb32f78ee6cf3a19659a26ee666584b4",
+      "data/maps/Route120/map.json": "b5e0275d2dea0d5272d9385204d56bc0913eb2c71bf754b9767c7c27e23622d8",
+      "data/maps/Route121/map.json": "11af702f987db18ff47e4eccb593fb84892b94918e0b913cfd37e5f04cb0ff53",
+      "data/maps/Route123/map.json": "cf10c76c2c291023ecaf8fdc9fa113fd46ee52b29a2d0375602768b759019386",
+      "data/maps/Route124/map.json": "f91cba239a8df8b16c4a5f885009d5f15ad088eeea4e12461ed42e4731f7f1a0",
+      "data/maps/Route125/map.json": "09ba5dba462f61a3b72fe1738cbbb485e7da666fb5d326fed0d0adb057f66d62",
+      "data/maps/Route126/map.json": "480899f6e16dccb68d918fe60a95cd7268dc4f984caef35f6cf4b6154dc63035",
+      "data/maps/Route127/map.json": "f309b5f5a1b47dd597ce4261e041773bb2109ad0fc4791b85c3aad4f39480b30",
+      "data/maps/Route128/map.json": "ea770a7bf2decb2109e26d8db287df1952835c425876b7b302d6d745a1907f38",
+      "data/maps/Route129/map.json": "3cf942421c1710d560b79749321cf12b1484d90fe33eaa71f9c5020f15ab71e0",
+      "data/maps/Route130/map.json": "db707edceeee6c966862317ef1630ec9c2c5166eee152d81f691d2d082ee17ab",
+      "data/maps/Route131/map.json": "5f37be2ef0a16ed3c688a7b882e37eb7a7100f18c3399f23d1e5ce47feb10d40",
+      "data/maps/RustboroCity/map.json": "0ef47236a7840d47c4c8ec84346cb722ca3fc9f895a946bce90f1c740a38f2e9",
+      "data/maps/RustboroCity_PokemonCenter_1F/map.json": "43103fdc0dfa83bdcf1d9b127737586d8cfd5a1fad8df33407c63daaadd3b956",
+      "data/maps/SeafloorCavern_Room1/map.json": "c1fdcfd0a3ba67120618a5d5148d83c740076ee0ad1453dae99bf7c956680d18",
+      "data/maps/SeafloorCavern_Room3/map.json": "c47ab7729a2195828ca5ff20a77b2e1f50120c9db8c2fdf885991e063a9e0827",
+      "data/maps/SlateportCity_PokemonCenter_1F/map.json": "9e7acebb35e44e6d83aa5e65391e006002cdf10588e924868302b2f7d263a97d",
+      "data/maps/SootopolisCity_Gym_1F/map.json": "15a40c139144641ef20e9f8b7c9fa481ad5c868093d171fd93c23b5bdb8d4ed1",
+      "data/maps/SootopolisCity_Gym_B1F/map.json": "6587044fec26028c16bfe1cf35b4eafb3c20e687d756473c1fa67ba79d7acd75",
+      "data/maps/SootopolisCity_PokemonCenter_1F/map.json": "ba79bdc177733ec3ae5e184177df6b02fd92bd60a7c2cbe5bfb025d63f0543f5",
+      "data/maps/VerdanturfTown_PokemonCenter_1F/map.json": "1e3287ca8ac95c831e4abb31ef468ee41c0e75e7d5aab4e0750456ceb5583604",
+      "data/maps/VictoryRoad_1F/map.json": "302dd5361cb681854d4e2d53fded47aa1299ea3beee92b6ec4ff08f9d9d4b9d4",
+      "data/maps/VictoryRoad_B1F/map.json": "eb9dab6960e561d33da962e2c5211c05fcf9fc6032fa09547762ef262cd03fc9",
+      "data/maps/VictoryRoad_B2F/map.json": "00e44900db4f2439d4cb7f102fbece883d7123dbcfcf9d97d3ba76645e6cd1e5"
+    },
+    "prior_report_commit": "b3b53147fefce05f6244129938cc8dca475c340c"
   },
   "custom_map_validations": [
     {
@@ -185,6 +346,81 @@
       "validation_only": true
     }
   ],
+  "custom_tm_restoration": {
+    "dependent_event_count": 2,
+    "dependent_events": [
+      {
+        "item": "ITEM_TM_U_TURN",
+        "map": "Route113"
+      },
+      {
+        "item": "ITEM_TM_DRAIN_PUNCH",
+        "map": "Route115"
+      }
+    ],
+    "mapping_count": 6,
+    "mappings": [
+      {
+        "item": "ITEM_TM_DRAIN_PUNCH",
+        "legacy_move": "FOCUS_PUNCH",
+        "move": "DRAIN_PUNCH",
+        "number": 1
+      },
+      {
+        "item": "ITEM_TM_FLIP_TURN",
+        "legacy_move": "WATER_PULSE",
+        "move": "FLIP_TURN",
+        "number": 3
+      },
+      {
+        "item": "ITEM_TM_THUNDER_WAVE",
+        "legacy_move": "SAFEGUARD",
+        "move": "THUNDER_WAVE",
+        "number": 20
+      },
+      {
+        "item": "ITEM_TM_U_TURN",
+        "legacy_move": "DOUBLE_TEAM",
+        "move": "U_TURN",
+        "number": 32
+      },
+      {
+        "item": "ITEM_TM_VOLT_SWITCH",
+        "legacy_move": "SHOCK_WAVE",
+        "move": "VOLT_SWITCH",
+        "number": 34
+      },
+      {
+        "item": "ITEM_TM_HURRICANE",
+        "legacy_move": "AERIAL_ACE",
+        "move": "HURRICANE",
+        "number": 40
+      }
+    ],
+    "paired_gym_reward_count": 3,
+    "paired_gym_rewards": [
+      {
+        "closure_sha256": "156eeee40ed555d61cb65bb5d6c10a70da8d0b158ac12a39797bb2b28e831b1a",
+        "map": "FortreeCity_Gym",
+        "mega_stone": "ITEM_ALTARIANITE",
+        "tm": "ITEM_TM_HURRICANE"
+      },
+      {
+        "closure_sha256": "dca759b32b57d705ae73e6a4e464e4184708b9e0b3761fe4b03975420d45a9ea",
+        "map": "MauvilleCity_Gym",
+        "mega_stone": "ITEM_MANECTITE",
+        "tm": "ITEM_TM_VOLT_SWITCH"
+      },
+      {
+        "closure_sha256": "b8f277f44c27c88c9588bedd8c1e9bf05b6303d9bf73b791627e8c03a13fa5e6",
+        "map": "SootopolisCity_Gym_1F",
+        "mega_stone": "ITEM_GYARADOSITE",
+        "tm": "ITEM_TM_FLIP_TURN"
+      }
+    ],
+    "undefined_tm_item_count": 0,
+    "undefined_tm_items": []
+  },
   "dependencies": [
     {
       "actual_target_label": "AlteringCave_EventScript_Red",
@@ -1665,6 +1901,36 @@
     },
     {
       "labels": [
+        "paired_reward:FortreeCity_Gym_EventScript_FinishReward",
+        "paired_reward:FortreeCity_Gym_EventScript_FinishReward2",
+        "paired_reward:FortreeCity_Gym_EventScript_GiveAerialAce",
+        "paired_reward:FortreeCity_Gym_EventScript_GiveAerialAce2",
+        "paired_reward:FortreeCity_Gym_EventScript_GiveAltarianite",
+        "paired_reward:FortreeCity_Gym_EventScript_GiveAltarianite2"
+      ],
+      "new_sha256": "6fca43fab34f05eb0c9b4684e91c2374e516ed4d0a10fbf9cfd3fb775adc6fdf",
+      "old_sha256": "7487bd2039db4a3e724fff383ee564855b8eea4391a08e1a5ad9567d393e5308",
+      "path": "data/maps/FortreeCity_Gym/scripts.inc",
+      "source": "exact reviewed dependency postimage",
+      "target_sha256": "6fca43fab34f05eb0c9b4684e91c2374e516ed4d0a10fbf9cfd3fb775adc6fdf"
+    },
+    {
+      "labels": [
+        "paired_reward:MauvilleCity_Gym_EventScript_FinishReward",
+        "paired_reward:MauvilleCity_Gym_EventScript_FinishReward2",
+        "paired_reward:MauvilleCity_Gym_EventScript_GiveManectite",
+        "paired_reward:MauvilleCity_Gym_EventScript_GiveManectite2",
+        "paired_reward:MauvilleCity_Gym_EventScript_GiveShockWave",
+        "paired_reward:MauvilleCity_Gym_EventScript_GiveShockWave2"
+      ],
+      "new_sha256": "4c9e6e382acf067a6903cc23bb39cf48a2f2134810bdae5019cec6ca03459e7d",
+      "old_sha256": "9fa32a400f7ac2e33a04f0e1beb3874b179a85b560aaf55dfe8e9ccf58cd4ffd",
+      "path": "data/maps/MauvilleCity_Gym/scripts.inc",
+      "source": "exact reviewed dependency postimage",
+      "target_sha256": "4c9e6e382acf067a6903cc23bb39cf48a2f2134810bdae5019cec6ca03459e7d"
+    },
+    {
+      "labels": [
         "dependency:OldaleTown_EventScript_MartEmployee"
       ],
       "new_sha256": "42723024a67fcb28b4f71b760c56a0311fe897b561df56d79a9b03e91612595a",
@@ -1738,6 +2004,21 @@
     },
     {
       "labels": [
+        "paired_reward:SootopolisCity_Gym_1F_EventScript_FinishReward",
+        "paired_reward:SootopolisCity_Gym_1F_EventScript_FinishReward2",
+        "paired_reward:SootopolisCity_Gym_1F_EventScript_GiveGyaradosite",
+        "paired_reward:SootopolisCity_Gym_1F_EventScript_GiveGyaradosite2",
+        "paired_reward:SootopolisCity_Gym_1F_EventScript_GiveWaterPulse",
+        "paired_reward:SootopolisCity_Gym_1F_EventScript_GiveWaterPulse2"
+      ],
+      "new_sha256": "d8b90ac95eb7f145f19863c09c82e5868243c42ed174eaece46a5fcdbd1abb55",
+      "old_sha256": "731683b579d64076400d00064b36e15b1d547e368396bbdfb99759f900c9c1be",
+      "path": "data/maps/SootopolisCity_Gym_1F/scripts.inc",
+      "source": "exact reviewed dependency postimage",
+      "target_sha256": "d8b90ac95eb7f145f19863c09c82e5868243c42ed174eaece46a5fcdbd1abb55"
+    },
+    {
+      "labels": [
         "dependency:EventScript_CutTree",
         "dependency:EventScript_RockSmash"
       ],
@@ -1759,15 +2040,22 @@
     },
     {
       "labels": [
+        "constant:FLAG_DELIVERED_FORTREE_GYM_MEGA_STONE",
+        "constant:FLAG_DELIVERED_FORTREE_GYM_TM",
+        "constant:FLAG_DELIVERED_MAUVILLE_GYM_MEGA_STONE",
+        "constant:FLAG_DELIVERED_MAUVILLE_GYM_TM",
+        "constant:FLAG_DELIVERED_SOOTOPOLIS_GYM_MEGA_STONE",
+        "constant:FLAG_DELIVERED_SOOTOPOLIS_GYM_TM",
         "constant:FLAG_RECEIVED_CAMERUPTITE",
+        "constant:FLAG_RECEIVED_TM_VOLT_SWITCH",
         "constant:FLAG_ROUTE120_BADGECHECKED",
         "constant:FLAG_ROUTE123_BADGECHECKED"
       ],
-      "new_sha256": "05c1ce13071a6ee47ba3b37f8ae4e9b975facb12a93602d5de66ec59053bd151",
+      "new_sha256": "5796813afc7cbb4c7039252d4710dfe777f6004ad9012990aef719d37441915b",
       "old_sha256": "8edc96def953819e714c709b47169067c0f830468db190f9a23560e6091648cf",
       "path": "include/constants/flags.h",
       "source": "exact reviewed dependency postimage",
-      "target_sha256": "05c1ce13071a6ee47ba3b37f8ae4e9b975facb12a93602d5de66ec59053bd151"
+      "target_sha256": "5796813afc7cbb4c7039252d4710dfe777f6004ad9012990aef719d37441915b"
     }
   ],
   "event_disposition_counts": {
@@ -1787,6 +2075,8 @@
     "ambiguity_group_count": 88,
     "archive_changed_map_count": 69,
     "custom_item_wrapper_count": 44,
+    "custom_tm_dependent_event_count": 2,
+    "custom_tm_mapping_count": 6,
     "duplicate_event_identity_count": 0,
     "duplicate_local_id_count": 0,
     "invalid_item_quantity_count": 0,
@@ -1795,6 +2085,7 @@
     "quantity_five_item_count": 6,
     "resolution_count": 423,
     "scoped_map_count": 75,
+    "undefined_tm_item_count": 0,
     "unresolved_count": 0,
     "unused_resolution_count": 0
   },
@@ -1830,14 +2121,14 @@
       "quantity": 5
     },
     {
-      "flag": "FLAG_ITEM_PETALBURG_WOODS_X_ATTACK",
-      "item": "ITEM_SUPER_POTION",
+      "flag": "FLAG_ITEM_PETALBURG_WOODS_PARALYZE_HEAL",
+      "item": "ITEM_FULL_HEAL",
       "map": "PetalburgWoods",
       "quantity": 1
     },
     {
-      "flag": "FLAG_ITEM_PETALBURG_WOODS_PARALYZE_HEAL",
-      "item": "ITEM_FULL_HEAL",
+      "flag": "FLAG_ITEM_PETALBURG_WOODS_X_ATTACK",
+      "item": "ITEM_SUPER_POTION",
       "map": "PetalburgWoods",
       "quantity": 1
     },
@@ -1884,20 +2175,20 @@
       "quantity": 1
     },
     {
-      "flag": "FLAG_ITEM_ROUTE_114_RARE_CANDY",
-      "item": "ITEM_MAX_POTION",
-      "map": "Route114",
-      "quantity": 1
-    },
-    {
       "flag": "FLAG_ITEM_ROUTE_114_PROTEIN",
       "item": "ITEM_MAX_POTION",
       "map": "Route114",
       "quantity": 1
     },
     {
-      "flag": "FLAG_ITEM_ROUTE_115_TM_FOCUS_PUNCH",
-      "item": "ITEM_TM_DRAIN_PUNCH",
+      "flag": "FLAG_ITEM_ROUTE_114_RARE_CANDY",
+      "item": "ITEM_MAX_POTION",
+      "map": "Route114",
+      "quantity": 1
+    },
+    {
+      "flag": "FLAG_ITEM_ROUTE_115_GREAT_BALL",
+      "item": "ITEM_SUPER_POTION",
       "map": "Route115",
       "quantity": 1
     },
@@ -1908,14 +2199,14 @@
       "quantity": 1
     },
     {
-      "flag": "FLAG_ITEM_ROUTE_115_GREAT_BALL",
-      "item": "ITEM_SUPER_POTION",
+      "flag": "FLAG_ITEM_ROUTE_115_PP_UP",
+      "item": "ITEM_PP_MAX",
       "map": "Route115",
       "quantity": 1
     },
     {
-      "flag": "FLAG_ITEM_ROUTE_115_PP_UP",
-      "item": "ITEM_PP_MAX",
+      "flag": "FLAG_ITEM_ROUTE_115_TM_FOCUS_PUNCH",
+      "item": "ITEM_TM_DRAIN_PUNCH",
       "map": "Route115",
       "quantity": 1
     },
@@ -1932,6 +2223,12 @@
       "quantity": 5
     },
     {
+      "flag": "FLAG_ITEM_ROUTE_119_RARE_CANDY",
+      "item": "ITEM_MAX_POTION",
+      "map": "Route119",
+      "quantity": 1
+    },
+    {
       "flag": "FLAG_ITEM_ROUTE_119_SUPER_REPEL",
       "item": "ITEM_HEART_SCALE",
       "map": "Route119",
@@ -1940,12 +2237,6 @@
     {
       "flag": "FLAG_ITEM_ROUTE_119_ZINC",
       "item": "ITEM_ETHER",
-      "map": "Route119",
-      "quantity": 1
-    },
-    {
-      "flag": "FLAG_ITEM_ROUTE_119_RARE_CANDY",
-      "item": "ITEM_MAX_POTION",
       "map": "Route119",
       "quantity": 1
     },
@@ -1986,12 +2277,6 @@
       "quantity": 1
     },
     {
-      "flag": "FLAG_ITEM_ROUTE_123_ULTRA_BALL",
-      "item": "ITEM_HYPER_POTION",
-      "map": "Route123",
-      "quantity": 1
-    },
-    {
       "flag": "FLAG_ITEM_ROUTE_123_PP_UP",
       "item": "ITEM_PP_MAX",
       "map": "Route123",
@@ -2004,14 +2289,20 @@
       "quantity": 1
     },
     {
-      "flag": "FLAG_ITEM_ROUTE_124_RED_SHARD",
-      "item": "ITEM_RED_SHARD",
-      "map": "Route124",
-      "quantity": 5
+      "flag": "FLAG_ITEM_ROUTE_123_ULTRA_BALL",
+      "item": "ITEM_HYPER_POTION",
+      "map": "Route123",
+      "quantity": 1
     },
     {
       "flag": "FLAG_ITEM_ROUTE_124_BLUE_SHARD",
       "item": "ITEM_BLUE_SHARD",
+      "map": "Route124",
+      "quantity": 5
+    },
+    {
+      "flag": "FLAG_ITEM_ROUTE_124_RED_SHARD",
+      "item": "ITEM_RED_SHARD",
       "map": "Route124",
       "quantity": 5
     },
@@ -2034,12 +2325,6 @@
       "quantity": 5
     },
     {
-      "flag": "FLAG_ITEM_ROUTE_127_ZINC",
-      "item": "ITEM_ETHER",
-      "map": "Route127",
-      "quantity": 1
-    },
-    {
       "flag": "FLAG_ITEM_ROUTE_127_CARBOS",
       "item": "ITEM_SUPER_POTION",
       "map": "Route127",
@@ -2048,6 +2333,12 @@
     {
       "flag": "FLAG_ITEM_ROUTE_127_RARE_CANDY",
       "item": "ITEM_MAX_POTION",
+      "map": "Route127",
+      "quantity": 1
+    },
+    {
+      "flag": "FLAG_ITEM_ROUTE_127_ZINC",
+      "item": "ITEM_ETHER",
       "map": "Route127",
       "quantity": 1
     },
@@ -12106,14 +12397,14 @@
       "quantity": 5
     },
     {
-      "flag": "FLAG_ITEM_ROUTE_124_RED_SHARD",
-      "item": "ITEM_RED_SHARD",
+      "flag": "FLAG_ITEM_ROUTE_124_BLUE_SHARD",
+      "item": "ITEM_BLUE_SHARD",
       "map": "Route124",
       "quantity": 5
     },
     {
-      "flag": "FLAG_ITEM_ROUTE_124_BLUE_SHARD",
-      "item": "ITEM_BLUE_SHARD",
+      "flag": "FLAG_ITEM_ROUTE_124_RED_SHARD",
+      "item": "ITEM_RED_SHARD",
       "map": "Route124",
       "quantity": 5
     },

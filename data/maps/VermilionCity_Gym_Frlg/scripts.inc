@@ -315,8 +315,8 @@ VermilionCity_Gym_Text_ReceivedTM34FromLtSurge::
 	.string "from LT. SURGE.$"
 
 VermilionCity_Gym_Text_ExplainTM34::
-	.string "TM34 contains SHOCK WAVE!\p"
-	.string "Teach it to an ELECTRIC POKéMON!$"
+	.string "TM34 contains VOLT SWITCH!\p"
+	.string "Attack, then switch out, kid!$"
 
 VermilionCity_Gym_Text_MakeRoomInYourBag::
 	.string "Yo, kid, make room in your BAG!$"
@@ -418,4 +418,3 @@ VermilionCity_Gym_Text_OnlyTrashLocksWereReset::
 	.string "There's only trash here.\p"
 	.string "Hey!\n"
 	.string "The electric locks were reset!$"
-

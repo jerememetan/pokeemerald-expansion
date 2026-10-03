@@ -1,113 +1,139 @@
 {
-  "id": "MAP_EVER_GRANDE_CITY_POKEMON_LEAGUE_1F",
-  "name": "EverGrandeCity_PokemonLeague_1F",
-  "layout": "LAYOUT_EVER_GRANDE_CITY_POKEMON_LEAGUE_1F",
-  "music": "MUS_POKE_CENTER",
-  "region": "REGION_HOENN",
-  "region_map_section": "MAPSEC_EVER_GRANDE_CITY",
-  "requires_flash": false,
-  "weather": "WEATHER_NONE",
-  "map_type": "MAP_TYPE_INDOOR",
   "allow_cycling": false,
   "allow_escaping": false,
   "allow_running": false,
-  "show_map_name": false,
   "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
+  "bg_events": [],
   "connections": null,
+  "coord_events": [],
+  "id": "MAP_EVER_GRANDE_CITY_POKEMON_LEAGUE_1F",
+  "layout": "LAYOUT_EVER_GRANDE_CITY_POKEMON_LEAGUE_1F",
+  "map_type": "MAP_TYPE_INDOOR",
+  "music": "MUS_POKE_CENTER",
+  "name": "EverGrandeCity_PokemonLeague_1F",
   "object_events": [
     {
-      "local_id": "LOCALID_LEAGUE_NURSE",
+      "elevation": 3,
+      "flag": "0",
       "graphics_id": "OBJ_EVENT_GFX_NURSE",
-      "x": 3,
-      "y": 2,
-      "elevation": 3,
-      "movement_type": "MOVEMENT_TYPE_FACE_DOWN",
+      "local_id": "LOCALID_LEAGUE_NURSE",
       "movement_range_x": 0,
       "movement_range_y": 0,
-      "trainer_type": "TRAINER_TYPE_NONE",
-      "trainer_sight_or_berry_tree_id": "0",
+      "movement_type": "MOVEMENT_TYPE_FACE_DOWN",
       "script": "EverGrandeCity_PokemonLeague_1F_EventScript_Nurse",
-      "flag": "0"
+      "trainer_sight_or_berry_tree_id": "0",
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "x": 3,
+      "y": 2
     },
     {
-      "graphics_id": "OBJ_EVENT_GFX_MART_EMPLOYEE",
-      "x": 16,
-      "y": 2,
       "elevation": 3,
-      "movement_type": "MOVEMENT_TYPE_FACE_DOWN",
+      "flag": "0",
+      "graphics_id": "OBJ_EVENT_GFX_MART_EMPLOYEE",
       "movement_range_x": 0,
       "movement_range_y": 0,
-      "trainer_type": "TRAINER_TYPE_NONE",
-      "trainer_sight_or_berry_tree_id": "0",
+      "movement_type": "MOVEMENT_TYPE_FACE_DOWN",
       "script": "EverGrandeCity_PokemonLeague_1F_EventScript_Clerk",
-      "flag": "0"
+      "trainer_sight_or_berry_tree_id": "0",
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "x": 16,
+      "y": 2
     },
     {
+      "elevation": 3,
+      "flag": "0",
+      "graphics_id": "OBJ_EVENT_GFX_MAN_3",
       "local_id": "LOCALID_LEAGUE_GUARD_1",
-      "graphics_id": "OBJ_EVENT_GFX_MAN_3",
-      "x": 8,
-      "y": 2,
-      "elevation": 3,
-      "movement_type": "MOVEMENT_TYPE_FACE_DOWN",
       "movement_range_x": 1,
       "movement_range_y": 1,
-      "trainer_type": "TRAINER_TYPE_NONE",
-      "trainer_sight_or_berry_tree_id": "0",
+      "movement_type": "MOVEMENT_TYPE_FACE_DOWN",
       "script": "EverGrandeCity_PokemonLeague_1F_EventScript_DoorGuard",
-      "flag": "0"
+      "trainer_sight_or_berry_tree_id": "0",
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "x": 8,
+      "y": 2
     },
     {
-      "local_id": "LOCALID_LEAGUE_GUARD_2",
-      "graphics_id": "OBJ_EVENT_GFX_MAN_3",
-      "x": 11,
-      "y": 2,
       "elevation": 3,
-      "movement_type": "MOVEMENT_TYPE_FACE_DOWN",
+      "flag": "0",
+      "graphics_id": "OBJ_EVENT_GFX_MAN_3",
+      "local_id": "LOCALID_LEAGUE_GUARD_2",
       "movement_range_x": 1,
       "movement_range_y": 1,
-      "trainer_type": "TRAINER_TYPE_NONE",
-      "trainer_sight_or_berry_tree_id": "0",
+      "movement_type": "MOVEMENT_TYPE_FACE_DOWN",
       "script": "EverGrandeCity_PokemonLeague_1F_EventScript_DoorGuard",
-      "flag": "0"
+      "trainer_sight_or_berry_tree_id": "0",
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "x": 11,
+      "y": 2
+    },
+    {
+      "elevation": 0,
+      "flag": "0",
+      "graphics_id": "OBJ_EVENT_GFX_MANIAC",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "movement_type": "MOVEMENT_TYPE_FACE_DOWN",
+      "script": "LilycoveCity_MoveDeletersHouse_EventScript_MoveDeleter",
+      "trainer_sight_or_berry_tree_id": "0",
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "x": 17,
+      "y": 2
+    },
+    {
+      "elevation": 0,
+      "flag": "0",
+      "graphics_id": "OBJ_EVENT_GFX_SCIENTIST_1",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "movement_type": "MOVEMENT_TYPE_FACE_DOWN",
+      "script": "FallarborTown_MoveRelearnersHouse_EventScript_MoveRelearner",
+      "trainer_sight_or_berry_tree_id": "0",
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "x": 15,
+      "y": 2
     }
   ],
+  "region": "REGION_HOENN",
+  "region_map_section": "MAPSEC_EVER_GRANDE_CITY",
+  "requires_flash": false,
+  "show_map_name": false,
   "warp_events": [
     {
-      "x": 9,
-      "y": 11,
-      "elevation": 3,
       "dest_map": "MAP_EVER_GRANDE_CITY",
-      "dest_warp_id": "0"
-    },
-    {
-      "x": 10,
-      "y": 11,
+      "dest_warp_id": "0",
       "elevation": 3,
-      "dest_map": "MAP_EVER_GRANDE_CITY",
-      "dest_warp_id": "0"
-    },
-    {
       "x": 9,
-      "y": 1,
-      "elevation": 3,
-      "dest_map": "MAP_EVER_GRANDE_CITY_HALL5",
-      "dest_warp_id": "0"
+      "y": 11
     },
     {
+      "dest_map": "MAP_EVER_GRANDE_CITY",
+      "dest_warp_id": "0",
+      "elevation": 3,
       "x": 10,
-      "y": 1,
-      "elevation": 3,
-      "dest_map": "MAP_EVER_GRANDE_CITY_HALL5",
-      "dest_warp_id": "0"
+      "y": 11
     },
     {
-      "x": 1,
-      "y": 7,
-      "elevation": 4,
+      "dest_map": "MAP_EVER_GRANDE_CITY_HALL5",
+      "dest_warp_id": "0",
+      "elevation": 3,
+      "x": 9,
+      "y": 1
+    },
+    {
+      "dest_map": "MAP_EVER_GRANDE_CITY_HALL5",
+      "dest_warp_id": "0",
+      "elevation": 3,
+      "x": 10,
+      "y": 1
+    },
+    {
       "dest_map": "MAP_EVER_GRANDE_CITY_POKEMON_LEAGUE_2F",
-      "dest_warp_id": "0"
+      "dest_warp_id": "0",
+      "elevation": 4,
+      "x": 1,
+      "y": 7
     }
   ],
-  "coord_events": [],
-  "bg_events": []
+  "weather": "WEATHER_NONE"
 }

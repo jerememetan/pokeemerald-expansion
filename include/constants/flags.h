@@ -194,7 +194,7 @@
 #define FLAG_TOUGH_PAINTING_MADE             0xA4
 #define FLAG_RECEIVED_TM_ROCK_TOMB           0xA5
 #define FLAG_RECEIVED_TM_BULK_UP             0xA6
-#define FLAG_RECEIVED_TM_SHOCK_WAVE          0xA7
+#define FLAG_RECEIVED_TM_VOLT_SWITCH         0xA7
 #define FLAG_RECEIVED_TM_OVERHEAT            0xA8
 #define FLAG_RECEIVED_TM_FACADE              0xA9
 #define FLAG_RECEIVED_TM_AERIAL_ACE          0xAA
@@ -666,12 +666,13 @@
 
 #define FLAG_UNUSED_0x264  0x264 // Unused Flag
 #define FLAG_RECEIVED_CAMERUPTITE  0x265
-#define FLAG_UNUSED_0x266  0x266 // Unused Flag
-#define FLAG_UNUSED_0x267  0x267 // Unused Flag
-#define FLAG_UNUSED_0x268  0x268 // Unused Flag
-#define FLAG_UNUSED_0x269  0x269 // Unused Flag
-#define FLAG_UNUSED_0x26A  0x26A // Unused Flag
-#define FLAG_UNUSED_0x26B  0x26B // Unused Flag
+// Successful item deliveries for the paired Gym rewards (independent of bag contents).
+#define FLAG_DELIVERED_FORTREE_GYM_TM 0x266
+#define FLAG_DELIVERED_FORTREE_GYM_MEGA_STONE 0x267
+#define FLAG_DELIVERED_MAUVILLE_GYM_TM 0x268
+#define FLAG_DELIVERED_MAUVILLE_GYM_MEGA_STONE 0x269
+#define FLAG_DELIVERED_SOOTOPOLIS_GYM_TM 0x26A
+#define FLAG_DELIVERED_SOOTOPOLIS_GYM_MEGA_STONE 0x26B
 #define FLAG_UNUSED_0x26C  0x26C // Unused Flag
 #define FLAG_UNUSED_0x26D  0x26D // Unused Flag
 #define FLAG_UNUSED_0x26E  0x26E // Unused Flag

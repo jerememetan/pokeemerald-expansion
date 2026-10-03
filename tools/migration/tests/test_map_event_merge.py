@@ -2,11 +2,13 @@ import copy
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import shutil
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from tools.migration.map_event_merge import (
     AmbiguousMatchError,
@@ -1764,7 +1766,7 @@ class CandidateBundlePublicationTests(unittest.TestCase):
 class FrozenDependencyPostimageSpecTests(unittest.TestCase):
     def test_frozen_specs_cover_all_authored_closures_and_owner_files(self):
         specs = merge_tool.DEPENDENCY_POSTIMAGE_SPECS
-        self.assertEqual(len(specs), 11)
+        self.assertEqual(len(specs), 14)
         dependency_ids = {
             dependency["id"]
             for spec in specs.values()
@@ -1776,14 +1778,24 @@ class FrozenDependencyPostimageSpecTests(unittest.TestCase):
             for literal in spec["required_literals"]
         }
         self.assertEqual(len(dependency_ids), 14)
-        self.assertEqual(
-            literal_ids,
-            {
+        expected_literals = {
                 "constant:FLAG_ROUTE120_BADGECHECKED",
                 "constant:FLAG_ROUTE123_BADGECHECKED",
                 "constant:FLAG_RECEIVED_CAMERUPTITE",
-            },
+                "constant:FLAG_RECEIVED_TM_VOLT_SWITCH",
+                "constant:FLAG_DELIVERED_FORTREE_GYM_TM",
+                "constant:FLAG_DELIVERED_FORTREE_GYM_MEGA_STONE",
+                "constant:FLAG_DELIVERED_MAUVILLE_GYM_TM",
+                "constant:FLAG_DELIVERED_MAUVILLE_GYM_MEGA_STONE",
+                "constant:FLAG_DELIVERED_SOOTOPOLIS_GYM_TM",
+                "constant:FLAG_DELIVERED_SOOTOPOLIS_GYM_MEGA_STONE",
+        }
+        expected_literals.update(
+            f"paired_reward:{label}"
+            for spec in merge_tool.PAIRED_GYM_REWARDS
+            for label in merge_tool._paired_reward_blocks(spec)
         )
+        self.assertEqual(literal_ids, expected_literals)
 
 
 class DependencyPostimageValidationTests(unittest.TestCase):
@@ -1935,6 +1947,976 @@ class DependencyPostimageValidationTests(unittest.TestCase):
             result["dependency_records"][0]["adaptation_kind"],
             "candidate_item_adapter",
         )
+
+
+class AuthoritativeMapApplyTests(unittest.TestCase):
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory()
+        self.root = Path(self.temporary.name)
+        self.candidate_dir = self.root / "build" / "legacy-map-events"
+        self.report_path = self.root / "report.json"
+        self.audit_path = self.root / "audit.json"
+        self.resolutions_path = self.root / "resolutions.json"
+        self.audit_path.write_bytes(b"audit")
+        self.resolutions_path.write_bytes(b"resolutions")
+        self.preimages = {}
+        self.postimages = {}
+        self.prior_postimages = {}
+        for name, marker in (("Alpha", 1), ("Beta", 2)):
+            relative = f"data/maps/{name}/map.json"
+            preimage = self.map_bytes(name, marker)
+            postimage = self.map_bytes(name, marker + 10)
+            target = self.root / relative
+            candidate = self.candidate_dir / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            candidate.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(preimage)
+            candidate.write_bytes(postimage)
+            self.preimages[relative] = preimage
+            self.postimages[relative] = postimage
+            self.prior_postimages[relative] = (
+                self.map_bytes(name, marker + 5)
+                if name == "Alpha"
+                else postimage
+            )
+        self.write_report()
+
+    def tearDown(self):
+        self.temporary.cleanup()
+
+    @staticmethod
+    def map_bytes(name, marker):
+        return json.dumps(
+            {
+                "id": f"MAP_{name.upper()}",
+                "layout": f"LAYOUT_{name.upper()}",
+                "object_events": [{"x": marker}],
+                "warp_events": [],
+                "coord_events": [],
+                "bg_events": [],
+            },
+            indent=2,
+        ).encode() + b"\n"
+
+    def write_report(self):
+        report = {
+            "mode": "candidate-only",
+            "candidate_map_count": len(self.postimages),
+            "candidate_maps": sorted(Path(path).parts[2] for path in self.postimages),
+            "candidate_sha256": {
+                path: hashlib.sha256(data).hexdigest()
+                for path, data in sorted(self.postimages.items())
+            },
+        }
+        self.report_path.write_bytes(json.dumps(report, sort_keys=True).encode())
+
+    def apply(self, **kwargs):
+        return merge_tool.apply_authoritative_maps(
+            self.root,
+            self.candidate_dir,
+            self.report_path,
+            self.audit_path,
+            self.resolutions_path,
+            self.preimages,
+            prior_postimage_hashes={
+                relative: hashlib.sha256(data).hexdigest()
+                for relative, data in self.prior_postimages.items()
+            },
+            **kwargs,
+        )
+
+    def target_bytes(self):
+        return {
+            relative: (self.root / relative).read_bytes()
+            for relative in self.preimages
+        }
+
+    def evidence_bytes(self):
+        return (
+            self.report_path.read_bytes(),
+            self.audit_path.read_bytes(),
+            self.resolutions_path.read_bytes(),
+            {
+                relative: (self.candidate_dir / relative).read_bytes()
+                for relative in self.postimages
+            },
+        )
+
+    def debris(self):
+        return sorted(
+            path for path in self.root.rglob("*")
+            if path.name.startswith(".map.json.")
+        )
+
+    def test_exact_preimage_set_applies_every_candidate(self):
+        self.assertEqual(self.apply(), 2)
+        self.assertEqual(self.target_bytes(), self.postimages)
+        self.assertEqual(self.debris(), [])
+
+    def test_exact_postimage_set_performs_zero_replacements(self):
+        for relative, data in self.postimages.items():
+            (self.root / relative).write_bytes(data)
+
+        calls = []
+        self.assertEqual(self.apply(replace=lambda source, target: calls.append((source, target))), 0)
+        self.assertEqual(calls, [])
+
+    def test_exact_prior_reviewed_set_upgrades_only_changed_candidates(self):
+        for relative, data in self.prior_postimages.items():
+            (self.root / relative).write_bytes(data)
+        calls = []
+
+        def tracked_replace(source, target):
+            calls.append(target)
+            os.replace(source, target)
+
+        self.assertEqual(self.apply(replace=tracked_replace), 1)
+        self.assertEqual(len(calls), 1)
+        self.assertEqual(calls[0].parent, self.root / "data/maps/Alpha")
+        self.assertIn("authoritative-backup", calls[0].name)
+        self.assertEqual(self.target_bytes(), self.postimages)
+
+    def test_mixed_prior_reviewed_and_original_set_fails_before_writes(self):
+        for relative, data in self.prior_postimages.items():
+            (self.root / relative).write_bytes(data)
+        (self.root / "data/maps/Beta/map.json").write_bytes(
+            self.preimages["data/maps/Beta/map.json"]
+        )
+        before = self.target_bytes()
+        with self.assertRaisesRegex(RuntimeError, "mixed"):
+            self.apply()
+        self.assertEqual(self.target_bytes(), before)
+
+    def test_prior_upgrade_failure_rolls_back_to_prior_reviewed_bytes(self):
+        for relative, data in self.prior_postimages.items():
+            (self.root / relative).write_bytes(data)
+
+        def fail_forward(_source, _target):
+            raise OSError("upgrade fault")
+
+        with self.assertRaisesRegex(RuntimeError, "prior authoritative state restored"):
+            self.apply(replace=fail_forward)
+        self.assertEqual(self.target_bytes(), self.prior_postimages)
+
+    def test_prior_upgrade_does_not_clobber_concurrent_source_change(self):
+        for relative, data in self.prior_postimages.items():
+            (self.root / relative).write_bytes(data)
+        changed = b"concurrent prior-state source"
+
+        def mutate_after_staging(phase, _index, _path):
+            if phase == "after_staging":
+                (self.root / "data/maps/Alpha/map.json").write_bytes(changed)
+
+        with self.assertRaisesRegex(RuntimeError, "changed while staging"):
+            self.apply(fault=mutate_after_staging)
+        self.assertEqual(
+            (self.root / "data/maps/Alpha/map.json").read_bytes(), changed
+        )
+        self.assertEqual(
+            (self.root / "data/maps/Beta/map.json").read_bytes(),
+            self.prior_postimages["data/maps/Beta/map.json"],
+        )
+        self.assertEqual(self.debris(), [])
+
+    def test_mixed_preimage_and_postimage_fails_before_writes_in_both_directions(self):
+        evidence = self.evidence_bytes()
+        for post_relative in self.postimages:
+            with self.subTest(post_relative=post_relative):
+                for relative, data in self.preimages.items():
+                    (self.root / relative).write_bytes(data)
+                (self.root / post_relative).write_bytes(self.postimages[post_relative])
+                before = self.target_bytes()
+                with self.assertRaisesRegex(RuntimeError, "mixed pre/post"):
+                    self.apply()
+                self.assertEqual(self.target_bytes(), before)
+                self.assertEqual(self.evidence_bytes(), evidence)
+
+    def test_arbitrary_third_state_fails_before_any_mutation(self):
+        relative = next(iter(self.preimages))
+        (self.root / relative).write_bytes(b"third state")
+        before_sources = self.target_bytes()
+        before_evidence = self.evidence_bytes()
+        with self.assertRaisesRegex(RuntimeError, "neither reviewed preimage nor candidate postimage"):
+            self.apply()
+        self.assertEqual(self.target_bytes(), before_sources)
+        self.assertEqual(self.evidence_bytes(), before_evidence)
+        self.assertEqual(self.debris(), [])
+
+    def test_forward_failure_rolls_back_all_prior_maps(self):
+        original_link = os.link
+        forward_calls = 0
+        forwards = set()
+
+        def tracked_stage(path, data, purpose):
+            staged = merge_tool._stage_file(path, data, purpose)
+            if purpose == "authoritative forward":
+                forwards.add(staged)
+            return staged
+
+        def fail_second_forward(source, target):
+            nonlocal forward_calls
+            if source in forwards:
+                forward_calls += 1
+                if forward_calls == 2:
+                    raise OSError("forward fault")
+            original_link(source, target)
+
+        with self.assertRaisesRegex(RuntimeError, "prior authoritative state restored"):
+            self.apply(link=fail_second_forward, stage=tracked_stage)
+        self.assertEqual(self.target_bytes(), self.preimages)
+        self.assertEqual(self.debris(), [])
+
+    def test_forward_and_rollback_failure_names_every_retained_sole_preimage(self):
+        original_link = os.link
+        forward_calls = 0
+        forwards = set()
+        rollbacks = set()
+
+        def tracked_stage(path, data, purpose):
+            staged = merge_tool._stage_file(path, data, purpose)
+            if purpose == "authoritative forward":
+                forwards.add(staged)
+            else:
+                rollbacks.add(staged)
+            return staged
+
+        def fail_forward_and_rollback(source, target):
+            nonlocal forward_calls
+            if source in forwards:
+                forward_calls += 1
+                if forward_calls == 2:
+                    raise OSError("forward fault")
+            if source in rollbacks:
+                raise OSError("rollback fault")
+            original_link(source, target)
+
+        with self.assertRaisesRegex(RuntimeError, "recovery copies retained") as raised:
+            self.apply(link=fail_forward_and_rollback, stage=tracked_stage)
+        recovery_paths = [
+            path
+            for path in self.root.rglob("*")
+            if ".authoritative-recovery." in path.name
+        ]
+        self.assertGreaterEqual(len(recovery_paths), 1)
+        self.assertTrue(
+            any(
+                path.read_bytes() == self.preimages["data/maps/Alpha/map.json"]
+                for path in recovery_paths
+            )
+        )
+        self.assertTrue(any(str(path) in str(raised.exception) for path in recovery_paths))
+
+    def test_recovery_naming_failure_retains_preimages_and_continues_rollback(self):
+        beta_relative = "data/maps/Beta/map.json"
+        beta_target = self.root / beta_relative
+        staged = {}
+        evidence = self.evidence_bytes()
+
+        def tracked_stage(path, data, purpose):
+            temporary = merge_tool._stage_file(path, data, purpose)
+            staged[(path, purpose)] = temporary
+            return temporary
+
+        def fail_beta_links(source, target):
+            if target == beta_target:
+                raise OSError("Beta forward/rollback link fault")
+            os.link(source, target)
+
+        with patch.object(
+            merge_tool, "_preserve_recovery_copy",
+            side_effect=OSError("recovery rename fault"),
+        ), self.assertRaises(Exception) as raised:
+            self.apply(link=fail_beta_links, stage=tracked_stage)
+
+        beta_rollback = staged[(beta_target, "authoritative rollback")]
+        self.assertTrue(beta_rollback.is_file(), "exact staged preimage was deleted")
+        self.assertEqual(beta_rollback.read_bytes(), self.preimages[beta_relative])
+        backups = list(beta_target.parent.glob(".map.json.authoritative-backup.*"))
+        self.assertEqual(len(backups), 1)
+        self.assertEqual(backups[0].read_bytes(), self.preimages[beta_relative])
+        self.assertFalse(beta_target.exists())
+        self.assertEqual(
+            (self.root / "data/maps/Alpha/map.json").read_bytes(),
+            self.preimages["data/maps/Alpha/map.json"],
+        )
+        self.assertIsInstance(raised.exception, RuntimeError)
+        self.assertIn("recovery rename fault", str(raised.exception))
+        for retained in (beta_rollback, backups[0]):
+            self.assertIn(str(retained), str(raised.exception))
+        self.assertEqual(set(self.debris()), {beta_rollback, backups[0]})
+        self.assertEqual(self.evidence_bytes(), evidence)
+
+    def test_concurrent_write_after_rollback_unlink_retains_named_exact_backup(self):
+        alpha_relative = "data/maps/Alpha/map.json"
+        alpha_target = self.root / alpha_relative
+        beta_target = self.root / "data/maps/Beta/map.json"
+        changed = b"concurrent write after rollback unlink"
+        staged = {}
+        evidence = self.evidence_bytes()
+
+        def tracked_stage(path, data, purpose):
+            temporary = merge_tool._stage_file(path, data, purpose)
+            staged[(path, purpose)] = temporary
+            return temporary
+
+        def fail_beta_forward(source, target):
+            if source == staged[(beta_target, "authoritative forward")]:
+                raise OSError("Beta forward link fault")
+            os.link(source, target)
+
+        def write_after_rollback_unlink(path):
+            path.unlink()
+            if path == staged[(alpha_target, "authoritative rollback")]:
+                alpha_target.write_bytes(changed)
+
+        with self.assertRaisesRegex(RuntimeError, "recovery copies retained") as raised:
+            self.apply(
+                link=fail_beta_forward, unlink=write_after_rollback_unlink,
+                stage=tracked_stage,
+            )
+
+        self.assertEqual(alpha_target.read_bytes(), changed)
+        self.assertEqual(beta_target.read_bytes(), self.preimages["data/maps/Beta/map.json"])
+        backups = list(alpha_target.parent.glob(".map.json.authoritative-backup.*"))
+        self.assertEqual(len(backups), 1, "last exact preimage was deleted before verification")
+        self.assertEqual(backups[0].read_bytes(), self.preimages[alpha_relative])
+        self.assertIn(str(backups[0]), str(raised.exception))
+        self.assertEqual(self.debris(), backups)
+        self.assertEqual(self.evidence_bytes(), evidence)
+
+    def test_candidate_report_audit_resolution_and_source_paths_cannot_collide(self):
+        target = self.root / "data/maps/Alpha/map.json"
+        cases = {
+            "candidate": (target, self.report_path, self.audit_path, self.resolutions_path),
+            "report": (self.candidate_dir, target, self.audit_path, self.resolutions_path),
+            "audit": (self.candidate_dir, self.report_path, target, self.resolutions_path),
+            "resolutions": (self.candidate_dir, self.report_path, self.audit_path, target),
+        }
+        for name, paths in cases.items():
+            with self.subTest(name=name), self.assertRaisesRegex(ValueError, "collid"):
+                merge_tool.apply_authoritative_maps(
+                    self.root, *paths, self.preimages
+                )
+
+    def test_internal_staging_path_collision_fails_before_writes(self):
+        target = self.root / "data/maps/Alpha/map.json"
+
+        def colliding_stage(_path, _data, _purpose):
+            return target
+
+        before = self.target_bytes()
+        with self.assertRaisesRegex(ValueError, "internal transaction path collides"):
+            self.apply(stage=colliding_stage)
+        self.assertEqual(self.target_bytes(), before)
+
+    def test_concurrent_source_change_before_first_replacement_is_not_clobbered(self):
+        changed = b"concurrent source"
+
+        def mutate_after_staging(phase, _index, _path):
+            if phase == "after_staging":
+                (self.root / "data/maps/Beta/map.json").write_bytes(changed)
+
+        with self.assertRaisesRegex(RuntimeError, "changed while staging"):
+            self.apply(fault=mutate_after_staging)
+        self.assertEqual((self.root / "data/maps/Beta/map.json").read_bytes(), changed)
+        self.assertEqual((self.root / "data/maps/Alpha/map.json").read_bytes(), self.preimages["data/maps/Alpha/map.json"])
+        self.assertEqual(self.debris(), [])
+
+    def test_concurrent_source_change_at_before_boundary_is_not_clobbered(self):
+        relative = "data/maps/Alpha/map.json"
+        changed = b"concurrent source at before boundary"
+
+        def mutate_at_before(phase, index, _path):
+            if phase == "before" and index == 0:
+                (self.root / relative).write_bytes(changed)
+
+        with self.assertRaisesRegex(RuntimeError, "concurrent|changed"):
+            self.apply(fault=mutate_at_before)
+        self.assertEqual((self.root / relative).read_bytes(), changed)
+        self.assertEqual(
+            (self.root / "data/maps/Beta/map.json").read_bytes(),
+            self.preimages["data/maps/Beta/map.json"],
+        )
+
+    def test_concurrent_post_install_edit_survives_rollback(self):
+        relative = "data/maps/Alpha/map.json"
+        changed = b"concurrent post-install edit"
+
+        def fail_after_first_install(phase, index, _path):
+            if phase == "after" and index == 0:
+                (self.root / relative).write_bytes(changed)
+                raise OSError("force rollback after concurrent edit")
+
+        with self.assertRaisesRegex(RuntimeError, "recovery copies retained") as raised:
+            self.apply(fault=fail_after_first_install)
+        self.assertEqual((self.root / relative).read_bytes(), changed)
+        recoveries = [
+            path
+            for path in (self.root / "data/maps/Alpha").iterdir()
+            if ".authoritative-recovery." in path.name
+        ]
+        self.assertEqual(len(recoveries), 1)
+        self.assertEqual(recoveries[0].read_bytes(), self.preimages[relative])
+        self.assertIn(str(recoveries[0]), str(raised.exception))
+
+    def test_no_clobber_install_collision_preserves_writer_and_preimage(self):
+        relative = "data/maps/Alpha/map.json"
+        target = self.root / relative
+        changed = b"concurrent replacement after atomic vacate"
+        original_link = os.link
+        injected = False
+
+        def collide_once(source, destination):
+            nonlocal injected
+            if not injected and destination == target:
+                injected = True
+                destination.write_bytes(changed)
+            original_link(source, destination)
+
+        with self.assertRaisesRegex(RuntimeError, "recovery copies retained") as raised:
+            self.apply(link=collide_once)
+        self.assertEqual(target.read_bytes(), changed)
+        recoveries = [
+            path for path in target.parent.iterdir()
+            if ".authoritative-recovery." in path.name
+        ]
+        self.assertEqual(len(recoveries), 1)
+        self.assertEqual(recoveries[0].read_bytes(), self.preimages[relative])
+        self.assertIn(str(recoveries[0]), str(raised.exception))
+
+    def test_atomic_vacate_failure_leaves_all_maps_unchanged(self):
+        before = self.target_bytes()
+
+        def fail_move(_source, _destination):
+            raise OSError("atomic move failed")
+
+        with self.assertRaisesRegex(RuntimeError, "state restored"):
+            self.apply(replace=fail_move)
+        self.assertEqual(self.target_bytes(), before)
+
+    def test_atomic_vacate_post_effect_failure_restores_moved_source(self):
+        original_move = os.replace
+        injected = False
+
+        def move_then_raise(source, destination):
+            nonlocal injected
+            original_move(source, destination)
+            if not injected:
+                injected = True
+                raise OSError("move reported failure after effect")
+
+        with self.assertRaisesRegex(RuntimeError, "state restored"):
+            self.apply(replace=move_then_raise)
+        self.assertEqual(self.target_bytes(), self.preimages)
+
+    def test_keyboard_interrupt_after_install_rolls_back_all_maps(self):
+        def interrupt(phase, index, _path):
+            if phase == "after" and index == 0:
+                raise KeyboardInterrupt()
+
+        with self.assertRaisesRegex(RuntimeError, "state restored"):
+            self.apply(fault=interrupt)
+        self.assertEqual(self.target_bytes(), self.preimages)
+
+    def test_unlink_failure_rolls_back_without_losing_preimage(self):
+        calls = 0
+
+        def fail_first_unlink(path):
+            nonlocal calls
+            calls += 1
+            if calls == 1:
+                raise OSError("unlink failed")
+            path.unlink()
+
+        with self.assertRaisesRegex(RuntimeError, "state restored"):
+            self.apply(unlink=fail_first_unlink)
+        self.assertEqual(self.target_bytes(), self.preimages)
+
+
+class PairedGymRewardDeliveryTests(unittest.TestCase):
+    """Exercise the real reward branches, not the validator's generated fixtures."""
+
+    ROOT = Path(__file__).resolve().parents[3]
+    LEADERS = ("Winona", "Wattson", "Juan")
+    DELIVERY_FLAGS = (
+        ("FLAG_DELIVERED_FORTREE_GYM_TM", "FLAG_DELIVERED_FORTREE_GYM_MEGA_STONE"),
+        ("FLAG_DELIVERED_MAUVILLE_GYM_TM", "FLAG_DELIVERED_MAUVILLE_GYM_MEGA_STONE"),
+        ("FLAG_DELIVERED_SOOTOPOLIS_GYM_TM", "FLAG_DELIVERED_SOOTOPOLIS_GYM_MEGA_STONE"),
+    )
+
+    def run_branch(self, spec, entry, bag, flags, blocked=()):
+        blocks = merge_tool.parse_label_blocks(
+            (self.ROOT / spec["path"]).read_bytes(), spec["path"]
+        )
+        common = merge_tool.parse_label_blocks(
+            (self.ROOT / "data/event_scripts.s").read_bytes(), "common scripts"
+        )
+        for label in ("Common_EventScript_BagIsFull", "Common_EventScript_ShowBagIsFull"):
+            blocks[label] = common[label]
+        labels, commands = {}, []
+        for label, block in blocks.items():
+            labels[label] = len(commands)
+            commands.extend(line.strip() for line in block.splitlines()[1:] if line.strip())
+        position = labels[entry]
+        result, released, gifts = False, False, []
+        for _ in range(100):
+            command, _, arguments = commands[position].partition(" ")
+            operands = arguments.split(", ")
+            position += 1
+            if command == "checkitem":
+                result = bag.get(arguments, 0) > 0
+            elif command == "giveitem":
+                result = arguments not in blocked
+                if result:
+                    gifts.append(arguments)
+                    bag[arguments] = bag.get(arguments, 0) + 1
+            elif command == "goto_if_eq":
+                value = result if operands[0] == "VAR_RESULT" else 0
+                expected = {"TRUE": True, "FALSE": False}.get(operands[1], operands[1])
+                if value == expected:
+                    position = labels[operands[2]]
+            elif command in ("goto_if_set", "goto_if_unset"):
+                if (operands[0] in flags) == (command == "goto_if_set"):
+                    position = labels[operands[1]]
+            elif command == "setflag":
+                flags.add(arguments)
+            elif command == "release":
+                released = True
+            elif command in ("return", "end"):
+                return gifts, command, released
+            elif command in ("msgbox", "trainerbattle_single"):
+                pass  # Enter leader dialogue after the battle, with rematches disabled.
+            elif command == "specialvar" and arguments == "VAR_RESULT, ShouldTryRematchBattle":
+                result = False
+            else:
+                self.fail(f"unexpected command in reward branch: {command} {arguments}")
+        self.fail("reward branch did not terminate")
+
+    def test_preowned_rewards_are_still_delivered_once(self):
+        for spec in merge_tool.PAIRED_GYM_REWARDS:
+            for suffix in ("", "2"):
+                with self.subTest(path=spec["path"], suffix=suffix):
+                    bag, flags = {spec["tm"]: 1, spec["stone"]: 1}, set()
+                    gifts, terminal, released = self.run_branch(
+                        spec, spec["stem"] + spec["root"] + suffix, bag, flags
+                    )
+                    self.assertEqual(gifts, [spec["tm"], spec["stone"]])
+                    self.assertIn(spec["flag"], flags)
+                    self.assertEqual((terminal, released), ("return", False) if not suffix else ("end", True))
+
+    def test_successful_tm_is_not_repeated_after_removal_during_stone_retry(self):
+        for spec, delivery_flags in zip(merge_tool.PAIRED_GYM_REWARDS, self.DELIVERY_FLAGS):
+            for suffix in ("", "2"):
+                with self.subTest(path=spec["path"], suffix=suffix):
+                    bag, flags = {}, set()
+                    gifts, terminal, released = self.run_branch(
+                        spec, spec["stem"] + spec["root"] + suffix, bag, flags, (spec["stone"],)
+                    )
+                    self.assertEqual(gifts, [spec["tm"]])
+                    self.assertNotIn(spec["flag"], flags)
+                    self.assertEqual((terminal, released), ("return", False) if not suffix else ("end", True))
+                    bag.pop(spec["tm"])
+                    gifts, _, _ = self.run_branch(
+                        spec, spec["stem"] + spec["root"] + "2", bag, flags
+                    )
+                    self.assertEqual(gifts, [spec["stone"]])
+                    self.assertTrue(set(delivery_flags).issubset(flags))
+                    self.assertIn(spec["flag"], flags)
+
+    def test_failed_tm_remains_pending_and_does_not_try_stone(self):
+        for spec, delivery_flags in zip(merge_tool.PAIRED_GYM_REWARDS, self.DELIVERY_FLAGS):
+            for suffix in ("", "2"):
+                with self.subTest(path=spec["path"], suffix=suffix):
+                    bag, flags = {}, set()
+                    gifts, terminal, released = self.run_branch(
+                        spec, spec["stem"] + spec["root"] + suffix, bag, flags, (spec["tm"],)
+                    )
+                    self.assertEqual(gifts, [])
+                    self.assertTrue(set(delivery_flags).isdisjoint(flags))
+                    self.assertNotIn(spec["flag"], flags)
+                    self.assertEqual((terminal, released), ("return", False) if not suffix else ("end", True))
+                    gifts, _, _ = self.run_branch(spec, spec["stem"] + spec["root"] + "2", bag, flags)
+                    self.assertEqual(gifts, [spec["tm"], spec["stone"]])
+
+    def test_completed_pair_does_not_repeat_through_leader_retry_gate(self):
+        for spec, leader in zip(merge_tool.PAIRED_GYM_REWARDS, self.LEADERS):
+            with self.subTest(path=spec["path"]):
+                bag, flags = {}, {"FLAG_BADGE06_GET"}
+                self.run_branch(spec, spec["stem"] + spec["root"], bag, flags)
+                bag.clear()
+                gifts, terminal, released = self.run_branch(spec, spec["stem"] + leader, bag, flags)
+                self.assertEqual(gifts, [])
+                self.assertEqual((terminal, released), ("end", True))
+
+
+class CustomTmRestorationValidationTests(unittest.TestCase):
+    MAPPINGS = (
+        (1, "FOCUS_PUNCH", "DRAIN_PUNCH"),
+        (3, "WATER_PULSE", "FLIP_TURN"),
+        (20, "SAFEGUARD", "THUNDER_WAVE"),
+        (32, "DOUBLE_TEAM", "U_TURN"),
+        (34, "SHOCK_WAVE", "VOLT_SWITCH"),
+        (40, "AERIAL_ACE", "HURRICANE"),
+    )
+
+    def setUp(self):
+        moves = [f"MOVE_{number}" for number in range(1, 51)]
+        for number, _old, new in self.MAPPINGS:
+            moves[number - 1] = new
+        self.files = {
+            "include/constants/tms_hms.h": (
+                "#define FOREACH_TM(F) " + chr(92) + chr(10)
+                + (" " + chr(92) + chr(10)).join(f"    F({move})" for move in moves)
+                + chr(10)
+            ).encode(),
+            "include/constants/flags.h": (
+                b"#define FLAG_RECEIVED_TM_VOLT_SWITCH 0xA7\n"
+                b"#define FLAG_DELIVERED_FORTREE_GYM_TM 0x266\n"
+                b"#define FLAG_DELIVERED_FORTREE_GYM_MEGA_STONE 0x267\n"
+                b"#define FLAG_DELIVERED_MAUVILLE_GYM_TM 0x268\n"
+                b"#define FLAG_DELIVERED_MAUVILLE_GYM_MEGA_STONE 0x269\n"
+                b"#define FLAG_DELIVERED_SOOTOPOLIS_GYM_TM 0x26A\n"
+                b"#define FLAG_DELIVERED_SOOTOPOLIS_GYM_MEGA_STONE 0x26B\n"
+            ),
+        }
+        item_blocks = []
+        prices = {1: 3000, 3: 3000, 20: 3000, 32: 3000, 34: 3000, 40: 3000}
+        descriptions = {
+            1: "An energy-draining\\n punch restores HP.",
+            3: "Attacks, then switches\\n the user out.",
+            20: "A weak electric charge\\n paralyzes the target.",
+            32: "Attacks, then switches\\n the user out.",
+            34: "Attacks, then switches\\n the user out.",
+            40: "A fierce wind may\\n confuse the target.",
+        }
+        for number, _old, new in self.MAPPINGS:
+            item_blocks.append(
+                f"[ITEM_TM_{new}] =\n{{\n"
+                f".name = ITEM_NAME(\"TM{number:02d}\"),\n"
+                f".price = {prices[number]},\n"
+                f".description = COMPOUND_STRING(\"{descriptions[number]}\"),\n"
+                ".importance = I_REUSABLE_TMS,\n"
+                ".pocket = POCKET_TM_HM,\n"
+                ".type = ITEM_USE_PARTY_MENU,\n"
+                ".fieldUseFunc = ItemUseOutOfBattle_TMHM,\n},\n"
+            )
+        self.files["src/data/items.h"] = "".join(item_blocks).encode()
+        script_expectations = {
+            "data/maps/LilycoveCity_DepartmentStore_4F/scripts.inc": ".2byte ITEM_TM_THUNDER_WAVE",
+            "data/maps/MauvilleCity_GameCorner/scripts.inc": "ITEM_TM_U_TURN",
+            "data/maps/CeladonCity_DepartmentStore_Roof_Frlg/scripts.inc": "TM20 contains THUNDER WAVE",
+            "data/maps/CeruleanCity_Gym_Frlg/scripts.inc": "TM03 teaches FLIP TURN",
+            "data/maps/VermilionCity_Gym_Frlg/scripts.inc": "TM34 contains VOLT SWITCH",
+        }
+        self.files.update({path: text.encode() for path, text in script_expectations.items()})
+        for spec in merge_tool.PAIRED_GYM_REWARDS:
+            blocks = merge_tool._paired_reward_blocks(spec)
+            required_text = "\n".join(merge_tool.CUSTOM_TM_SCRIPT_LITERALS[spec["path"]])
+            self.files[spec["path"]] = (
+                "".join(blocks.values()) + "Test_Text:\n" + required_text + "\n"
+            ).encode()
+        self.maps = {
+            "Route113": {"bg_events": [{"type": "hidden_item", "item": "ITEM_TM_U_TURN"}]},
+            "Route115": {"object_events": [{"script": "Common_EventScript_FindItem", "trainer_sight_or_berry_tree_id": "ITEM_TM_DRAIN_PUNCH"}]},
+        }
+
+    def validate(self):
+        return merge_tool.validate_custom_tm_restoration(self.files, self.maps)
+
+    def test_accepts_exact_six_slot_customization_and_two_rewards(self):
+        result = self.validate()
+        self.assertEqual(result["mapping_count"], 6)
+        self.assertEqual(result["dependent_event_count"], 2)
+        self.assertEqual(result["undefined_tm_item_count"], 0)
+
+    def test_rejects_partial_or_swapped_slot_tables(self):
+        original = self.files["include/constants/tms_hms.h"]
+        for changed in (
+            original.replace(b"F(DRAIN_PUNCH)", b"F(FOCUS_PUNCH)"),
+            original.replace(b"F(DRAIN_PUNCH)", b"F(TM_SWAP_SENTINEL)")
+            .replace(b"F(FLIP_TURN)", b"F(DRAIN_PUNCH)")
+            .replace(b"F(TM_SWAP_SENTINEL)", b"F(FLIP_TURN)"),
+        ):
+            with self.subTest(changed=changed), self.assertRaisesRegex(ValueError, "TM slot"):
+                self.files["include/constants/tms_hms.h"] = changed
+                self.validate()
+        self.files["include/constants/tms_hms.h"] = original
+
+    def test_rejects_missing_named_item_block(self):
+        self.files["src/data/items.h"] = self.files["src/data/items.h"].replace(
+            b"[ITEM_TM_HURRICANE]", b"[ITEM_TM_AERIAL_ACE]"
+        )
+        with self.assertRaisesRegex(ValueError, "ITEM_TM_HURRICANE"):
+            self.validate()
+
+    def test_rejects_stale_legacy_reward_operand(self):
+        path = "data/maps/FortreeCity_Gym/scripts.inc"
+        self.files[path] += b"\ngiveitem ITEM_TM_AERIAL_ACE\n"
+        with self.assertRaisesRegex(ValueError, "obsolete"):
+            self.validate()
+
+    def test_rejects_wrong_route113_or_route115_reward(self):
+        for route, wrong in (("Route113", "ITEM_TM_DOUBLE_TEAM"), ("Route115", "ITEM_TM_FOCUS_PUNCH")):
+            with self.subTest(route=route):
+                category, field = (("bg_events", "item") if route == "Route113" else ("object_events", "trainer_sight_or_berry_tree_id"))
+                original = self.maps[route][category][0][field]
+                self.maps[route][category][0][field] = wrong
+                with self.assertRaisesRegex(ValueError, route):
+                    self.validate()
+                self.maps[route][category][0][field] = original
+
+    def test_rejects_wrong_tm32_price(self):
+        self.files["src/data/items.h"] = self.files["src/data/items.h"].replace(
+            b"[ITEM_TM_U_TURN] =\n{\n.name = ITEM_NAME(\"TM32\"),\n.price = 3000,",
+            b"[ITEM_TM_U_TURN] =\n{\n.name = ITEM_NAME(\"TM32\"),\n.price = 2000,",
+        )
+        with self.assertRaisesRegex(ValueError, "ITEM_TM_U_TURN"):
+            self.validate()
+
+    def test_rejects_incomplete_paired_gym_reward_closure(self):
+        path = "data/maps/FortreeCity_Gym/scripts.inc"
+        self.files[path] = (
+            b"FortreeCity_Gym_EventScript_GiveAerialAce2::\n"
+            b"\tgiveitem ITEM_TM_HURRICANE\n"
+            b"\tgoto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull\n"
+            b"\tmsgbox FortreeCity_Gym_Text_ExplainAerialAce, MSGBOX_DEFAULT\n"
+            b"\tsetflag FLAG_RECEIVED_TM_AERIAL_ACE\n\trelease\n\tend\n"
+            b"FortreeCity_Gym_EventScript_GiveAerialAce::\n"
+            b"\tgiveitem ITEM_TM_HURRICANE\n"
+            b"\tgoto_if_eq VAR_RESULT, FALSE, Common_EventScript_BagIsFull\n"
+            b"\tmsgbox FortreeCity_Gym_Text_ExplainAerialAce, MSGBOX_DEFAULT\n"
+            b"\tsetflag FLAG_RECEIVED_TM_AERIAL_ACE\n\treturn\n"
+            b"TM40 contains HURRICANE\n"
+        )
+        with self.assertRaisesRegex(ValueError, "ALTARIANITE|paired"):
+            self.validate()
+
+    def test_rejects_missing_delivery_flag(self):
+        path = "include/constants/flags.h"
+        self.files[path] = self.files[path].replace(
+            b"#define FLAG_DELIVERED_FORTREE_GYM_TM 0x266\n", b""
+        )
+        with self.assertRaisesRegex(ValueError, "FLAG_DELIVERED_FORTREE_GYM_TM"):
+            self.validate()
+
+    def test_rejects_delivery_flag_id_collision(self):
+        self.files["include/constants/flags.h"] += b"#define FLAG_UNUSED_0x266 0x266\n"
+        with self.assertRaisesRegex(ValueError, "collision"):
+            self.validate()
+
+    def test_tm32_price_matches_both_pinned_legacy_references_and_current(self):
+        root = Path(__file__).resolve().parents[3]
+        sources = {
+            merge_tool.LEGACY_COMMIT: merge_tool.git_bytes(
+                merge_tool.LEGACY_COMMIT, "src/data/items.h"
+            ),
+            merge_tool.LEGACY_TM_PRICE_REFERENCE_COMMIT: merge_tool.git_bytes(
+                merge_tool.LEGACY_TM_PRICE_REFERENCE_COMMIT, "src/data/items.h"
+            ),
+            "working-tree": (root / "src/data/items.h").read_bytes(),
+        }
+        for source, data in sources.items():
+            with self.subTest(source=source):
+                text = data.decode("utf-8")
+                match = re.search(
+                    r"\[ITEM_TM_U_TURN\]\s*=\s*\{(?P<body>.*?)^\s*\},",
+                    text,
+                    re.MULTILINE | re.DOTALL,
+                )
+                self.assertIsNotNone(match)
+                self.assertRegex(match.group("body"), r"(?m)^\s*\.price\s*=\s*3000,")
+
+    def test_paired_reward_dialogue_matches_pinned_legacy_blocks(self):
+        root = Path(__file__).resolve().parents[3]
+        for spec in merge_tool.PAIRED_GYM_REWARDS:
+            path = spec["path"]
+            legacy = merge_tool.parse_label_blocks(
+                merge_tool.git_bytes(merge_tool.LEGACY_COMMIT, path), path
+            )
+            current = merge_tool.parse_label_blocks((root / path).read_bytes(), path)
+            with self.subTest(path=path):
+                self.assertEqual(current[spec["message"]], legacy[spec["message"]])
+
+
+class CandidateItemAdapterIntegrationTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.root = Path(__file__).resolve().parents[3]
+        commits = dict(merge_tool.SOURCE_COMMITS)
+        layout_report_data = (cls.root / merge_tool.LAYOUT_REPORT).read_bytes()
+        audit, known = merge_tool.build_audit(cls.root, commits, layout_report_data)
+        groups = {group["id"]: group for group in audit["ambiguity_groups"]}
+        dependencies = {
+            dependency["label"]: dependency for dependency in audit["dependencies"]
+        }
+        resolutions = merge_tool._validate_resolutions(
+            cls.root / merge_tool.RESOLUTION_INVENTORY,
+            known,
+            groups,
+            dependencies,
+        )
+        resolved_ids = {entry["id"] for entry in resolutions["resolutions"]}
+        audit["unresolved"] = [
+            item for item in audit["unresolved"] if item["id"] not in resolved_ids
+        ]
+        audit["unresolved_count"] = len(audit["unresolved"])
+        audit["resolution_ids"] = sorted(resolved_ids)
+        sources = merge_tool.Sources(commits)
+        documents = {}
+        for map_audit in audit["maps"]:
+            map_name = map_audit["map"]
+            path = f"data/maps/{map_name}/map.json"
+            documents[map_name] = {
+                source: merge_tool._event_arrays(
+                    sources.json(source, path), f"{source}:{path}"
+                )
+                for source in merge_tool.SOURCE_COMMITS
+            }
+        cls.audit = audit
+        cls.dependencies = dependencies
+        cls.dependency_resolutions = {
+            entry["id"]: entry
+            for entry in resolutions["resolutions"]
+            if entry["category"] == "dependency"
+        }
+        cls.documents = documents
+        cls.report, candidate_files = merge_tool.generate_candidates_and_report(
+            cls.root, audit, documents, resolutions, sources
+        )
+        cls.candidates = {
+            Path(relative).parts[2]: json.loads(data)
+            for relative, data in candidate_files.items()
+        }
+
+    def test_all_reviewed_visible_item_balls_are_adapted_in_candidate_events(self):
+        expected = []
+        obsolete_labels = set()
+        for dependency in self.dependencies.values():
+            block = dependency["normalized_blocks"]["legacy"]
+            if not dependency["item_equivalence"] or block is None:
+                continue
+            item, quantity = extract_legacy_item_and_quantity(block)
+            obsolete_labels.add(dependency["label"])
+            resolution = self.dependency_resolutions.get(dependency["id"])
+            if resolution is None or resolution["decision"] != "use_archive":
+                continue
+            for evidence in dependency["item_equivalence"]:
+                expected.append((dependency, evidence, item, quantity))
+
+        self.assertEqual(len(expected), 44)
+        self.assertEqual(sum(quantity == 5 for _, _, _, quantity in expected), 6)
+        observed = []
+        for dependency, evidence, item, quantity in expected:
+            map_name = evidence["map"]
+            archive = self.documents[map_name]["legacy"]["object_events"][
+                evidence["archive_index"]
+            ]
+            current = self.documents[map_name]["current"]["object_events"][
+                evidence["current_index"]
+            ]
+            matches = [
+                event
+                for event in self.candidates[map_name]["object_events"]
+                if event.get("flag") == archive["flag"]
+            ]
+            self.assertEqual(len(matches), 1, (map_name, archive["flag"]))
+            event = matches[0]
+            self.assertEqual(event["script"], "Common_EventScript_FindItem")
+            self.assertEqual(event["trainer_sight_or_berry_tree_id"], item)
+            self.assertEqual(event["movement_range_x"], quantity)
+            self.assertEqual(event["movement_range_y"], current["movement_range_y"])
+            self.assertEqual(set(event), set(current))
+            for field in ("flag", "x", "y", "elevation"):
+                self.assertEqual(event[field], archive[field])
+            observed.append(
+                {
+                    "map": map_name,
+                    "flag": archive["flag"],
+                    "item": item,
+                    "quantity": quantity,
+                }
+            )
+
+        candidate_scripts = {
+            event.get("script")
+            for document in self.candidates.values()
+            for event in document["object_events"]
+        }
+        self.assertEqual(candidate_scripts & obsolete_labels, set())
+        self.assertCountEqual(self.report["item_wrappers"], observed)
+
+    def test_custom_tm_visible_and_hidden_rewards_use_restored_items(self):
+        route113 = self.candidates["Route113"]
+        self.assertEqual(
+            [
+                event
+                for event in route113["bg_events"]
+                if event.get("item") == "ITEM_TM_U_TURN"
+            ].__len__(),
+            1,
+        )
+        route115 = self.candidates["Route115"]
+        self.assertEqual(
+            [
+                event
+                for event in route115["object_events"]
+                if event.get("script") == "Common_EventScript_FindItem"
+                and event.get("trainer_sight_or_berry_tree_id")
+                == "ITEM_TM_DRAIN_PUNCH"
+            ].__len__(),
+            1,
+        )
+
+    def test_report_freezes_exact_prior_to_corrected_candidate_delta(self):
+        expected = {
+            "data/maps/AquaHideout_B1F/map.json",
+            "data/maps/LilycoveCity/map.json",
+            "data/maps/MtPyre_3F/map.json",
+            "data/maps/PetalburgWoods/map.json",
+            "data/maps/Route108/map.json",
+            "data/maps/Route111/map.json",
+            "data/maps/Route112/map.json",
+            "data/maps/Route113/map.json",
+            "data/maps/Route114/map.json",
+            "data/maps/Route115/map.json",
+            "data/maps/Route116/map.json",
+            "data/maps/Route119/map.json",
+            "data/maps/Route120/map.json",
+            "data/maps/Route123/map.json",
+            "data/maps/VictoryRoad_1F/map.json",
+            "data/maps/VictoryRoad_B1F/map.json",
+            "data/maps/VictoryRoad_B2F/map.json",
+        }
+        upgrade = self.report["candidate_upgrade"]
+        self.assertEqual(
+            upgrade["prior_report_commit"],
+            merge_tool.PRIOR_REVIEWED_CANDIDATE_COMMIT,
+        )
+        self.assertEqual(upgrade["corrected_file_count"], len(expected))
+        self.assertEqual(
+            {record["path"] for record in upgrade["corrected_files"]}, expected
+        )
+        for record in upgrade["corrected_files"]:
+            self.assertEqual(
+                record["prior_sha256"],
+                upgrade["prior_candidate_sha256"][record["path"]],
+            )
+            self.assertEqual(
+                record["corrected_sha256"],
+                self.report["candidate_sha256"][record["path"]],
+            )
+    def test_candidate_script_validation_rejects_undefined_object_script(self):
+        documents = {
+            "Broken": {
+                "object_events": [object_event(script="Broken_EventScript_Missing")],
+                "coord_events": [],
+                "bg_events": [],
+            }
+        }
+        with self.assertRaisesRegex(ValueError, "Broken_EventScript_Missing"):
+            merge_tool.validate_candidate_script_symbols(
+                documents, {"Common_EventScript_FindItem"}
+            )
 
 
 if __name__ == "__main__":

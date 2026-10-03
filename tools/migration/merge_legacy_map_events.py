@@ -33,7 +33,9 @@ from map_event_merge import (
 
 BASE_COMMIT = "024848a9e9c0ae30cbb9a269779504561d5443d3"
 LEGACY_COMMIT = "f5e81e85df6fe40ae490bf7268d0186d7f0426ed"
+LEGACY_TM_PRICE_REFERENCE_COMMIT = "a2c5b722216000066f1def3ef49b8b3493759e7f"
 CURRENT_BASELINE_COMMIT = "49c5f6dcaa57f0fc4dbc5bb114377ad49d6b9f5d"
+PRIOR_REVIEWED_CANDIDATE_COMMIT = "b3b53147fefce05f6244129938cc8dca475c340c"
 LAYOUT_REPORT = Path(
     "docs/superpowers/inventories/2026-08-10-legacy-map-layout-report.json"
 )
@@ -46,6 +48,265 @@ RESOLUTION_INVENTORY = Path(
 REPORT_INVENTORY = Path(
     "docs/superpowers/inventories/2026-08-17-legacy-map-event-report.json"
 )
+
+CUSTOM_TM_MAPPINGS = (
+    {"number": 1, "legacy_move": "FOCUS_PUNCH", "move": "DRAIN_PUNCH", "price": 3000},
+    {"number": 3, "legacy_move": "WATER_PULSE", "move": "FLIP_TURN", "price": 3000},
+    {"number": 20, "legacy_move": "SAFEGUARD", "move": "THUNDER_WAVE", "price": 3000},
+    {"number": 32, "legacy_move": "DOUBLE_TEAM", "move": "U_TURN", "price": 3000},
+    {"number": 34, "legacy_move": "SHOCK_WAVE", "move": "VOLT_SWITCH", "price": 3000},
+    {"number": 40, "legacy_move": "AERIAL_ACE", "move": "HURRICANE", "price": 3000},
+)
+
+CUSTOM_TM_SCRIPT_LITERALS = {
+    "data/maps/FortreeCity_Gym/scripts.inc": ("ITEM_TM_HURRICANE", "TM40 contains HURRICANE"),
+    "data/maps/LilycoveCity_DepartmentStore_4F/scripts.inc": ("ITEM_TM_THUNDER_WAVE",),
+    "data/maps/MauvilleCity_GameCorner/scripts.inc": ("ITEM_TM_U_TURN",),
+    "data/maps/MauvilleCity_Gym/scripts.inc": ("ITEM_TM_VOLT_SWITCH", "FLAG_RECEIVED_TM_VOLT_SWITCH", "TM34 there contains VOLT SWITCH"),
+    "data/maps/SootopolisCity_Gym_1F/scripts.inc": ("ITEM_TM_FLIP_TURN", "contains FLIP TURN"),
+    "data/maps/CeladonCity_DepartmentStore_Roof_Frlg/scripts.inc": ("TM20 contains THUNDER WAVE",),
+    "data/maps/CeruleanCity_Gym_Frlg/scripts.inc": ("TM03 teaches FLIP TURN",),
+    "data/maps/VermilionCity_Gym_Frlg/scripts.inc": ("TM34 contains VOLT SWITCH",),
+}
+CUSTOM_TM_OBSOLETE_SCRIPT_LITERALS = {
+    "data/maps/FortreeCity_Gym/scripts.inc": ("ITEM_TM_AERIAL_ACE", "TM40 contains AERIAL ACE"),
+    "data/maps/LilycoveCity_DepartmentStore_4F/scripts.inc": ("ITEM_TM_SAFEGUARD",),
+    "data/maps/MauvilleCity_GameCorner/scripts.inc": ("ITEM_TM_DOUBLE_TEAM",),
+    "data/maps/MauvilleCity_Gym/scripts.inc": ("ITEM_TM_SHOCK_WAVE", "FLAG_RECEIVED_TM_SHOCK_WAVE", "TM34 there contains SHOCK WAVE"),
+    "data/maps/SootopolisCity_Gym_1F/scripts.inc": ("ITEM_TM_WATER_PULSE", "contains WATER PULSE"),
+    "data/maps/CeladonCity_DepartmentStore_Roof_Frlg/scripts.inc": ("TM20 contains SAFEGUARD",),
+    "data/maps/CeruleanCity_Gym_Frlg/scripts.inc": ("TM03 teaches WATER PULSE",),
+    "data/maps/VermilionCity_Gym_Frlg/scripts.inc": ("TM34 contains SHOCK WAVE",),
+}
+PAIRED_GYM_DELIVERY_FLAGS = {
+    "FLAG_DELIVERED_FORTREE_GYM_TM": 0x266,
+    "FLAG_DELIVERED_FORTREE_GYM_MEGA_STONE": 0x267,
+    "FLAG_DELIVERED_MAUVILLE_GYM_TM": 0x268,
+    "FLAG_DELIVERED_MAUVILLE_GYM_MEGA_STONE": 0x269,
+    "FLAG_DELIVERED_SOOTOPOLIS_GYM_TM": 0x26A,
+    "FLAG_DELIVERED_SOOTOPOLIS_GYM_MEGA_STONE": 0x26B,
+}
+PAIRED_GYM_REWARDS = (
+    {
+        "path": "data/maps/FortreeCity_Gym/scripts.inc",
+        "stem": "FortreeCity_Gym_EventScript_",
+        "root": "GiveAerialAce",
+        "helper": "GiveAltarianite",
+        "finish": "FinishReward",
+        "tm": "ITEM_TM_HURRICANE",
+        "stone": "ITEM_ALTARIANITE",
+        "tm_flag": "FLAG_DELIVERED_FORTREE_GYM_TM",
+        "stone_flag": "FLAG_DELIVERED_FORTREE_GYM_MEGA_STONE",
+        "message": "FortreeCity_Gym_Text_ExplainAerialAce",
+        "flag": "FLAG_RECEIVED_TM_AERIAL_ACE",
+    },
+    {
+        "path": "data/maps/MauvilleCity_Gym/scripts.inc",
+        "stem": "MauvilleCity_Gym_EventScript_",
+        "root": "GiveShockWave",
+        "helper": "GiveManectite",
+        "finish": "FinishReward",
+        "tm": "ITEM_TM_VOLT_SWITCH",
+        "stone": "ITEM_MANECTITE",
+        "tm_flag": "FLAG_DELIVERED_MAUVILLE_GYM_TM",
+        "stone_flag": "FLAG_DELIVERED_MAUVILLE_GYM_MEGA_STONE",
+        "message": "MauvilleCity_Gym_Text_ExplainShockWave",
+        "flag": "FLAG_RECEIVED_TM_VOLT_SWITCH",
+    },
+    {
+        "path": "data/maps/SootopolisCity_Gym_1F/scripts.inc",
+        "stem": "SootopolisCity_Gym_1F_EventScript_",
+        "root": "GiveWaterPulse",
+        "helper": "GiveGyaradosite",
+        "finish": "FinishReward",
+        "tm": "ITEM_TM_FLIP_TURN",
+        "stone": "ITEM_GYARADOSITE",
+        "tm_flag": "FLAG_DELIVERED_SOOTOPOLIS_GYM_TM",
+        "stone_flag": "FLAG_DELIVERED_SOOTOPOLIS_GYM_MEGA_STONE",
+        "message": "SootopolisCity_Gym_1F_Text_ExplainWaterPulse",
+        "flag": "FLAG_RECEIVED_TM_WATER_PULSE",
+    },
+)
+
+
+def _paired_reward_blocks(spec: dict[str, str]) -> dict[str, str]:
+    blocks: dict[str, str] = {}
+    for suffix, bag_full, terminator in (
+        ("", "Common_EventScript_BagIsFull", "\treturn"),
+        ("2", "Common_EventScript_ShowBagIsFull", "\trelease\n\tend"),
+    ):
+        root = f"{spec['stem']}{spec['root']}{suffix}"
+        helper = f"{spec['stem']}{spec['helper']}{suffix}"
+        finish = f"{spec['stem']}{spec['finish']}{suffix}"
+        blocks[root] = (
+            f"{root}::\n"
+            f"\tgoto_if_set {spec['tm_flag']}, {helper}\n"
+            f"\tgiveitem {spec['tm']}\n"
+            f"\tgoto_if_eq VAR_RESULT, FALSE, {bag_full}\n"
+            f"\tsetflag {spec['tm_flag']}\n"
+        )
+        blocks[helper] = (
+            f"{helper}::\n"
+            f"\tgoto_if_set {spec['stone_flag']}, {finish}\n"
+            f"\tgiveitem {spec['stone']}\n"
+            f"\tgoto_if_eq VAR_RESULT, FALSE, {bag_full}\n"
+            f"\tsetflag {spec['stone_flag']}\n"
+        )
+        blocks[finish] = (
+            f"{finish}::\n"
+            f"\tmsgbox {spec['message']}, MSGBOX_DEFAULT\n"
+            f"\tsetflag {spec['flag']}\n"
+            f"{terminator}\n"
+        )
+    return blocks
+
+
+def validate_custom_tm_restoration(
+    files: dict[str, bytes], map_documents: dict[str, dict[str, object]]
+) -> dict[str, object]:
+    """Verify the reviewed six-slot TM customization and its direct rewards."""
+
+    def decoded(path: str) -> str:
+        try:
+            return files[path].decode("utf-8")
+        except KeyError as error:
+            raise ValueError(f"missing custom TM evidence file: {path}") from error
+        except UnicodeDecodeError as error:
+            raise ValueError(f"custom TM evidence is not UTF-8: {path}") from error
+
+    table = re.findall(r"\bF\(([A-Z0-9_]+)\)", decoded("include/constants/tms_hms.h"))
+    if len(table) < 50:
+        raise ValueError(f"TM slot table has only {len(table)} entries")
+    mappings = []
+    for spec in CUSTOM_TM_MAPPINGS:
+        number = spec["number"]
+        move = spec["move"]
+        actual = table[number - 1]
+        if actual != move:
+            raise ValueError(f"TM slot {number:02d} is {actual}, expected {move}")
+        mappings.append(
+            {
+                "number": number,
+                "legacy_move": spec["legacy_move"],
+                "move": move,
+                "item": f"ITEM_TM_{move}",
+            }
+        )
+
+    items = decoded("src/data/items.h")
+    item_headers = list(re.finditer(r"^\s*\[(ITEM_TM_[A-Z0-9_]+)\]\s*=\s*$", items, re.MULTILINE))
+    item_blocks = {
+        match.group(1): items[match.start():(item_headers[index + 1].start() if index + 1 < len(item_headers) else len(items))]
+        for index, match in enumerate(item_headers)
+    }
+    defined_tm_items = set(item_blocks)
+    for spec in CUSTOM_TM_MAPPINGS:
+        item = f"ITEM_TM_{spec['move']}"
+        block = item_blocks.get(item)
+        if block is None:
+            raise ValueError(f"missing custom TM item block: {item}")
+        required = (
+            f'ITEM_NAME("TM{spec["number"]:02d}")',
+            f'.price = {spec["price"]},',
+            ".description = COMPOUND_STRING(",
+            ".importance = I_REUSABLE_TMS,",
+            ".pocket = POCKET_TM_HM,",
+            ".type = ITEM_USE_PARTY_MENU,",
+            ".fieldUseFunc = ItemUseOutOfBattle_TMHM,",
+        )
+        missing = [literal for literal in required if literal not in block]
+        if missing:
+            raise ValueError(f"invalid {item} block; missing {missing}")
+        old_item = f"ITEM_TM_{spec['legacy_move']}"
+        if old_item in defined_tm_items:
+            raise ValueError(f"obsolete numbered TM item block remains: {old_item}")
+
+    flags = decoded("include/constants/flags.h")
+    if not re.search(r"^#define\s+FLAG_RECEIVED_TM_VOLT_SWITCH\s+0xA7\s*$", flags, re.MULTILINE):
+        raise ValueError("FLAG_RECEIVED_TM_VOLT_SWITCH must retain numeric ID 0xA7")
+    if re.search(r"^#define\s+FLAG_RECEIVED_TM_SHOCK_WAVE\s+0xA7\s*$", flags, re.MULTILINE):
+        raise ValueError("obsolete Hoenn Shock Wave reward flag remains at 0xA7")
+    numeric_flags = re.findall(
+        r"^#define\s+(FLAG_\w+)\s+(0x[0-9A-Fa-f]+|[0-9]+)\b", flags, re.MULTILINE
+    )
+    for name, expected_id in PAIRED_GYM_DELIVERY_FLAGS.items():
+        owners = [flag for flag, value in numeric_flags if int(value, 0) == expected_id]
+        if name not in owners:
+            raise ValueError(f"{name} must use permanent flag ID 0x{expected_id:X}")
+        if owners != [name]:
+            raise ValueError(f"paired gym delivery flag collision at 0x{expected_id:X}: {owners}")
+
+    for path, required in CUSTOM_TM_SCRIPT_LITERALS.items():
+        script = decoded(path)
+        missing = [literal for literal in required if literal not in script]
+        if missing:
+            raise ValueError(f"custom TM script evidence missing in {path}: {missing}")
+        obsolete = [
+            literal for literal in CUSTOM_TM_OBSOLETE_SCRIPT_LITERALS[path]
+            if literal in script
+        ]
+        if obsolete:
+            raise ValueError(f"obsolete custom TM script evidence remains in {path}: {obsolete}")
+
+    paired_rewards = []
+    for spec in PAIRED_GYM_REWARDS:
+        path = spec["path"]
+        actual_blocks = parse_label_blocks(files[path], f"paired reward {path}")
+        expected_blocks = _paired_reward_blocks(spec)
+        wrong = sorted(
+            label
+            for label, expected in expected_blocks.items()
+            if actual_blocks.get(label) != expected
+        )
+        if wrong:
+            raise ValueError(
+                f"paired gym reward closure is incomplete or altered in {path}: {wrong}"
+            )
+        paired_rewards.append(
+            {
+                "map": PurePosixPath(path).parts[2],
+                "tm": spec["tm"],
+                "mega_stone": spec["stone"],
+                "closure_sha256": sha256(
+                    "".join(expected_blocks[label] for label in sorted(expected_blocks)).encode()
+                ),
+            }
+        )
+
+    route_items = {
+        "Route113": ("bg_events", "item", "ITEM_TM_U_TURN"),
+        "Route115": ("object_events", "trainer_sight_or_berry_tree_id", "ITEM_TM_DRAIN_PUNCH"),
+    }
+    undefined: list[str] = []
+    dependent_events = []
+    for route, (category, item_field, expected_item) in route_items.items():
+        try:
+            events = map_documents[route][category]
+        except (KeyError, TypeError) as error:
+            raise ValueError(f"{route} custom TM reward evidence is missing") from error
+        matches = [
+            event for event in events if event.get(item_field) == expected_item
+            and (
+                category == "bg_events"
+                or event.get("script") == "Common_EventScript_FindItem"
+            )
+        ]
+        if len(matches) != 1:
+            raise ValueError(f"{route} must contain exactly one {expected_item} item reward")
+        if expected_item not in defined_tm_items:
+            undefined.append(expected_item)
+        dependent_events.append({"map": route, "item": expected_item})
+
+    return {
+        "mappings": mappings,
+        "mapping_count": len(mappings),
+        "dependent_events": dependent_events,
+        "dependent_event_count": len(dependent_events),
+        "undefined_tm_items": sorted(undefined),
+        "undefined_tm_item_count": len(undefined),
+        "paired_gym_rewards": paired_rewards,
+        "paired_gym_reward_count": len(paired_rewards),
+    }
 
 # Frozen against CURRENT_BASELINE_COMMIT and the reviewed Task 4 working-tree
 # postimages. Whole-file hashes reject both missing changes and unrelated edits;
@@ -123,15 +384,61 @@ DEPENDENCY_POSTIMAGE_SPECS = {
     },
     "include/constants/flags.h": {
         "old_sha256": "8edc96def953819e714c709b47169067c0f830468db190f9a23560e6091648cf",
-        "new_sha256": "05c1ce13071a6ee47ba3b37f8ae4e9b975facb12a93602d5de66ec59053bd151",
+        "new_sha256": "5796813afc7cbb4c7039252d4710dfe777f6004ad9012990aef719d37441915b",
         "dependencies": [],
         "required_literals": [
             {"id": "constant:FLAG_ROUTE120_BADGECHECKED", "text": "#define FLAG_ROUTE120_BADGECHECKED 0x22", "rationale": "Reviewed reuse of an upstream unused flag."},
             {"id": "constant:FLAG_ROUTE123_BADGECHECKED", "text": "#define FLAG_ROUTE123_BADGECHECKED 0x24", "rationale": "Reviewed reuse of an upstream unused flag."},
             {"id": "constant:FLAG_RECEIVED_CAMERUPTITE", "text": "#define FLAG_RECEIVED_CAMERUPTITE  0x265", "rationale": "Reviewed reuse of an upstream unused flag."},
+            {"id": "constant:FLAG_RECEIVED_TM_VOLT_SWITCH", "text": "#define FLAG_RECEIVED_TM_VOLT_SWITCH         0xA7", "rationale": "User-authored TM34 reward flag keeps its original numeric save identity."},
         ],
     },
 }
+
+DEPENDENCY_POSTIMAGE_SPECS["include/constants/flags.h"]["required_literals"].extend(
+    {
+        "id": f"constant:{name}",
+        "text": f"#define {name} 0x{value:X}",
+        "rationale": "Successful paired Gym item delivery uses an otherwise unused permanent flag.",
+    }
+    for name, value in PAIRED_GYM_DELIVERY_FLAGS.items()
+)
+
+_PAIRED_REWARD_POSTIMAGE_HASHES = {
+    "data/maps/FortreeCity_Gym/scripts.inc": (
+        "7487bd2039db4a3e724fff383ee564855b8eea4391a08e1a5ad9567d393e5308",
+        "6fca43fab34f05eb0c9b4684e91c2374e516ed4d0a10fbf9cfd3fb775adc6fdf",
+    ),
+    "data/maps/MauvilleCity_Gym/scripts.inc": (
+        "9fa32a400f7ac2e33a04f0e1beb3874b179a85b560aaf55dfe8e9ccf58cd4ffd",
+        "4c9e6e382acf067a6903cc23bb39cf48a2f2134810bdae5019cec6ca03459e7d",
+    ),
+    "data/maps/SootopolisCity_Gym_1F/scripts.inc": (
+        "731683b579d64076400d00064b36e15b1d547e368396bbdfb99759f900c9c1be",
+        "d8b90ac95eb7f145f19863c09c82e5868243c42ed174eaece46a5fcdbd1abb55",
+    ),
+}
+for _paired_spec in PAIRED_GYM_REWARDS:
+    _paired_path = _paired_spec["path"]
+    _old_hash, _new_hash = _PAIRED_REWARD_POSTIMAGE_HASHES[_paired_path]
+    DEPENDENCY_POSTIMAGE_SPECS[_paired_path] = {
+        "old_sha256": _old_hash,
+        "new_sha256": _new_hash,
+        "dependencies": [],
+        "required_literals": [
+            {
+                "id": f"paired_reward:{label}",
+                "text": block,
+                "rationale": (
+                    "Legacy paired TM and Mega Stone reward adapted with retry-safe "
+                    "current script control flow."
+                ),
+            }
+            for label, block in _paired_reward_blocks(_paired_spec).items()
+        ],
+    }
+del _paired_spec, _paired_path, _old_hash, _new_hash
+
 EXPECTED_SHARED_LAYOUTS = 61
 EXPECTED_SCOPED_MAPS = 75
 EXPECTED_ARCHIVE_CHANGED_MAPS = 69
@@ -236,6 +543,32 @@ def git_json(commit: str, path: str) -> dict[str, object]:
     if not isinstance(value, dict):
         raise ValueError(f"expected JSON object at {commit}:{path}")
     return value
+
+
+def prior_reviewed_candidate_hashes() -> dict[str, str]:
+    """Read the immutable Task 4 candidate manifest used for safe upgrades."""
+
+    report = git_json(
+        PRIOR_REVIEWED_CANDIDATE_COMMIT, REPORT_INVENTORY.as_posix()
+    )
+    hashes = report.get("candidate_sha256")
+    maps = report.get("candidate_maps")
+    if not isinstance(hashes, dict) or not isinstance(maps, list):
+        raise ValueError("frozen prior candidate report lacks its manifest")
+    expected_paths = {f"data/maps/{name}/map.json" for name in maps}
+    if (
+        report.get("mode") != "candidate-only"
+        or report.get("candidate_map_count") != len(hashes)
+        or set(hashes) != expected_paths
+        or any(
+            not isinstance(path, str)
+            or not isinstance(digest, str)
+            or re.fullmatch(r"[0-9a-f]{64}", digest) is None
+            for path, digest in hashes.items()
+        )
+    ):
+        raise ValueError("frozen prior candidate report has an invalid manifest")
+    return dict(sorted(hashes.items()))
 
 
 def sha256(data: bytes) -> str:
@@ -1809,6 +2142,370 @@ def publish_candidate_bundle(
             _fsync_directory(report_path.parent)
 
 
+def _paths_overlap(left: Path, right: Path) -> bool:
+    return left == right or left in right.parents or right in left.parents
+
+
+def _vacant_neighbor(target: Path, purpose: str) -> Path:
+    """Reserve a unique same-directory name, then leave it absent for atomic moves."""
+
+    handle, name = tempfile.mkstemp(
+        prefix=f".{target.name}.{purpose}.", dir=target.parent
+    )
+    os.close(handle)
+    path = Path(name)
+    path.unlink()
+    return path
+
+
+def _preserve_recovery_copy(source: Path, target: Path) -> Path:
+    """Give sole recovery bytes an explicit, unique neighboring name."""
+
+    recovery = _vacant_neighbor(target, "authoritative-recovery")
+    os.replace(source, recovery)
+    return recovery
+
+
+def apply_authoritative_maps(
+    root: Path,
+    candidate_dir: Path,
+    report_path: Path,
+    audit_path: Path,
+    resolutions_path: Path,
+    preimage_files: dict[str, bytes],
+    *,
+    prior_postimage_hashes: dict[str, str] | None = None,
+    fault: Callable[[str, int, Path], None] | None = None,
+    replace: Callable[[Path, Path], None] = os.replace,
+    link: Callable[[Path, Path], None] = os.link,
+    unlink: Callable[[Path], None] = lambda path: path.unlink(),
+    stage: Callable[[Path, bytes, str], Path] = _stage_file,
+) -> int:
+    """Apply one reviewed candidate set to authoritative maps transactionally."""
+
+    root = root.resolve()
+    candidate_dir = candidate_dir.resolve()
+    report_path = report_path.resolve()
+    audit_path = audit_path.resolve()
+    resolutions_path = resolutions_path.resolve()
+    named_inputs = {
+        "candidate": candidate_dir,
+        "report": report_path,
+        "audit": audit_path,
+        "resolutions": resolutions_path,
+    }
+    if not isinstance(preimage_files, dict):
+        raise TypeError("authoritative preimages must be a path-to-bytes object")
+    if prior_postimage_hashes is not None and not isinstance(
+        prior_postimage_hashes, dict
+    ):
+        raise TypeError("prior reviewed postimages must be a path-to-hash object")
+
+    targets: dict[str, Path] = {}
+    for relative, data in preimage_files.items():
+        parts = PurePosixPath(relative).parts if isinstance(relative, str) else ()
+        if (
+            len(parts) != 4
+            or parts[:2] != ("data", "maps")
+            or parts[3] != "map.json"
+            or not re.fullmatch(r"[A-Za-z0-9_]+", parts[2])
+        ):
+            raise ValueError(f"invalid authoritative map path: {relative!r}")
+        if not isinstance(data, bytes):
+            raise TypeError(f"authoritative preimage must be bytes: {relative}")
+        target = (root / Path(*parts)).resolve()
+        if root not in target.parents:
+            raise ValueError(f"authoritative map escapes repository root: {relative}")
+        targets[relative] = target
+
+    named_paths = list(named_inputs.items())
+    for index, (left_name, left) in enumerate(named_paths):
+        for right_name, right in named_paths[index + 1:]:
+            if _paths_overlap(left, right):
+                raise ValueError(
+                    f"authoritative apply paths collide: {left_name}={left}, {right_name}={right}"
+                )
+        for relative, target in targets.items():
+            if _paths_overlap(left, target):
+                raise ValueError(
+                    f"authoritative apply path collides with source {relative}: {left_name}={left}"
+                )
+
+    _validate_existing_candidate_tree(candidate_dir)
+    candidate_files = {
+        path.relative_to(candidate_dir).as_posix(): path.read_bytes()
+        for path in candidate_dir.rglob("map.json")
+    }
+    report_data = report_path.read_bytes()
+    _validate_candidate_file_set(candidate_files)
+    _validate_candidate_report_bytes(report_data, candidate_files)
+    if set(preimage_files) != set(candidate_files):
+        raise ValueError("reviewed report/candidates do not match authoritative preimage allowlist")
+    if prior_postimage_hashes is not None:
+        if set(prior_postimage_hashes) != set(candidate_files):
+            raise ValueError(
+                "prior reviewed manifest does not match candidate map allowlist"
+            )
+        invalid_hashes = sorted(
+            relative
+            for relative, digest in prior_postimage_hashes.items()
+            if not isinstance(digest, str)
+            or re.fullmatch(r"[0-9a-f]{64}", digest) is None
+        )
+        if invalid_hashes:
+            raise ValueError(
+                f"prior reviewed manifest has invalid hashes: {invalid_hashes}"
+            )
+
+    evidence_preimages = {
+        path: _path_snapshot(path) for path in named_inputs.values()
+    }
+    source_preimages: dict[str, bytes] = {}
+    for relative, target in sorted(targets.items()):
+        if not target.is_file() or target.is_symlink():
+            raise ValueError(f"authoritative target is not a regular file: {target}")
+        actual = target.read_bytes()
+        source_preimages[relative] = actual
+    is_original = all(
+        source_preimages[relative] == preimage_files[relative]
+        for relative in targets
+    )
+    is_final = all(
+        source_preimages[relative] == candidate_files[relative]
+        for relative in targets
+    )
+    is_prior = prior_postimage_hashes is not None and all(
+        sha256(source_preimages[relative]) == prior_postimage_hashes[relative]
+        for relative in targets
+    )
+    if is_final:
+        return 0
+    if not is_prior and not is_original:
+        allowed_by_file = {
+            relative: (
+                source_preimages[relative] == preimage_files[relative]
+                or source_preimages[relative] == candidate_files[relative]
+                or (
+                    prior_postimage_hashes is not None
+                    and sha256(source_preimages[relative])
+                    == prior_postimage_hashes[relative]
+                )
+            )
+            for relative in targets
+        }
+        if all(allowed_by_file.values()):
+            raise RuntimeError(
+                "authoritative maps are in a mixed pre/post state "
+                "across original/prior/final manifests"
+            )
+        invalid = sorted(
+            relative for relative, allowed in allowed_by_file.items() if not allowed
+        )
+        raise RuntimeError(
+            "authoritative map is neither reviewed preimage nor candidate postimage "
+            f"(or frozen prior reviewed postimage): {invalid}"
+        )
+
+    replacements = [
+        relative
+        for relative in sorted(targets)
+        if source_preimages[relative] != candidate_files[relative]
+    ]
+
+    forwards: dict[str, Path] = {}
+    rollbacks: dict[str, Path] = {}
+    backups: dict[str, Path] = {}
+    cleanup: set[Path] = set()
+    preserved: set[Path] = set()
+    vacated: list[str] = []
+    protected = set(named_inputs.values()) | set(targets.values())
+    try:
+        for relative in replacements:
+            target = targets[relative]
+            forward = stage(target, candidate_files[relative], "authoritative forward")
+            rollback = stage(target, source_preimages[relative], "authoritative rollback")
+            for internal in (forward, rollback):
+                internal = internal.resolve()
+                if any(_paths_overlap(internal, path) for path in protected | cleanup):
+                    raise ValueError(f"internal transaction path collides: {internal}")
+                cleanup.add(internal)
+            forwards[relative] = forward
+            rollbacks[relative] = rollback
+        if fault is not None:
+            fault("after_staging", -1, root)
+
+        for path, snapshot in evidence_preimages.items():
+            if _path_snapshot(path) != snapshot:
+                raise RuntimeError(f"review evidence changed while staging: {path}")
+        for relative, target in sorted(targets.items()):
+            if target.read_bytes() != source_preimages[relative]:
+                raise RuntimeError(f"authoritative source changed while staging: {relative}")
+
+        for index, relative in enumerate(replacements):
+            target = targets[relative]
+            if target.read_bytes() != source_preimages[relative]:
+                raise RuntimeError(f"authoritative source changed before replacement: {relative}")
+            if fault is not None:
+                fault("before", index, target)
+            backup = _vacant_neighbor(target, "authoritative-backup")
+            backups[relative] = backup
+            vacated.append(relative)
+            replace(target, backup)
+            cleanup.add(backup)
+            if backup.read_bytes() != source_preimages[relative]:
+                raise RuntimeError(
+                    f"authoritative source changed concurrently before install: {relative}"
+                )
+            try:
+                link(forwards[relative], target)
+            except FileExistsError as error:
+                raise RuntimeError(
+                    f"authoritative destination was recreated concurrently: {relative}"
+                ) from error
+            unlink(forwards[relative])
+            cleanup.discard(forwards[relative])
+            if fault is not None:
+                fault("after", index, target)
+            if target.read_bytes() != candidate_files[relative]:
+                raise RuntimeError(f"authoritative postimage verification failed: {relative}")
+    except BaseException as apply_error:
+        rollback_errors: list[str] = []
+        for relative in reversed(vacated):
+            target = targets[relative]
+            rollback = rollbacks[relative]
+            try:
+                backup = backups.get(relative)
+                if backup is None or not backup.exists():
+                    if os.path.lexists(target):
+                        if (
+                            target.is_file()
+                            and not target.is_symlink()
+                            and target.read_bytes() == source_preimages[relative]
+                        ):
+                            _remove_temporary(rollback)
+                            cleanup.discard(rollback)
+                            continue
+                        recovery = _preserve_recovery_copy(rollback, target)
+                        cleanup.discard(rollback)
+                        preserved.add(recovery)
+                        raise RuntimeError(
+                            "concurrent destination retained after failed atomic vacate; "
+                            f"exact reviewed preimage retained at {recovery}"
+                        )
+                    link(rollback, target)
+                    unlink(rollback)
+                    cleanup.discard(rollback)
+                    continue
+                if (
+                    backup.read_bytes() != source_preimages[relative]
+                ):
+                    if os.path.lexists(target):
+                        recovery = _preserve_recovery_copy(rollback, target)
+                        cleanup.discard(rollback)
+                        preserved.add(recovery)
+                        preserved.add(backup)
+                        raise RuntimeError(
+                            "concurrent pre-install destination retained; "
+                            f"concurrent displaced bytes retained at {backup}; "
+                            f"exact reviewed preimage retained at {recovery}"
+                        )
+                    link(backup, target)
+                    unlink(backup)
+                    cleanup.discard(backup)
+                    recovery = _preserve_recovery_copy(rollback, target)
+                    cleanup.discard(rollback)
+                    preserved.add(recovery)
+                    raise RuntimeError(
+                        "concurrent pre-install data restored; exact reviewed preimage "
+                        f"retained at {recovery}"
+                    )
+                displaced: Path | None = None
+                if os.path.lexists(target):
+                    displaced = _vacant_neighbor(target, "authoritative-displaced")
+                    replace(target, displaced)
+                    cleanup.add(displaced)
+                if displaced is not None and displaced.read_bytes() != candidate_files[relative]:
+                    try:
+                        link(displaced, target)
+                        unlink(displaced)
+                        cleanup.discard(displaced)
+                    except BaseException:
+                        preserved.add(displaced)
+                        raise
+                    recovery = _preserve_recovery_copy(rollback, target)
+                    cleanup.discard(rollback)
+                    preserved.add(recovery)
+                    if backup is not None:
+                        _remove_temporary(backup)
+                        cleanup.discard(backup)
+                    raise RuntimeError(
+                        "concurrent post-install data retained; exact reviewed preimage "
+                        f"retained at {recovery}"
+                    )
+                try:
+                    link(rollback, target)
+                except FileExistsError as error:
+                    if displaced is not None:
+                        preserved.add(displaced)
+                    recovery = _preserve_recovery_copy(rollback, target)
+                    cleanup.discard(rollback)
+                    preserved.add(recovery)
+                    raise RuntimeError(
+                        "authoritative destination was recreated during rollback; "
+                        f"exact reviewed preimage retained at {recovery}"
+                    ) from error
+                unlink(rollback)
+                cleanup.discard(rollback)
+                if target.read_bytes() != source_preimages[relative]:
+                    raise RuntimeError("restored bytes do not match reviewed preimage")
+                if displaced is not None:
+                    if displaced.exists():
+                        unlink(displaced)
+                    cleanup.discard(displaced)
+                if backup is not None:
+                    _remove_temporary(backup)
+                    cleanup.discard(backup)
+            except BaseException as rollback_error:
+                detail = f"{relative}: {rollback_error}"
+                backup = backups.get(relative)
+                if backup is not None and backup.exists():
+                    preserved.add(backup)
+                    detail += f"; backup recovery data retained at {backup}"
+                if rollback.exists():
+                    # Protect the existing copy before attempting its fallible rename.
+                    preserved.add(rollback)
+                    try:
+                        recovery = _preserve_recovery_copy(rollback, target)
+                    except BaseException as recovery_error:
+                        detail += (
+                            f"; recovery naming failed: {recovery_error}"
+                            f"; exact recovery data retained at {rollback}"
+                        )
+                    else:
+                        cleanup.discard(rollback)
+                        preserved.discard(rollback)
+                        preserved.add(recovery)
+                        detail += f"; exact recovery data retained at {recovery}"
+                rollback_errors.append(detail)
+        if rollback_errors:
+            retained = sorted(str(path) for path in preserved)
+            raise RuntimeError(
+                "authoritative apply failed and rollback failed; recovery copies retained: "
+                + ", ".join(retained)
+                + f"; rollback errors: {rollback_errors}"
+            ) from apply_error
+        if not vacated and isinstance(apply_error, (TypeError, ValueError)):
+            raise
+        raise RuntimeError(
+            f"authoritative apply failed; prior authoritative state restored: {apply_error}"
+        ) from apply_error
+    finally:
+        for temporary in cleanup - preserved:
+            _remove_temporary(temporary)
+
+    return len(vacated)
+
+
 def build_audit(root: Path, commits: dict[str, str], layout_report_data: bytes) -> tuple[dict[str, object], dict[str, dict[str, object]]]:
     try:
         layout_report = json.loads(layout_report_data.decode("utf-8"))
@@ -2051,17 +2748,17 @@ def _reviewed_event_units(
 def _adapt_reviewed_item_events(
     events: list[dict[str, object]],
     dependency_by_label: dict[str, dict[str, object]],
-    dependency_resolutions: dict[str, dict[str, object]],
 ) -> list[dict[str, object]]:
+    """Translate every audited legacy finditem label into current object data."""
+
     output: list[dict[str, object]] = []
     for event in events:
         label = event.get("script")
         dependency = dependency_by_label.get(label) if isinstance(label, str) else None
-        resolution = dependency_resolutions.get(f"dependency:{label}")
         legacy_block = dependency["normalized_blocks"]["legacy"] if dependency else None
         if (
-            resolution is not None
-            and resolution["decision"] == "use_archive"
+            dependency is not None
+            and dependency["item_equivalence"]
             and isinstance(legacy_block, str)
             and re.search(r"(?m)^\s*finditem\b", legacy_block)
         ):
@@ -2069,6 +2766,113 @@ def _adapt_reviewed_item_events(
         else:
             output.append(copy.deepcopy(event))
     return output
+
+
+def _validated_item_wrapper_records(
+    candidate_documents: dict[str, dict[str, object]],
+    source_documents: dict[str, dict[str, dict[str, list[dict[str, object]]]]],
+    dependencies: dict[str, dict[str, object]],
+    dependency_resolutions: dict[str, dict[str, object]],
+) -> list[dict[str, object]]:
+    """Return evidence for the 44 reviewed wrappers only after inspecting output."""
+
+    records: list[dict[str, object]] = []
+    all_item_labels: set[str] = set()
+    for label, dependency in sorted(dependencies.items()):
+        evidence_rows = dependency["item_equivalence"]
+        legacy_block = dependency["normalized_blocks"]["legacy"]
+        if not evidence_rows or not isinstance(legacy_block, str):
+            continue
+        all_item_labels.add(label)
+        item, quantity = extract_legacy_item_and_quantity(legacy_block)
+        resolution = dependency_resolutions.get(dependency["id"])
+        reviewed_wrapper = (
+            resolution is not None and resolution["decision"] == "use_archive"
+        )
+        for evidence in evidence_rows:
+            map_name = evidence["map"]
+            archive_event = source_documents[map_name]["legacy"]["object_events"][
+                evidence["archive_index"]
+            ]
+            current_event = source_documents[map_name]["current"]["object_events"][
+                evidence["current_index"]
+            ]
+            matches = [
+                event
+                for event in candidate_documents[map_name]["object_events"]
+                if event.get("flag") == archive_event.get("flag")
+            ]
+            if len(matches) != 1:
+                raise ValueError(
+                    f"item adapter {map_name}:{label} has {len(matches)} candidate events "
+                    f"for flag {archive_event.get('flag')}"
+                )
+            event = matches[0]
+            expected = adapt_item_ball(archive_event, legacy_block)
+            expected["movement_range_y"] = current_event["movement_range_y"]
+            if event != expected or set(event) != set(current_event):
+                raise ValueError(
+                    f"item adapter {map_name}:{label} was not applied to the exact candidate event"
+                )
+            if reviewed_wrapper:
+                records.append(
+                    {
+                        "map": map_name,
+                        "flag": archive_event.get("flag"),
+                        "item": item,
+                        "quantity": quantity,
+                    }
+                )
+
+    remaining = sorted(
+        {
+            event.get("script")
+            for document in candidate_documents.values()
+            for event in document["object_events"]
+            if event.get("script") in all_item_labels
+        }
+    )
+    if remaining:
+        raise ValueError(f"obsolete per-map item scripts remain in candidates: {remaining}")
+    return records
+
+
+def validate_candidate_script_symbols(
+    candidate_documents: dict[str, dict[str, object]],
+    defined_labels: set[str],
+) -> None:
+    """Reject candidate event script operands that have no assembled definition."""
+
+    referenced: set[str] = set()
+    for document in candidate_documents.values():
+        for category in ("object_events", "coord_events", "bg_events"):
+            for event in document[category]:
+                script = event.get("script")
+                if (
+                    isinstance(script, str)
+                    and script not in {"0", "NULL"}
+                    and re.fullmatch(r"0x[0-9A-Fa-f]+", script) is None
+                ):
+                    referenced.add(script)
+    undefined = sorted(referenced - defined_labels)
+    if undefined:
+        raise ValueError(f"undefined candidate script symbols: {undefined}")
+
+
+def _defined_script_symbols(root: Path) -> set[str]:
+    labels: set[str] = set()
+    paths = [
+        path
+        for path in (root / "data").rglob("*")
+        if path.is_file() and path.suffix in {".inc", ".s"}
+    ]
+    for path in sorted(paths):
+        try:
+            text = path.read_text(encoding="utf-8")
+        except UnicodeDecodeError as error:
+            raise ValueError(f"script source is not UTF-8: {path}") from error
+        labels.update(re.findall(r"(?m)^\s*([A-Za-z_][A-Za-z0-9_]*)::", text))
+    return labels
 
 
 def dependency_report_record(
@@ -2343,12 +3147,17 @@ def generate_candidates_and_report(
     candidate_hashes: dict[str, str] = {}
     map_validations: list[dict[str, object]] = []
     disposition_counts: Counter[str] = Counter()
-    item_records: list[dict[str, object]] = []
     candidate_documents: dict[str, dict[str, object]] = {}
     candidate_files: dict[str, bytes] = {}
     authoritative_before = {
         map_audit["map"]: sha256(
             (root / "data" / "maps" / map_audit["map"] / "map.json").read_bytes()
+        )
+        for map_audit in audit["maps"]
+    }
+    authoritative_preimages = {
+        map_audit["map"]: sha256(
+            sources.bytes("current", f"data/maps/{map_audit['map']}/map.json")
         )
         for map_audit in audit["maps"]
     }
@@ -2371,19 +3180,7 @@ def generate_candidates_and_report(
                 groups,
             )
             if category == "object_events":
-                merged = _adapt_reviewed_item_events(
-                    merged, dependency_by_label, dependency_resolutions
-                )
-                for event in merged:
-                    if event.get("script") == "Common_EventScript_FindItem" and isinstance(event.get("trainer_sight_or_berry_tree_id"), str) and event["trainer_sight_or_berry_tree_id"].startswith("ITEM_"):
-                        item_records.append(
-                            {
-                                "map": map_name,
-                                "flag": event.get("flag"),
-                                "item": event["trainer_sight_or_berry_tree_id"],
-                                "quantity": event.get("movement_range_x"),
-                            }
-                        )
+                merged = _adapt_reviewed_item_events(merged, dependency_by_label)
             candidate[category] = merged
             category_records[category] = records
             disposition_counts.update(record["disposition"] for record in records)
@@ -2456,8 +3253,17 @@ def generate_candidates_and_report(
         raise ValueError(f"invalid packed item quantities: {invalid_item_quantities}")
     if local_id_duplicates:
         raise ValueError(f"duplicate local IDs: {local_id_duplicates}")
+    item_records = _validated_item_wrapper_records(
+        candidate_documents,
+        documents,
+        dependency_by_label,
+        dependency_resolutions,
+    )
     if len(item_records) != 44 or len([item for item in item_records if item["quantity"] == 5]) != 6:
         raise ValueError("custom item wrapper count/quantity invariant differs")
+    validate_candidate_script_symbols(
+        candidate_documents, _defined_script_symbols(root)
+    )
     woodgrove_warps = [
         event for event in candidate_documents["PetalburgWoods"]["warp_events"]
         if event.get("dest_map") == "MAP_PETALBURG_WOODGROVE"
@@ -2517,6 +3323,32 @@ def generate_candidates_and_report(
             "disposition": "retained_current",
         }
     quantity_five = [item for item in item_records if item["quantity"] == 5]
+    custom_tm_validation = validate_custom_tm_restoration(
+        {
+            path: (root / path).read_bytes()
+            for path in (
+                "include/constants/tms_hms.h",
+                "include/constants/flags.h",
+                "src/data/items.h",
+                *CUSTOM_TM_SCRIPT_LITERALS,
+            )
+        },
+        {route: candidate_documents[route] for route in ("Route113", "Route115")},
+    )
+    prior_candidate_hashes = prior_reviewed_candidate_hashes()
+    if set(prior_candidate_hashes) != set(candidate_hashes):
+        raise ValueError(
+            "corrected candidate set differs from the frozen Task 4 manifest"
+        )
+    corrected_files = [
+        {
+            "path": path,
+            "prior_sha256": prior_candidate_hashes[path],
+            "corrected_sha256": candidate_hashes[path],
+        }
+        for path in sorted(candidate_hashes)
+        if prior_candidate_hashes[path] != candidate_hashes[path]
+    ]
     report = {
         "schema_version": 1,
         "mode": "candidate-only",
@@ -2535,12 +3367,21 @@ def generate_candidates_and_report(
             "missing_dependency_count": len(missing_dependencies),
             "custom_item_wrapper_count": len(item_records),
             "quantity_five_item_count": len(quantity_five),
+            "custom_tm_mapping_count": custom_tm_validation["mapping_count"],
+            "custom_tm_dependent_event_count": custom_tm_validation["dependent_event_count"],
+            "undefined_tm_item_count": custom_tm_validation["undefined_tm_item_count"],
         },
         "candidate_map_count": len(changed_maps),
         "candidate_maps": changed_maps,
         "candidate_sha256": dict(sorted(candidate_hashes.items())),
+        "candidate_upgrade": {
+            "prior_report_commit": PRIOR_REVIEWED_CANDIDATE_COMMIT,
+            "prior_candidate_sha256": prior_candidate_hashes,
+            "corrected_file_count": len(corrected_files),
+            "corrected_files": corrected_files,
+        },
         "authoritative_map_sha256_aggregate": sha256(
-            json.dumps(authoritative_before, sort_keys=True, separators=(",", ":")).encode()
+            json.dumps(authoritative_preimages, sort_keys=True, separators=(",", ":")).encode()
         ),
         "woodgrove_access_warps": woodgrove_warps,
         "event_disposition_counts": dict(sorted(disposition_counts.items())),
@@ -2548,6 +3389,7 @@ def generate_candidates_and_report(
         "custom_map_validations": custom_validations,
         "item_wrappers": item_records,
         "quantity_five_items": quantity_five,
+        "custom_tm_restoration": custom_tm_validation,
         "dependencies": dependency_records,
         "named_current_dependency_validations": named_automatic,
         "dependency_writes": dependency_writes,
@@ -2564,8 +3406,6 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--audit-only", action="store_true")
     parser.add_argument("--apply", action="store_true")
     args = parser.parse_args(argv)
-    if args.apply:
-        parser.error("--apply is reserved for Task 5; candidate generation never writes authoritative maps")
     root = repository_root()
     candidate_path, audit_path, resolutions_path, report_path = _validate_paths(root, args)
     commits = {name: resolve_commit(ref) for name, ref in SOURCE_COMMITS.items()}
@@ -2610,9 +3450,37 @@ def main(argv: list[str] | None = None) -> int:
         report, candidate_files = generate_candidates_and_report(
             root, audit, documents, resolutions, sources
         )
-        publish_candidate_bundle(
-            candidate_path, candidate_files, report_path, _json_bytes(report)
-        )
+        report_data = _json_bytes(report)
+        if args.apply:
+            if not candidate_path.is_dir():
+                raise ValueError("reviewed candidate directory is missing; generate it without --apply first")
+            existing_candidates = {
+                path.relative_to(candidate_path).as_posix(): path.read_bytes()
+                for path in candidate_path.rglob("map.json")
+            }
+            if existing_candidates != candidate_files or report_path.read_bytes() != report_data:
+                raise ValueError(
+                    "reviewed candidate/report bundle differs from deterministic generation; "
+                    "regenerate without --apply and review it before applying"
+                )
+            preimage_files = {
+                relative: sources.bytes("current", relative)
+                for relative in candidate_files
+            }
+            replacement_count = apply_authoritative_maps(
+                root,
+                candidate_path,
+                report_path,
+                audit_path,
+                resolutions_path,
+                preimage_files,
+                prior_postimage_hashes=prior_reviewed_candidate_hashes(),
+            )
+            print(f"authoritative replacements: {replacement_count}")
+        else:
+            publish_candidate_bundle(
+                candidate_path, candidate_files, report_path, report_data
+            )
         print(
             f"candidates: maps={report['candidate_map_count']} "
             f"items={report['invariants']['custom_item_wrapper_count']} "

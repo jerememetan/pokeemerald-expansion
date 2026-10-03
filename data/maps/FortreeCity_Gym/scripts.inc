@@ -50,16 +50,32 @@ FortreeCity_Gym_EventScript_WinonaDefeated::
 	end
 
 FortreeCity_Gym_EventScript_GiveAerialAce2::
-	giveitem ITEM_TM_AERIAL_ACE
+	goto_if_set FLAG_DELIVERED_FORTREE_GYM_TM, FortreeCity_Gym_EventScript_GiveAltarianite2
+	giveitem ITEM_TM_HURRICANE
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
+	setflag FLAG_DELIVERED_FORTREE_GYM_TM
+FortreeCity_Gym_EventScript_GiveAltarianite2::
+	goto_if_set FLAG_DELIVERED_FORTREE_GYM_MEGA_STONE, FortreeCity_Gym_EventScript_FinishReward2
+	giveitem ITEM_ALTARIANITE
+	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
+	setflag FLAG_DELIVERED_FORTREE_GYM_MEGA_STONE
+FortreeCity_Gym_EventScript_FinishReward2::
 	msgbox FortreeCity_Gym_Text_ExplainAerialAce, MSGBOX_DEFAULT
 	setflag FLAG_RECEIVED_TM_AERIAL_ACE
 	release
 	end
 
 FortreeCity_Gym_EventScript_GiveAerialAce::
-	giveitem ITEM_TM_AERIAL_ACE
+	goto_if_set FLAG_DELIVERED_FORTREE_GYM_TM, FortreeCity_Gym_EventScript_GiveAltarianite
+	giveitem ITEM_TM_HURRICANE
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_BagIsFull
+	setflag FLAG_DELIVERED_FORTREE_GYM_TM
+FortreeCity_Gym_EventScript_GiveAltarianite::
+	goto_if_set FLAG_DELIVERED_FORTREE_GYM_MEGA_STONE, FortreeCity_Gym_EventScript_FinishReward
+	giveitem ITEM_ALTARIANITE
+	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_BagIsFull
+	setflag FLAG_DELIVERED_FORTREE_GYM_MEGA_STONE
+FortreeCity_Gym_EventScript_FinishReward::
 	msgbox FortreeCity_Gym_Text_ExplainAerialAce, MSGBOX_DEFAULT
 	setflag FLAG_RECEIVED_TM_AERIAL_ACE
 	return
@@ -263,9 +279,13 @@ FortreeCity_Gym_Text_ExplainFeatherBadgeTakeThis:
 	.string "This is a gift from me.$"
 
 FortreeCity_Gym_Text_ExplainAerialAce:
-	.string "TM40 contains AERIAL ACE.\p"
-	.string "Its speed…\n"
-	.string "No POKéMON should be able to avoid it.\p"
+	.string "TM40 contains HURRICANE.\p"
+	.string "It's powerful…\n"
+	.string "It might even confuse the foe.\p"
+	.string "With this Mega Stone, you can Mega\n"
+	.string "Evolve an Altaria, a powerful and bulky\l"
+	.string "Fairy and Dragon-type POKéMON. \p"
+	.string "Anyways…\n"
 	.string "… … … … … …$"
 
 FortreeCity_Gym_Text_RegisteredWinona:

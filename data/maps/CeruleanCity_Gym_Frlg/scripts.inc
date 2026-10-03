@@ -79,8 +79,9 @@ CeruleanCity_Gym_Text_MistyIntro::
 	.string "with WATER-type POKéMON!{PLAY_BGM}{MUS_RG_ENCOUNTER_GYM_LEADER}$"
 
 CeruleanCity_Gym_Text_ExplainTM03::
-	.string "TM03 teaches WATER PULSE.\p"
-	.string "Use it on an aquatic POKéMON!$"
+	.string "TM03 teaches FLIP TURN.\p"
+	.string "Attack, then switch with another\n"
+	.string "POKéMON!$"
 
 CeruleanCity_Gym_Text_ExplainCascadeBadge::
 	.string "The CASCADEBADGE makes all\n"
@@ -160,4 +161,3 @@ CeruleanCity_Gym_Text_GymStatuePlayerWon::
 	.string "LEADER: MISTY\p"
 	.string "WINNING TRAINERS:\n"
 	.string "{RIVAL}, {PLAYER}$"
-

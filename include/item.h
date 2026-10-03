@@ -119,7 +119,7 @@ static inline enum TMHMIndex GetItemTMHMIndex(enum Item item)
     switch (item)
     {
     /* Expands to:
-        * case ITEM_TM_FOCUS_PUNCH:
+        * case ITEM_TM_DRAIN_PUNCH:
         *     return 1;
         * case ITEM_TM_DRAGON_CLAW:
         *      return 2;
@@ -136,8 +136,8 @@ static inline enum Move GetItemTMHMMoveId(enum Item item)
     switch (item)
     {
     /* Expands to:
-        * case ITEM_TM_FOCUS_PUNCH:
-        *     return MOVE_FOCUS_PUNCH;
+        * case ITEM_TM_DRAIN_PUNCH:
+        *     return MOVE_DRAIN_PUNCH;
         * case ITEM_TM_DRAGON_CLAW:
         *      return MOVE_DRAGON_CLAW;
         * etc */
@@ -153,8 +153,8 @@ static inline enum Item GetTMHMItemIdFromMoveId(enum Move move)
     switch (move)
     {
     /* Expands to:
-        * case MOVE_FOCUS_PUNCH:
-        *     return ITEM_TM_FOCUS_PUNCH;
+        * case MOVE_DRAIN_PUNCH:
+        *     return ITEM_TM_DRAIN_PUNCH;
         * case MOVE_DRAGON_CLAW:
         *      return ITEM_TM_DRAGON_CLAW;
         * etc */

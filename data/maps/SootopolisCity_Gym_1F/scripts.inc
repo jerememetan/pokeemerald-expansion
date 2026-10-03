@@ -116,15 +116,31 @@ SootopolisCity_Gym_1F_EventScript_JuanDefeated::
 	end
 
 SootopolisCity_Gym_1F_EventScript_GiveWaterPulse::
-	giveitem ITEM_TM_WATER_PULSE
+	goto_if_set FLAG_DELIVERED_SOOTOPOLIS_GYM_TM, SootopolisCity_Gym_1F_EventScript_GiveGyaradosite
+	giveitem ITEM_TM_FLIP_TURN
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_BagIsFull
+	setflag FLAG_DELIVERED_SOOTOPOLIS_GYM_TM
+SootopolisCity_Gym_1F_EventScript_GiveGyaradosite::
+	goto_if_set FLAG_DELIVERED_SOOTOPOLIS_GYM_MEGA_STONE, SootopolisCity_Gym_1F_EventScript_FinishReward
+	giveitem ITEM_GYARADOSITE
+	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_BagIsFull
+	setflag FLAG_DELIVERED_SOOTOPOLIS_GYM_MEGA_STONE
+SootopolisCity_Gym_1F_EventScript_FinishReward::
 	msgbox SootopolisCity_Gym_1F_Text_ExplainWaterPulse, MSGBOX_DEFAULT
 	setflag FLAG_RECEIVED_TM_WATER_PULSE
 	return
 
 SootopolisCity_Gym_1F_EventScript_GiveWaterPulse2::
-	giveitem ITEM_TM_WATER_PULSE
+	goto_if_set FLAG_DELIVERED_SOOTOPOLIS_GYM_TM, SootopolisCity_Gym_1F_EventScript_GiveGyaradosite2
+	giveitem ITEM_TM_FLIP_TURN
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
+	setflag FLAG_DELIVERED_SOOTOPOLIS_GYM_TM
+SootopolisCity_Gym_1F_EventScript_GiveGyaradosite2::
+	goto_if_set FLAG_DELIVERED_SOOTOPOLIS_GYM_MEGA_STONE, SootopolisCity_Gym_1F_EventScript_FinishReward2
+	giveitem ITEM_GYARADOSITE
+	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
+	setflag FLAG_DELIVERED_SOOTOPOLIS_GYM_MEGA_STONE
+SootopolisCity_Gym_1F_EventScript_FinishReward2::
 	msgbox SootopolisCity_Gym_1F_Text_ExplainWaterPulse, MSGBOX_DEFAULT
 	setflag FLAG_RECEIVED_TM_WATER_PULSE
 	release
@@ -248,9 +264,9 @@ SootopolisCity_Gym_1F_Text_ExplainRainBadgeTakeThis:
 
 SootopolisCity_Gym_1F_Text_ExplainWaterPulse:
 	.string "The TECHNICAL MACHINE I handed you\n"
-	.string "contains WATER PULSE.\p"
-	.string "In use, it will occasionally confuse\n"
-	.string "the target with ultrasonic waves.\p"
+	.string "contains FLIP TURN.\p"
+	.string "It's deals damage and switches\n"
+	.string "out to another POKéMON.\p"
 	.string "… … … … … …$"
 
 SootopolisCity_Gym_1F_Text_RegisteredJuan:
@@ -316,4 +332,3 @@ SootopolisCity_Gym_1F_Text_JuanRematchNeedTwoMons:
 	.string "You have with you but one POKéMON.\p"
 	.string "I wish that you would return with\n"
 	.string "two, perhaps more, POKéMON, please.$"
-
