@@ -76,7 +76,7 @@
 
 extern u16 gSpecialVar_ItemId;
 
-#define FRIENDSHIP_EVO_THRESHOLD ((P_FRIENDSHIP_EVO_THRESHOLD >= GEN_8) ? 160 : 220)
+#define FRIENDSHIP_EVO_THRESHOLD ((P_FRIENDSHIP_EVO_THRESHOLD >= GEN_8) ? 120 : 220)
 
 struct SpeciesItem
 {
