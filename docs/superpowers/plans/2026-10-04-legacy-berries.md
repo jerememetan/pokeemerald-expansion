@@ -22,7 +22,7 @@ Starting HEAD: `bf8074499f` (the user's map/encounter cleanup is preserved).
 - Modify `src/berry.c` — only `CalcBerryYieldInternal` and its descriptive comment.
 - Create `tools/migration/tests/test_legacy_berries.py` — independent actual-C and tree-data fixtures.
 
-- [ ] Write the failing fixtures. Use this expected operand map:
+- [x] Write the failing fixtures. Use this expected operand map:
 
 ```python
 EXPECTED_VARIETIES = {
@@ -67,7 +67,7 @@ Use `cc -std=c11 -Wall -Wextra -Werror` and execute the resulting runner;
 only use disposable temporary outputs. The test command must not silently
 skip missing compiler coverage: run in WSL where `cc` is available.
 
-- [ ] Run red before editing the production sources:
+- [x] Run red before editing the production sources:
 
 ```powershell
 wsl.exe -e bash -lc 'cd /mnt/c/Users/jerem/Documents/Github/pokeemerald-expansion && python3 -m unittest tools.migration.tests.test_legacy_berries -v'
@@ -76,7 +76,7 @@ wsl.exe -e bash -lc 'cd /mnt/c/Users/jerem/Documents/Github/pokeemerald-expansio
 Expected: assertions show missing tree substitutions and differing default yields;
 the optional moisture behaviour already passes.
 
-- [ ] Apply the operand map above and this complete yield kernel:
+- [x] Apply the operand map above and this complete yield kernel:
 
 ```c
 static u8 CalcBerryYieldInternal(u16 max, u16 min, u8 water)
@@ -109,13 +109,13 @@ static u8 CalcBerryYieldInternal(u16 max, u16 min, u8 water)
 }
 ```
 
-- [ ] Run the same tests green, `git diff --check`, and Python syntax checks.
-- [ ] Obtain independent spec review, then quality review; fix and rereview any findings.
-- [ ] Build the ROM using an exact native-filesystem source snapshot, or the normal workspace if fast enough.
-- [ ] Stage only these three paths and commit `feat: restore archived berry varieties and yields` after verification.
+- [x] Run the same tests green, `git diff --check`, and Python syntax checks.
+- [x] Obtain independent spec review, then quality review; fix and rereview any findings.
+- [x] Build the ROM using an exact native-filesystem source snapshot, or the normal workspace if fast enough.
+- [x] Stage only these three paths and commit `feat: restore archived berry varieties and yields` after verification.
 
 ### Task 2: Record acceptance and continue to caps
 
-- [ ] Record automated results, exact source/build hashes, and explicitly pending fresh-save/harvest checks in the dated migration progress document.
-- [ ] Preserve all user changes outside this allowlist; do not touch existing saves.
-- [ ] Continue the separate level-cap unit without asking for another continuation approval.
+- [x] Record automated results, exact source/build hashes, and explicitly pending fresh-save/harvest checks in the dated migration progress document.
+- [x] Preserve all user changes outside this allowlist; do not touch existing saves.
+- [x] Continue the separate level-cap unit without asking for another continuation approval.
