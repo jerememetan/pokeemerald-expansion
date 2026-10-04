@@ -384,9 +384,10 @@ DEPENDENCY_POSTIMAGE_SPECS = {
     },
     "include/constants/flags.h": {
         "old_sha256": "8edc96def953819e714c709b47169067c0f830468db190f9a23560e6091648cf",
-        "new_sha256": "5796813afc7cbb4c7039252d4710dfe777f6004ad9012990aef719d37441915b",
+        "new_sha256": "dda3eb5f9f4e7814273689b70080d9f882811fe1f630a1b88501353f9d8cd04a",
         "dependencies": [],
         "required_literals": [
+            {"id": "constant:FLAG_TOGGLE_EXPALL", "text": "#define FLAG_TOGGLE_EXPALL   0x23", "rationale": "Approved native EXP All toggle uses the otherwise unused permanent flag slot at 0x23."},
             {"id": "constant:FLAG_ROUTE120_BADGECHECKED", "text": "#define FLAG_ROUTE120_BADGECHECKED 0x22", "rationale": "Reviewed reuse of an upstream unused flag."},
             {"id": "constant:FLAG_ROUTE123_BADGECHECKED", "text": "#define FLAG_ROUTE123_BADGECHECKED 0x24", "rationale": "Reviewed reuse of an upstream unused flag."},
             {"id": "constant:FLAG_RECEIVED_CAMERUPTITE", "text": "#define FLAG_RECEIVED_CAMERUPTITE  0x265", "rationale": "Reviewed reuse of an upstream unused flag."},

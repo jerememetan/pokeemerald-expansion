@@ -1779,6 +1779,7 @@ class FrozenDependencyPostimageSpecTests(unittest.TestCase):
         }
         self.assertEqual(len(dependency_ids), 14)
         expected_literals = {
+                "constant:FLAG_TOGGLE_EXPALL",
                 "constant:FLAG_ROUTE120_BADGECHECKED",
                 "constant:FLAG_ROUTE123_BADGECHECKED",
                 "constant:FLAG_RECEIVED_CAMERUPTITE",
@@ -1796,6 +1797,107 @@ class FrozenDependencyPostimageSpecTests(unittest.TestCase):
             for label in merge_tool._paired_reward_blocks(spec)
         )
         self.assertEqual(literal_ids, expected_literals)
+
+
+class ExpAllDependencyPostimageTests(unittest.TestCase):
+    path = "include/constants/flags.h"
+    expall_id = "constant:FLAG_TOGGLE_EXPALL"
+    expall_literal = b"#define FLAG_TOGGLE_EXPALL   0x23"
+    expall_line = (
+        expall_literal + b" // Permanent Exp. Share party-wide experience toggle\n"
+    )
+    pre_expall_line = b"#define FLAG_UNUSED_0x023    0x23 // Unused Flag\n"
+    baseline_sha256 = "8edc96def953819e714c709b47169067c0f830468db190f9a23560e6091648cf"
+    approved_sha256 = "dda3eb5f9f4e7814273689b70080d9f882811fe1f630a1b88501353f9d8cd04a"
+    pre_expall_sha256 = "5796813afc7cbb4c7039252d4710dfe777f6004ad9012990aef719d37441915b"
+
+    @classmethod
+    def setUpClass(cls):
+        root = Path(__file__).resolve().parents[3]
+        cls.actual = (root / cls.path).read_bytes()
+        cls.baseline = merge_tool.git_bytes(
+            merge_tool.SOURCE_COMMITS["current"], cls.path
+        )
+
+    def validate(self, actual):
+        return merge_tool.validate_dependency_postimages(
+            {self.path: actual},
+            {self.path: self.baseline},
+            {},
+            {},
+            {self.path: merge_tool.DEPENDENCY_POSTIMAGE_SPECS[self.path]},
+        )
+
+    def test_accepts_actual_approved_expall_header(self):
+        self.assertEqual(hashlib.sha256(self.actual).hexdigest(), self.approved_sha256)
+        self.assertEqual(self.validate(self.actual)["missing_dependencies"], [])
+        self.assertEqual(
+            merge_tool.DEPENDENCY_POSTIMAGE_SPECS[self.path]["new_sha256"],
+            self.approved_sha256,
+        )
+
+    def test_requires_exact_expall_literal_at_permanent_slot(self):
+        literals = {
+            literal["id"]: literal
+            for literal in merge_tool.DEPENDENCY_POSTIMAGE_SPECS[self.path]["required_literals"]
+        }
+        self.assertIn(self.expall_id, literals)
+        self.assertEqual(literals[self.expall_id]["text"], self.expall_literal.decode())
+        self.assertIn("permanent", literals[self.expall_id]["rationale"].lower())
+
+    def test_rejects_pre_expall_reviewed_header(self):
+        self.assertEqual(self.actual.count(self.expall_line), 1)
+        pre_expall = self.actual.replace(self.expall_line, self.pre_expall_line)
+        self.assertEqual(hashlib.sha256(pre_expall).hexdigest(), self.pre_expall_sha256)
+        self.assertIn(self.expall_id, self.validate(pre_expall)["missing_dependencies"])
+
+    def test_rejects_altered_expall_flag(self):
+        self.assertEqual(self.actual.count(self.expall_literal), 1)
+        altered = self.actual.replace(
+            self.expall_literal, b"#define FLAG_TOGGLE_EXPALL   0x24"
+        )
+        self.assertIn(self.expall_id, self.validate(altered)["missing_dependencies"])
+
+    def test_rejects_missing_expall_flag(self):
+        self.assertEqual(self.actual.count(self.expall_line), 1)
+        removed = self.actual.replace(self.expall_line, b"")
+        self.assertIn(self.expall_id, self.validate(removed)["missing_dependencies"])
+
+    def test_rejects_unrelated_append_even_when_all_literals_remain(self):
+        appended = self.actual + b"// Unreviewed unrelated header edit\n"
+        for literal in merge_tool.DEPENDENCY_POSTIMAGE_SPECS[self.path]["required_literals"]:
+            self.assertIn(literal["text"].encode(), appended)
+        self.assertIn(self.expall_id, self.validate(appended)["missing_dependencies"])
+
+    def test_preserves_exact_baseline_hash(self):
+        self.assertEqual(hashlib.sha256(self.baseline).hexdigest(), self.baseline_sha256)
+        self.assertEqual(
+            merge_tool.DEPENDENCY_POSTIMAGE_SPECS[self.path]["old_sha256"],
+            self.baseline_sha256,
+        )
+
+    def test_preserves_all_ten_original_required_constants(self):
+        expected = {
+            "FLAG_ROUTE120_BADGECHECKED": "#define FLAG_ROUTE120_BADGECHECKED 0x22",
+            "FLAG_ROUTE123_BADGECHECKED": "#define FLAG_ROUTE123_BADGECHECKED 0x24",
+            "FLAG_RECEIVED_CAMERUPTITE": "#define FLAG_RECEIVED_CAMERUPTITE  0x265",
+            "FLAG_RECEIVED_TM_VOLT_SWITCH": "#define FLAG_RECEIVED_TM_VOLT_SWITCH         0xA7",
+            "FLAG_DELIVERED_FORTREE_GYM_TM": "#define FLAG_DELIVERED_FORTREE_GYM_TM 0x266",
+            "FLAG_DELIVERED_FORTREE_GYM_MEGA_STONE": "#define FLAG_DELIVERED_FORTREE_GYM_MEGA_STONE 0x267",
+            "FLAG_DELIVERED_MAUVILLE_GYM_TM": "#define FLAG_DELIVERED_MAUVILLE_GYM_TM 0x268",
+            "FLAG_DELIVERED_MAUVILLE_GYM_MEGA_STONE": "#define FLAG_DELIVERED_MAUVILLE_GYM_MEGA_STONE 0x269",
+            "FLAG_DELIVERED_SOOTOPOLIS_GYM_TM": "#define FLAG_DELIVERED_SOOTOPOLIS_GYM_TM 0x26A",
+            "FLAG_DELIVERED_SOOTOPOLIS_GYM_MEGA_STONE": "#define FLAG_DELIVERED_SOOTOPOLIS_GYM_MEGA_STONE 0x26B",
+        }
+        original_literals = {
+            literal["id"].removeprefix("constant:"): literal["text"]
+            for literal in merge_tool.DEPENDENCY_POSTIMAGE_SPECS[self.path]["required_literals"]
+            if literal["id"] != self.expall_id
+        }
+        self.assertEqual(original_literals, expected)
+        for text in expected.values():
+            with self.subTest(text=text):
+                self.assertIn(text.encode(), self.actual)
 
 
 class DependencyPostimageValidationTests(unittest.TestCase):
