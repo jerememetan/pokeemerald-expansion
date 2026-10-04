@@ -10,14 +10,15 @@ u32 GetCurrentLevelCap(void)
     static const u32 sLevelCapFlagMap[][2] =
     {
         {FLAG_BADGE01_GET, 15},
-        {FLAG_BADGE02_GET, 19},
-        {FLAG_BADGE03_GET, 24},
-        {FLAG_BADGE04_GET, 29},
-        {FLAG_BADGE05_GET, 31},
-        {FLAG_BADGE06_GET, 33},
-        {FLAG_BADGE07_GET, 42},
-        {FLAG_BADGE08_GET, 46},
-        {FLAG_IS_CHAMPION, 58},
+        {FLAG_BADGE02_GET, 20},
+        {FLAG_BADGE03_GET, 26},
+        {FLAG_BADGE04_GET, 35},
+        {FLAG_BADGE05_GET, 39},
+        {FLAG_BADGE06_GET, 49},
+        {FLAG_HIDE_LILYCOVE_CITY_RIVAL, 53},
+        {FLAG_BADGE07_GET, 60},
+        {FLAG_BADGE08_GET, 69},
+        {FLAG_IS_CHAMPION, 81},
     };
 
     u32 i;
@@ -38,13 +39,50 @@ u32 GetCurrentLevelCap(void)
     return MAX_LEVEL;
 }
 
+static u32 GetPartyExpFactor(u32 level)
+{
+    // Archived relative-party multipliers, expressed in hundredths.
+    static const u16 sRelativePartyScaling[] =
+    {
+        300, 275, 250, 233, 225, 200, 180, 170, 160, 150,
+        140, 130, 120, 110, 100, 90, 80, 75, 66, 50,
+        40, 33, 25, 20, 15, 10, 5,
+    };
+    u32 count;
+    u32 total = 0;
+    u32 threshold;
+    u32 teamLevel;
+
+    for (count = 0; count < PARTY_SIZE; count++)
+    {
+        if (GetMonData(&gParties[B_TRAINER_PLAYER][count], MON_DATA_SPECIES) == SPECIES_NONE)
+            break;
+        total += gParties[B_TRAINER_PLAYER][count].level;
+    }
+    if (count == 0)
+        return 100;
+
+    threshold = (total / count) * 4 / 5;
+    total = 0;
+    for (u32 i = 0; i < count; i++)
+    {
+        if (gParties[B_TRAINER_PLAYER][i].level >= threshold)
+            total += gParties[B_TRAINER_PLAYER][i].level;
+    }
+    // Deliberately divide by the original party count, even for filtered mons.
+    teamLevel = total / count;
+    if (level >= teamLevel + 12)
+        return sRelativePartyScaling[ARRAY_COUNT(sRelativePartyScaling) - 1];
+    if (level + 14 <= teamLevel)
+        return sRelativePartyScaling[0];
+    return sRelativePartyScaling[level + 14 - teamLevel];
+}
+
 u32 GetSoftLevelCapExpValue(u32 level, u32 expValue)
 {
-    static const u32 sExpScalingDown[5] = { 4, 8, 16, 32, 64 };
-    static const u32 sExpScalingUp[5]   = { 16, 8, 4, 2, 1 };
-
-    u32 levelDifference;
+    static const u32 sExpScalingUp[5] = { 16, 8, 4, 2, 1 };
     u32 currentLevelCap = GetCurrentLevelCap();
+    u64 scaledExp = expValue;
 
     if (B_EXP_CAP_TYPE == EXP_CAP_NONE)
         return expValue;
@@ -53,33 +91,41 @@ u32 GetSoftLevelCapExpValue(u32 level, u32 expValue)
     {
         if (B_LEVEL_CAP_EXP_UP)
         {
-            levelDifference = currentLevelCap - level;
+            u32 levelDifference = currentLevelCap - level;
             if (levelDifference > ARRAY_COUNT(sExpScalingUp) - 1)
-                return expValue + (expValue / sExpScalingUp[ARRAY_COUNT(sExpScalingUp) - 1]);
-            else
-                return expValue + (expValue / sExpScalingUp[levelDifference]);
-        }
-        else
-        {
-            return expValue;
+                levelDifference = ARRAY_COUNT(sExpScalingUp) - 1;
+            scaledExp += expValue / sExpScalingUp[levelDifference];
         }
     }
     else if (B_EXP_CAP_TYPE == EXP_CAP_HARD)
     {
         return 0;
     }
-    else if (B_EXP_CAP_TYPE == EXP_CAP_SOFT)
+    if (B_EXP_CAP_TYPE == EXP_CAP_SOFT)
     {
-        levelDifference = level - currentLevelCap;
-        if (levelDifference > ARRAY_COUNT(sExpScalingDown) - 1)
-            return expValue / sExpScalingDown[ARRAY_COUNT(sExpScalingDown) - 1];
-        else
-            return expValue / sExpScalingDown[levelDifference];
+        u32 numerator = GetPartyExpFactor(level);
+        u32 denominator = 100;
+
+        // MAX_LEVEL is a no-cap sentinel once every milestone flag is set.
+        // A variable cap of MAX_LEVEL is still an explicitly selected cap.
+        if (level >= currentLevelCap
+         && B_LEVEL_CAP_TYPE != LEVEL_CAP_NONE
+         && (B_LEVEL_CAP_TYPE != LEVEL_CAP_FLAG_LIST || currentLevelCap != MAX_LEVEL))
+        {
+            if (level == currentLevelCap)
+            {
+                numerator *= 3;
+                denominator = 1000;
+            }
+            else
+            {
+                denominator = 1000000;
+            }
+        }
+        // Combine the two factors before truncating, without floating point.
+        scaledExp = scaledExp * numerator / denominator;
     }
-    else
-    {
-       return expValue;
-    }
+    return scaledExp > (u32)-1 ? (u32)-1 : (u32)scaledExp;
 }
 
 u32 GetCurrentEVCap(void)
