@@ -54,7 +54,7 @@
 #define FLAG_UNUSED_0x020    0x20 // Unused Flag
 #define FLAG_UNUSED_0x021    0x21 // Unused Flag
 #define FLAG_ROUTE120_BADGECHECKED 0x22
-#define FLAG_UNUSED_0x023    0x23 // Unused Flag
+#define FLAG_TOGGLE_EXPALL   0x23 // Permanent Exp. Share party-wide experience toggle
 #define FLAG_ROUTE123_BADGECHECKED 0x24
 #define FLAG_ALTERINGCAVE_RED_DEFEATED 0x25
 #define FLAG_UNUSED_0x026    0x26 // Unused Flag

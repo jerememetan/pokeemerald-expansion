@@ -101,7 +101,7 @@ enum __attribute__((packed)) Stat
 #define MAX_STAT_STAGE    12
 
 // Shiny odds
-#define SHINY_ODDS 8 // Actual probability is SHINY_ODDS/65536
+#define SHINY_ODDS 128 // Actual probability is SHINY_ODDS/65536
 
 // Ribbon IDs used by TV and Pokénav
 #define CHAMPION_RIBBON       0
@@ -406,7 +406,7 @@ enum ShinyMode {
 #define NUM_ABILITY_PERSONALITY 0xFF
 
 #if P_LEGENDARY_PERFECT_IVS >= GEN_6
-#define LEGENDARY_PERFECT_IV_COUNT 3
+#define LEGENDARY_PERFECT_IV_COUNT 4
 #else
 #define LEGENDARY_PERFECT_IV_COUNT 0
 #endif
