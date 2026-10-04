@@ -277,6 +277,7 @@ unsigned Toggles(void) { return toggles; }
 
     def test_exact_header_macro_allowlist_and_untouched_species_settings(self):
         allowed = {CONFIG + filename: set(names) for filename, names in SETTINGS.items()}
+        allowed[CONFIG + "battle.h"].add("B_VAR_NO_BAG_USE")
         allowed[CONSTANTS + "pokemon.h"] = {"SHINY_ODDS", "LEGENDARY_PERFECT_IV_COUNT"}
         allowed[CONSTANTS + "flags.h"] = {"FLAG_UNUSED_0x023", "FLAG_TOGGLE_EXPALL"}
         paths = subprocess.check_output(["git", "ls-tree", "-r", "--name-only", PRE_UNIT,
