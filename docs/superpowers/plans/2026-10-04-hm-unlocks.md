@@ -25,13 +25,16 @@ New tests: tools/migration/tests/test_hm_unlocks.py.
   script/Surf/menu functions, not a Python reimplementation. Stub only engine
   dependencies. Expected Emerald pairs are Cut1, Flash2, RockSmash3,
   Strength4, Surf5, Fly6, Dive7, Waterfall8 with corresponding received flags.
-  FRLG uses existing alternate badges Cut2/Flash1/RockSmash6/Fly3/Waterfall7.
+  FRLG uses existing alternate badges Cut2/Flash1/RockSmash6/Fly3/Waterfall7;
+  its received-HM aliases are zero, so retain actual badge-only semantics.
 - [ ] Run red: WSL python3 -m unittest tools.migration.tests.test_hm_unlocks -v.
   Existing badge-only unlocks and learned-HM lookup must produce genuine
   assertion failures, not missing-helper compilation errors. Use actual old
   script selector to establish the no-teaching regression before introducing
   the new shared selector. Afterward compile the real shared selector.
-- [ ] Change each HM callback's badge return to badge && received-HM flag.
+- [ ] Change each Emerald HM callback's badge return to badge && received-HM
+  flag. Preserve the existing FRLG badge-only behaviour without inventing
+  receipt flags: use existing FRLG branches or badge && (IS_FRLG || receipt).
   Add pokemon.h for GetMonData/MonKnowsMove/gParties declarations if needed.
 - [ ] Implement/decorate this shared selector and declare it in field_move.h:
 

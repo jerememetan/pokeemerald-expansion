@@ -18,14 +18,19 @@ inventory's known-move requirement. Starting checkpoint: e6cd947d6f.
 | Dive, including surfacing | 7 | FLAG_RECEIVED_HM_DIVE |
 | Waterfall | 8 | FLAG_RECEIVED_HM_WATERFALL |
 
-Both flags must be set for all entry points. Preserve the current alternate
-FRLG badge mapping when compiled for FRLG. Preserve terrain/warp/direction,
+Both flags must be set for all Emerald entry points. Preserve the current
+alternate FRLG badge-only mapping when compiled for FRLG: its actual upstream
+received-HM aliases are all zero, so do not invent receipt flags or lock all
+FRLG HMs behind flag zero. Independent FRLG receipt storage is outside scope.
+Preserve terrain/warp/direction,
 already-surfing, follower, link-room and other current environment checks.
 Already-activated Strength retains its existing session state behaviour.
 
 Use current field animations and a valid non-egg party member as the animation
 actor, without requiring that actor to know the HM. Empty/all-egg parties
-must fail safely without indexing PARTY_SIZE. Non-HM moves retain their
+must fail safely on selector-driven animation paths without indexing
+PARTY_SIZE. Existing direct Cut/Rock Smash object removal has no Pokemon
+animation actor and remains as-is. Non-HM moves retain their
 known-move and optional unlock requirements; no universal field-move cheat.
 
 ## Smallest practical implementation
@@ -58,7 +63,8 @@ Focused tests compile actual field_move.c, actual script-command and Surf
 selector bodies, and actual party root/submenu construction under narrow
 native C stubs. Independently specify all eight badge/flag pairs; test every
 combination with no learned HMs, learned-but-locked, valid/empty/egg parties,
-non-HM known-move preservation, Emerald/FRLG mappings, script outputs and
+non-HM known-move preservation, Emerald gates/actual FRLG badge-only mapping,
+script outputs and
 safe failure. Exercise all-unlocked submenu, worst-case nine-action root,
 Cancel placement and capacity/window bounds. Tests must fail before source
 changes and pass after; independent spec then quality review, ROM build.
