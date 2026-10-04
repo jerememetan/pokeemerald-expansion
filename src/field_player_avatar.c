@@ -7,6 +7,7 @@
 #include "field_control_avatar.h"
 #include "field_effect.h"
 #include "field_effect_helpers.h"
+#include "field_move.h"
 #include "field_screen_effect.h"
 #include "field_player_avatar.h"
 #include "fieldmap.h"
@@ -1619,19 +1620,8 @@ enum Gender GetPlayerAvatarGenderByGraphicsId(u16 gfxId)
 
 bool8 PartyHasMonWithSurf(void)
 {
-    u8 i;
-
-    if (!TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_SURFING))
-    {
-        for (i = 0; i < PARTY_SIZE; i++)
-        {
-            if (GetMonData(&gParties[B_TRAINER_PLAYER][i], MON_DATA_SPECIES) == SPECIES_NONE)
-                break;
-            if (MonKnowsMove(&gParties[B_TRAINER_PLAYER][i], MOVE_SURF))
-                return TRUE;
-        }
-    }
-    return FALSE;
+    return !TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_SURFING)
+        && FieldMove_GetPartyMon(FIELD_MOVE_SURF, TRUE) < PARTY_SIZE;
 }
 
 bool8 IsPlayerSurfingNorth(void)

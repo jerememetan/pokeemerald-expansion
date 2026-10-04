@@ -14,6 +14,8 @@ struct FieldMoveInfo
 
 extern const struct FieldMoveInfo gFieldMoveInfo[];
 
+u32 FieldMove_GetPartyMon(enum FieldMove fieldMove, bool32 checkUnlocked);
+
 static inline bool32 SetUpFieldMove(enum FieldMove fieldMove)
 {
     return gFieldMoveInfo[fieldMove].fieldMoveFunc();

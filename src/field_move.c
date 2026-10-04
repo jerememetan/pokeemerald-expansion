@@ -4,6 +4,7 @@
 #include "fldeff.h"
 #include "fldeff_misc.h"
 #include "party_menu.h"
+#include "pokemon.h"
 #include "constants/field_move.h"
 #include "constants/moves.h"
 #include "constants/party_menu.h"
@@ -13,7 +14,7 @@ static bool32 IsFieldMoveUnlocked_Cut(void)
     if (IS_FRLG)
         return FlagGet(FLAG_BADGE02_GET);
 
-    return FlagGet(FLAG_BADGE01_GET);
+    return FlagGet(FLAG_BADGE01_GET) && FlagGet(FLAG_RECEIVED_HM_CUT);
 }
 
 static bool32 IsFieldMoveUnlocked_Flash(void)
@@ -21,7 +22,7 @@ static bool32 IsFieldMoveUnlocked_Flash(void)
     if (IS_FRLG)
         return FlagGet(FLAG_BADGE01_GET);
 
-    return FlagGet(FLAG_BADGE02_GET);
+    return FlagGet(FLAG_BADGE02_GET) && FlagGet(FLAG_RECEIVED_HM_FLASH);
 }
 
 static bool32 IsFieldMoveUnlocked_RockSmash(void)
@@ -29,17 +30,17 @@ static bool32 IsFieldMoveUnlocked_RockSmash(void)
     if (IS_FRLG)
         return FlagGet(FLAG_BADGE06_GET);
 
-    return FlagGet(FLAG_BADGE03_GET);
+    return FlagGet(FLAG_BADGE03_GET) && FlagGet(FLAG_RECEIVED_HM_ROCK_SMASH);
 }
 
 static bool32 IsFieldMoveUnlocked_Strength(void)
 {
-    return FlagGet(FLAG_BADGE04_GET);
+    return FlagGet(FLAG_BADGE04_GET) && (IS_FRLG || FlagGet(FLAG_RECEIVED_HM_STRENGTH));
 }
 
 static bool32 IsFieldMoveUnlocked_Surf(void)
 {
-    return FlagGet(FLAG_BADGE05_GET);
+    return FlagGet(FLAG_BADGE05_GET) && (IS_FRLG || FlagGet(FLAG_RECEIVED_HM_SURF));
 }
 
 static bool32 IsFieldMoveUnlocked_Fly(void)
@@ -47,12 +48,12 @@ static bool32 IsFieldMoveUnlocked_Fly(void)
     if (IS_FRLG)
         return FlagGet(FLAG_BADGE03_GET);
 
-    return FlagGet(FLAG_BADGE06_GET);
+    return FlagGet(FLAG_BADGE06_GET) && FlagGet(FLAG_RECEIVED_HM_FLY);
 }
 
 static bool32 IsFieldMoveUnlocked_Dive(void)
 {
-    return FlagGet(FLAG_BADGE07_GET);
+    return FlagGet(FLAG_BADGE07_GET) && (IS_FRLG || FlagGet(FLAG_RECEIVED_HM_DIVE));
 }
 
 static bool32 IsFieldMoveUnlocked_Waterfall(void)
@@ -60,7 +61,7 @@ static bool32 IsFieldMoveUnlocked_Waterfall(void)
     if (IS_FRLG)
         return FlagGet(FLAG_BADGE07_GET);
 
-    return FlagGet(FLAG_BADGE08_GET);
+    return FlagGet(FLAG_BADGE08_GET) && FlagGet(FLAG_RECEIVED_HM_WATERFALL);
 }
 
 static bool32 IsFieldMoveUnlocked_RockClimb(void)
@@ -101,6 +102,25 @@ static bool32 IsFieldMoveUnlocked_SweetScent(void)
 static bool32 IsFieldMoveUnlocked_Defog(void)
 {
     return OW_DEFOG_FIELD_MOVE;
+}
+
+u32 FieldMove_GetPartyMon(enum FieldMove fieldMove, bool32 checkUnlocked)
+{
+    bool32 isHM = fieldMove <= FIELD_MOVE_WATERFALL;
+
+    if ((isHM || checkUnlocked) && !IsFieldMoveUnlocked(fieldMove))
+        return PARTY_SIZE;
+
+    for (u32 i = 0; i < PARTY_SIZE; i++)
+    {
+        if (GetMonData(&gParties[B_TRAINER_PLAYER][i], MON_DATA_SPECIES) == SPECIES_NONE)
+            break;
+        if (!GetMonData(&gParties[B_TRAINER_PLAYER][i], MON_DATA_IS_EGG)
+         && (isHM || MonKnowsMove(&gParties[B_TRAINER_PLAYER][i], FieldMove_GetMoveId(fieldMove))))
+            return i;
+    }
+
+    return PARTY_SIZE;
 }
 
 const struct FieldMoveInfo gFieldMoveInfo[FIELD_MOVES_COUNT] =
