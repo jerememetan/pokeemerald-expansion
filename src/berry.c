@@ -2657,9 +2657,9 @@ static u8 GetNumStagesWateredByBerryTreeId(u8 id)
     return BerryTreeGetNumStagesWatered(GetBerryTreeInfo(id));
 }
 
-// Berries can be watered at 4 stages of growth. The distribution is largely
-// even but slightly prefers middle berry yields, since it uniformly draws from
-// a subset of the total yield range.
+// Stage-based watering retains the hack's higher yields: no watering adds 0-3,
+// and watered bounds use water and water + 1, so yields may exceed max.
+// Moisture-based growth still uses its separately accumulated minimum yield.
 static u8 CalcBerryYieldInternal(u16 max, u16 min, u8 water)
 {
     u32 randMin;
@@ -2667,14 +2667,18 @@ static u8 CalcBerryYieldInternal(u16 max, u16 min, u8 water)
     u32 rand;
     u32 extraYield;
 
-    if (water == 0 || OW_BERRY_MOISTURE)
+    if (OW_BERRY_MOISTURE)
     {
         return min;
     }
+    else if (water == 0)
+    {
+        return Random() % 4 + min;
+    }
     else
     {
-        randMin = (max - min) * (water - 1);
-        randMax = (max - min) * (water);
+        randMin = (max - min) * water;
+        randMax = (max - min) * (water + 1);
         rand = randMin + Random() % (randMax - randMin + 1);
 
         // Round upwards
